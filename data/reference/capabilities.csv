@@ -1,0 +1,316 @@
+capability_id,framework_id,source_capability_id,source_framework_id,framework_name,capability_code,capability_name
+6d535757-f366-5331-b729-ef1127e74004,framework:1,1,1,NSW Public Sector Capability Framework,,Display Resilience and Courage
+89cd17fb-7001-509c-9b5c-f39ca3edf5af,framework:1,2,1,NSW Public Sector Capability Framework,,Act with Integrity
+f39e2100-9439-5665-a2c2-14dce9ba81e9,framework:1,3,1,NSW Public Sector Capability Framework,,Value Diversity and Inclusion
+8d018ebc-fcc4-5416-b695-28cddda61f62,framework:1,4,1,NSW Public Sector Capability Framework,,Communicate Effectively
+a460254c-14da-54af-b462-430c452f11d6,framework:1,5,1,NSW Public Sector Capability Framework,,Influence and Negotiate
+76383ac2-2da6-59b9-8d06-930315dc1d0e,framework:1,6,1,NSW Public Sector Capability Framework,,Deliver Results
+eab1af50-2fa1-5083-a854-38d2c8709bff,framework:1,7,1,NSW Public Sector Capability Framework,,Demonstrate Accountability
+221f92cc-6931-5e57-bd9b-1b51de74cec2,framework:1,8,1,NSW Public Sector Capability Framework,,Project Management
+602bca9b-87d9-581f-a898-c13b23e4d8f1,framework:1,9,1,NSW Public Sector Capability Framework,,Manage and Develop People
+7732d276-de16-5b72-970d-3ba88cc324a9,framework:1,10,1,NSW Public Sector Capability Framework,,Manage Self
+93345849-f7ee-52b3-b353-fab17178e0b0,framework:1,11,1,NSW Public Sector Capability Framework,,Commit to Customer Service
+322a7cc8-adad-576d-a922-bc493882004c,framework:1,12,1,NSW Public Sector Capability Framework,,Work Collaboratively
+f9ff9eba-a9c2-50ef-b663-9cec258c540d,framework:1,13,1,NSW Public Sector Capability Framework,,Plan and Prioritise
+ac04cd9b-7fb9-5464-b157-46035c1858ea,framework:1,14,1,NSW Public Sector Capability Framework,,Think and Solve Problems
+39dae87e-eade-59cc-a963-4883eaa107b2,framework:1,15,1,NSW Public Sector Capability Framework,,Finance
+81c323d6-f17c-5fb3-a369-295e133cc153,framework:1,16,1,NSW Public Sector Capability Framework,,Technology
+7c37b1a3-d2cb-5884-85f4-0f4230d04e0f,framework:1,17,1,NSW Public Sector Capability Framework,,Procurement and Contract Management
+c0906f8a-9d47-5f17-a647-6e2fb6c393e3,framework:1,18,1,NSW Public Sector Capability Framework,,Inspire Direction and Purpose
+b47578ad-3141-5774-b606-2c5d7ea89b0f,framework:1,19,1,NSW Public Sector Capability Framework,,Optimise Business Outcomes
+0b550d3f-0d5f-51b2-affa-1f2b528b6971,framework:1,20,1,NSW Public Sector Capability Framework,,Manage Reform and Change
+08c60e72-be23-5bbc-8ea7-16945def6eca,framework:10,21,10,Unidentified occupation-specific framework,,Workforce strategy
+3e7a38c2-6545-51e7-8795-55b6cd3238fd,framework:10,22,10,Unidentified occupation-specific framework,,Talent Management
+33dab063-9020-5afa-9b2d-fa269b9e984b,framework:10,23,10,Unidentified occupation-specific framework,,Development and
+8e606ec4-e84a-5135-9a8a-ce9faa58a6a4,framework:10,24,10,Unidentified occupation-specific framework,,"Delivery and Operation, Technology Management"
+3393ce9a-5ab3-52d9-82a2-a9c8b6eab7b1,framework:10,25,10,Unidentified occupation-specific framework,,"Delivery and Operation, Security Services"
+c636a3d2-6784-5792-b2c7-661db92cc4a6,framework:3,26,3,Finance,,Finance Operations and Systems
+28d40d6f-082f-5ba8-a0ce-e30758b2f15c,framework:3,27,3,Finance,,Finance Business Partnering
+06ac7a9b-4b3a-5111-86c0-fe16a7df603d,framework:10,28,10,Unidentified occupation-specific framework,,"Relationships and Engagement, Stakeholder Management, Customer Service Support"
+f1d39c87-4e61-5874-8a2e-d7737b63d59a,framework:10,29,10,Unidentified occupation-specific framework,,"Delivery and operation, Service Operation, Incident Management"
+c08b7f48-8669-5f91-a393-c7699282c038,framework:10,30,10,Unidentified occupation-specific framework,,"Delivery and operation, Service Operation, Security Administration"
+782e7218-4ab8-5e33-9ee2-889279df73a7,framework:6,31,6,Information and Communication Technology (ICT),CSMG,"Relationships and Engagement, Stakeholder Management, Customer Service Support"
+2b582684-c8c1-5100-bac4-da72f9371d5a,framework:6,32,6,Information and Communication Technology (ICT),USUP,"Delivery and operation, Service Operation, Incident Management"
+66877e75-0c33-5732-862d-0f51e8031c3e,framework:6,33,6,Information and Communication Technology (ICT),SCAD,"Delivery and operation, Service Operation, Security Administration"
+c2403a67-e307-520a-9a12-36d223b223e8,framework:6,34,6,Information and Communication Technology (ICT),METL,"Strategy and Architecture, Technical Strategy and Planning, Methods and Tools"
+6f5d51c1-2ebb-50da-89c0-b6ceb654f14e,framework:6,35,6,Information and Communication Technology (ICT),NTAS,"Delivery and operation, Service Operation, Network Support"
+026553e5-72d0-53fb-8dd1-5bdbcc03f285,framework:6,36,6,Information and Communication Technology (ICT),ITOP,"Delivery and operation, Service Operation, IT Infrastructure"
+3d4dda49-52b8-54b4-b31e-fac2684627b6,framework:4,37,4,Human resources,,Organisational culture
+41f4c7aa-6778-57ab-a9f3-ba8330a3016d,framework:4,38,4,Human resources,,Workforce Relations
+77582fe0-7709-5b94-93e5-9837bfe685bd,framework:10,39,10,Unidentified occupation-specific framework,,Strategy and Architecture – Information Strategy
+43f36c18-c98c-5d78-a811-ae62d0258a87,framework:10,40,10,Unidentified occupation-specific framework,,Strategy and Architecture – Business strategy and planning
+3054ed6c-e197-56c1-ab8c-a085bae5948d,framework:10,41,10,Unidentified occupation-specific framework,,"Change and transformation, Business change implementation"
+81cded9a-01c6-59c7-95da-a83cc31b1be3,framework:4,42,4,Human resources,,Organisational design
+24316df4-2a74-57b7-a32a-7a325ab0a3ae,framework:4,43,4,Human resources,,Talent Management
+a17d230a-38b3-50f5-8664-03e0b6ad9056,framework:4,44,4,Human resources,,Workforce insights
+0a7089e7-2177-57d9-bf2e-4295a152825a,framework:10,45,10,Unidentified occupation-specific framework,,Development and Implementation – Installation and integration
+be9f2de2-9102-507c-b40d-3c6f72feaf61,framework:10,46,10,Unidentified occupation-specific framework,,Delivery & Operation – Service Operation
+107aa778-7d62-5e2c-bec7-4d6770a9bfce,framework:10,47,10,Unidentified occupation-specific framework,,"Delivery and Operation, Service Operation, Network Support"
+54c4ed7e-e8f8-5f7a-996a-beab84e35a2b,framework:10,48,10,Unidentified occupation-specific framework,,"Delivery and Operation, Service Operation, Incident Management"
+a303f649-c491-507e-8ca7-f9ddfb6673bb,framework:10,49,10,Unidentified occupation-specific framework,,"Delivery and Operation, Service Operation, Problem Management"
+edc805dc-c38c-5122-9c88-fa19513dcc74,framework:10,50,10,Unidentified occupation-specific framework,,"Delivery and Operation, Service Operation, Security Administration"
+7a4090f3-927a-5d94-8ac1-7a8813caecca,framework:4,51,4,Human resources,,Employee services
+99f219da-e115-5736-ad1b-b8edcf24f426,framework:10,52,10,Unidentified occupation-specific framework,,Development and Implementation –System development
+f9a3e36f-98dd-58fe-97a6-0c28f93b1112,framework:10,53,10,Unidentified occupation-specific framework,,Development and Implementation– Installation and Integration
+85454b07-aeb4-5c5a-a574-a2ee7466366b,framework:10,54,10,Unidentified occupation-specific framework,,Development and Implementation –System development – programming/software development
+b0c167b7-2a17-5fe6-8539-b80e475e5d99,framework:10,55,10,Unidentified occupation-specific framework,,Development and Implementation– Installation and Integration – Systems integration and build
+88adec52-dde4-5c3f-9858-5914a41a4927,framework:3,56,3,Finance,,Management Accounting
+116b262e-b5a8-53ec-b137-6eb6a99afc79,framework:6,57,6,Information and Communication Technology (ICT),PROG,Development and Implementation –System development – programming/software development
+d3d5ec18-f5e4-5c3d-9f1d-22b573fc0b81,framework:6,58,6,Information and Communication Technology (ICT),SINT,Development and Implementation– Installation and Integration – Systems integration and build
+8da3ada3-e706-58d6-bc8e-ca224d3f393a,framework:10,59,10,Unidentified occupation-specific framework,,"Delivery and Operation,"
+9da3c543-24db-55b6-8e4f-79a1b657382f,framework:10,60,10,Unidentified occupation-specific framework,,"Delivery and Operation, Service Operation"
+b886b2b0-db1f-5d9c-a48f-4cfbd61f8914,framework:10,61,10,Unidentified occupation-specific framework,,"Development and implementation, Systems development"
+65cc03c5-2121-528f-a776-594354105280,framework:4,62,4,Human resources,,Workforce strategy
+22d158aa-53e6-50e0-bdfa-23ca2c265ac5,framework:10,63,10,Unidentified occupation-specific framework,,Strategy & Architecture Technical Strategy & Planning
+4a8750f9-ced9-5a0b-8200-baa5887dd902,framework:10,64,10,Unidentified occupation-specific framework,,Development & Implementation Systems Development
+531ca63b-3960-53a3-975e-8ed1009e511e,framework:6,65,6,Information and Communication Technology (ICT),ARCH,"Strategy and Architecture, Technical Strategy and Planning, Solutions Architecture"
+f5ebde6d-ef48-5b92-9a3d-284f99b7e3ca,framework:6,66,6,Information and Communication Technology (ICT),DESN,"Development and Implementation, Systems Development, Systems Design"
+180bcc93-77f9-51c8-890b-af2ba5b650e9,framework:6,67,6,Information and Communication Technology (ICT),CNSL,"Strategy and Architecture, Advice and Guidance, Consultancy"
+db74b484-045d-5414-8688-61058c76f92c,framework:10,68,10,Unidentified occupation-specific framework,,Strategy and Architecture
+694305e9-c569-5368-871a-68140326b357,framework:10,69,10,Unidentified occupation-specific framework,,Strategy & Architecture
+53138c67-5f23-5b7e-9e0d-3cf4f58f216e,framework:6,70,6,Information and Communication Technology (ICT),ITSP,"Strategy & Architecture, Information strategy, Strategic Planning"
+4a8911d8-bc18-5504-9c07-f0855e49630d,framework:6,71,6,Information and Communication Technology (ICT),INOV,"Strategy & Architecture, Business strategy & planning, Innovation"
+4a04ef93-10f4-5e83-a546-19eed0750054,framework:6,72,6,Information and Communication Technology (ICT),EMRG,"Strategy & Architecture, Technical Strategy & Planning, Emerging Technology Monitoring"
+9e1855d8-dea3-58bc-98f2-cdf9e1442c99,framework:10,73,10,Unidentified occupation-specific framework,,"Delivery and Implementation, Systems Development"
+95394574-8f43-5b22-80cb-74860fd46fa2,framework:10,74,10,Unidentified occupation-specific framework,,"Skills & Quality, Quality & Performance"
+dc2a1453-6a5d-5dac-ba56-9f60f708fbcb,framework:10,75,10,Unidentified occupation-specific framework,,"Delivery and Operation, Service Design, Service Level Management"
+dfdf6496-e66d-5cb0-8138-b66d406bec11,framework:10,76,10,Unidentified occupation-specific framework,,"Relationships and Engagement, Stakeholder Management, Relationship Management"
+a43b6e13-10a9-50af-99bd-e90d5e1efd9c,framework:6,77,6,Information and Communication Technology (ICT),SLMO,"Delivery and Operation, Service Design, Service Level Management"
+b0d59129-b728-53b9-b77e-e706b75c1279,framework:6,78,6,Information and Communication Technology (ICT),RLMT,"Relationships and Engagement, Stakeholder Management, Relationship Management"
+d718699a-2c91-5d24-a03f-693fe69cece7,framework:6,79,6,Information and Communication Technology (ICT),PEMT,"Skills and Quality, People Management, Performance Management"
+0d69da9b-977d-5462-80cf-c95f3fbee13f,framework:10,80,10,Unidentified occupation-specific framework,,Solution Development & Implementation
+981b34d4-fc48-5c8c-9296-9747305b658b,framework:10,81,10,Unidentified occupation-specific framework,,Business Change
+f2124d6f-9298-5639-a932-735074c35af3,framework:10,82,10,Unidentified occupation-specific framework,,"Development & Implementation, Systems Development, Testing"
+8e703864-9d7f-5375-9ef8-f876d664f42d,framework:10,83,10,Unidentified occupation-specific framework,,"Change & Transformation Business Change Management, Business Process Testing"
+325f26bb-4a3d-5522-a4f9-9d8ca37253ca,framework:10,84,10,Unidentified occupation-specific framework,,"Delivery & Operation, Service Transition, Service Acceptance"
+7b79a7dd-3d3c-5481-ac35-7b70e5b1e84d,framework:3,85,3,Finance,,Financial Accounting and Statutory Reporting
+401df861-d9e0-5cc3-a1be-89c6a46edf52,framework:10,86,10,Unidentified occupation-specific framework,,Employee services
+721dfdbb-02e8-510f-95ab-a06b1023d64f,framework:10,87,10,Unidentified occupation-specific framework,,Workforce insights
+3c176c84-e410-58f0-a02f-c421b7d74a52,framework:10,88,10,Unidentified occupation-specific framework,,Change and Transformation – Business Change implementation
+576fd284-335d-5ac8-9dd6-fc0b8d068f62,framework:10,89,10,Unidentified occupation-specific framework,,Relationship and engagement – Stakeholder Management
+d29af2cc-9e0b-56a8-b1d2-3e3a7b09d195,framework:10,90,10,Unidentified occupation-specific framework,,Strategy and Architecture – Advice and Guidance
+501761f7-e5b8-56e6-a0ac-eeb349c03518,framework:6,91,6,Information and Communication Technology (ICT),PRMG,Change and Transformation – Business Change implementation
+e9a44808-cf49-5e0a-a1cb-1a401ce5e881,framework:6,92,6,Information and Communication Technology (ICT),RLMT,Relationship and engagement – Stakeholder Management – Relationship management
+8f36fc26-a2f6-571c-bf29-e1f7cd471cc9,framework:6,93,6,Information and Communication Technology (ICT),TECH,Strategy and Architecture – Advice and Guidance – Specialist Advice
+ad7ae1bc-baa3-5829-b056-54c0593d4152,framework:6,94,6,Information and Communication Technology (ICT),DENG,engineering
+8e1dbe6b-9795-5ec8-96d6-34018c869904,framework:6,95,6,Information and Communication Technology (ICT),DATM,management
+1aa28ca1-69c9-596b-bb3c-6c12279bff47,framework:10,96,10,Unidentified occupation-specific framework,,"Development and implementation, Installation and integration"
+e7a8a124-e895-5b9f-b36c-acf90590b3dc,framework:10,97,10,Unidentified occupation-specific framework,,"Strategy and architecture, Technical strategy and planning"
+61c9c021-572a-5431-aed0-0ee162377eef,framework:10,98,10,Unidentified occupation-specific framework,,"Delivery and operation, Service operation"
+092742e3-ca65-57e4-86e8-ec5d53f8994c,framework:10,99,10,Unidentified occupation-specific framework,,"Relationship and engagement, Stakeholder management"
+4065732b-3b69-5319-a32b-6dac4c893a59,framework:10,100,10,Unidentified occupation-specific framework,,"Strategy and Architecture, Technical Strategy and Planning, Emerging Technology Monitoring"
+51fa2a92-2669-550d-ab2e-9e30aa448be9,framework:10,101,10,Unidentified occupation-specific framework,,"Strategy and Architecture, Advice and Guidance, Consultancy"
+eeae790c-f3cf-5502-85c2-7f2540020ff4,framework:6,102,6,Information and Communication Technology (ICT),EMRG,"Strategy and Architecture, Technical Strategy and Planning, Emerging Technology & Monitoring"
+bbf53d4a-04e8-59df-8eab-4279f8ef70c6,framework:3,103,3,Finance,,"Financial Strategy, Governance and Risk Management"
+6938771c-6bfe-594c-b3d9-4a0f48f07366,framework:6,104,6,Information and Communication Technology (ICT),PROG,programming/software development
+439e54af-51b3-58c8-8f47-2bbeef6a442f,framework:6,105,6,Information and Communication Technology (ICT),SINT,Systems integration and build
+a1055e39-b250-5bd3-bfba-f1955c154686,framework:10,106,10,Unidentified occupation-specific framework,,Strategy and architecture Business strategy and planning
+d050f088-9c84-5a94-924b-a8b7c9746f55,framework:10,107,10,Unidentified occupation-specific framework,,Strategy and architecture Advice and guidance
+fe2a4eda-b2a0-5177-b5c1-b320f49fca16,framework:10,108,10,Unidentified occupation-specific framework,,Strategy and architecture Technical strategy and planning
+24687fbe-a999-5deb-860e-2184e02db449,framework:10,109,10,Unidentified occupation-specific framework,,"Delivery and operation, Service Transition"
+1ec9eb07-8954-5074-b67f-716f23191562,framework:10,110,10,Unidentified occupation-specific framework,,"Skills and quality, People management"
+c02be03c-8e48-5061-8a59-5e7911126aa8,framework:10,111,10,Unidentified occupation-specific framework,,"Delivery and Operation, Service Transition"
+88c882a2-77f7-50e6-a06b-a07e6c8052e2,framework:6,112,6,Information and Communication Technology (ICT),ITOP,"Delivery and Operation, Service Operation, IT infrastructure"
+54dcecba-ac59-5e5c-9345-18ea71e535d9,framework:6,113,6,Information and Communication Technology (ICT),RELM,"Delivery and Operation, Service Transition, Release and deployment"
+cca8371d-f4e2-5a6e-89ce-c9fa9714ee37,framework:6,114,6,Information and Communication Technology (ICT),SYSP,"Delivery and Operation, Service Operation, System software"
+6a794fc6-d66a-5180-8565-3eb5bcc3411d,framework:10,115,10,Unidentified occupation-specific framework,,"Development and operation, Service operation"
+f1ca6482-cabe-5947-b945-40f557e07dad,framework:10,116,10,Unidentified occupation-specific framework,,"Strategy and architecture, Advice and guidance"
+43477e0e-2aa8-52cb-95b4-0494243b43a1,framework:6,117,6,Information and Communication Technology (ICT),ITOP,"Development and operation, Service operation, IT Infrastructure"
+8220670e-2b8a-580a-8848-4f5cfa98ae72,framework:6,118,6,Information and Communication Technology (ICT),TECH,"Strategy and architecture, advice and guidance, Specialist advice"
+54697586-4ce0-5a1f-938c-d3dcd150a5cb,framework:10,119,10,Unidentified occupation-specific framework,,Delivery and Operation – Service Operation
+75068756-25df-52b2-a871-8e1159eedf68,framework:10,120,10,Unidentified occupation-specific framework,,"Business Change, Business Change Management"
+fc66affa-5437-5eaf-afd3-8e9ec2706d54,framework:6,121,6,Information and Communication Technology (ICT),STPL,"Strategy & Architecture, Business Strategy & Planning, Enterprise & Business Architecture"
+5d52bc27-8fa3-566e-847e-dae269fca571,framework:6,122,6,Information and Communication Technology (ICT),CNSL,"Strategy & Architecture, Advice & Guidance, Consultancy"
+84220aaf-b8ed-5b2c-9dd2-1aef90e18b22,framework:6,123,6,Information and Communication Technology (ICT),IRMG,Information Management
+d545efeb-151a-5db0-ae58-8b52eb456e11,framework:6,124,6,Information and Communication Technology (ICT),BURM,Business Risk Management
+3235ed9a-c337-5aa1-8cc9-43019e2861ff,framework:6,125,6,Information and Communication Technology (ICT),RLMT,Stakeholder Relationship Management
+c1f6ea36-598f-5000-b31d-6a5124a912a9,framework:10,126,10,Unidentified occupation-specific framework,,Strategy and Architecture –Information Strategy
+f3264dfa-9d6e-5910-9387-7af2a2a37c85,framework:10,127,10,Unidentified occupation-specific framework,,Strategy and Architecture –technical strategy and planning
+0ca635ef-36e5-52d3-a907-7842c9c8099f,framework:10,128,10,Unidentified occupation-specific framework,,"Development and Implementation, System development"
+11298d69-3c29-54bc-9cd2-23a254db6ad6,framework:6,129,6,Information and Communication Technology (ICT),INAN,"Strategy and Architecture –Information Strategy, Analytics"
+2476d73c-e042-529f-a3e0-08947a71a55e,framework:6,130,6,Information and Communication Technology (ICT),METL,Strategy and Architecture –technical strategy and planning–Methods and tools
+3024d31a-ce45-52fb-94e2-d0717e77a23f,framework:6,131,6,Information and Communication Technology (ICT),PROG,"Development and Implementation, System development, Programming/Software development"
+7015b482-16ca-5d9a-bfed-8beaf81b44ad,framework:6,132,6,Information and Communication Technology (ICT),ASUP,"Delivery and operation, Service operation, Application support"
+4a578f45-7e9c-5ec1-84e0-145567bffdd0,framework:10,133,10,Unidentified occupation-specific framework,,"Strategy and Architecture, Technical Strategy and Planning, Methods and Tools"
+1e2662a8-3508-5ce9-b035-6f15c8a8769a,framework:6,134,6,Information and Communication Technology (ICT),TECH,"Strategy and Architecture, Advice and Guidance, Specialist Advice"
+cf1c6d16-7319-5f31-805e-c96772f9fd53,framework:6,135,6,Information and Communication Technology (ICT),KNOW,"Strategy and Architecture, Business Strategy and Planning, Knowledge Management"
+646c6d76-71a3-5c16-8033-723ec48791e5,framework:6,136,6,Information and Communication Technology (ICT),NTAS,"Delivery and Operation, Service Operation, Network Support"
+bf3a67d1-ff7d-52c9-9f28-5f1bc569e8c3,framework:6,137,6,Information and Communication Technology (ICT),USUP,"Delivery and Operation, Service Operation, Incident Management"
+97cb884b-4e99-54c5-a41c-daf0557119c6,framework:10,138,10,Unidentified occupation-specific framework,,"Relationship and engagement , Stakeholder management"
+2d630e85-ab49-5b4b-9863-b1b097b2a0e3,framework:6,139,6,Information and Communication Technology (ICT),CSMG,"Relationship and engagement, Stakeholder management, Customer service support"
+4e7c4306-a7ee-5d2e-bcba-121133a36bc1,framework:6,140,6,Information and Communication Technology (ICT),METL,"Strategy and architecture, Technical strategy and planning, Methods and Tools"
+89e269d3-22bb-5c26-b14e-af2b7f2acec4,framework:6,141,6,Information and Communication Technology (ICT),NTAS,"Delivery and Operation, Service Operation, Network support"
+14b7adc1-d499-5b53-959e-addf0fa6bb60,framework:6,142,6,Information and Communication Technology (ICT),EMRG,"Strategy and architecture, Technical strategy and planning, Emerging technology monitoring"
+6463cc8a-fc00-552e-98d5-d876d51b5015,framework:10,143,10,Unidentified occupation-specific framework,,"Strategy and Architecture, Technical Strategy and planning, Solution architecture"
+ed26fdc1-1f29-5808-a5cd-7a96ba0d27e1,framework:10,144,10,Unidentified occupation-specific framework,,"Strategy and Architecture, Information Strategy, Information Management"
+639a6426-1935-5d13-bf23-55960b8704cd,framework:6,145,6,Information and Communication Technology (ICT),ARCH,"Strategy and Architecture, Technical Strategy and planning, Solution architecture"
+bde972a8-b780-5471-a5a8-50abeecec50c,framework:6,146,6,Information and Communication Technology (ICT),IRMG,"Strategy and Architecture, Information Strategy, Information Management"
+1bbe6563-1548-5d07-8397-dada852d56fa,framework:10,147,10,Unidentified occupation-specific framework,,"Delivery and Operation , Problem Management"
+199fbaf5-b5c0-5cdf-9bee-e358d29a09ce,framework:6,148,6,Information and Communication Technology (ICT),DBAD,"Delivery and Operation, Service Operation, Database administration"
+c4a1c5c4-dcb2-56fd-b5d9-3704fbeef62b,framework:6,149,6,Information and Communication Technology (ICT),PBMG,"Delivery and Operation, Service Operation, Problem Management"
+c751e8f3-88a0-5d7b-9250-12d0c155f1f7,framework:10,150,10,Unidentified occupation-specific framework,,Relationship and engagement
+efc478ec-2801-5685-8728-5c41b78c128d,framework:10,151,10,Unidentified occupation-specific framework,,Development and implementation
+7cc3109f-b987-5256-bf3c-4a935258d642,framework:6,152,6,Information and Communication Technology (ICT),RLMT,"Relationships and Engagement, Stakeholder Management, Stakeholder Relationship Management"
+5a4152b1-eaaf-5961-8497-b35b96cebbce,framework:6,153,6,Information and Communication Technology (ICT),PROD,"Development and Implementation, Systems Development, Product Management"
+84c7b066-7c2e-588c-bca0-f5c5409bd1b4,framework:6,154,6,Information and Communication Technology (ICT),PROF,"Change and transformation , Business change implementation, Portfolio, programme and project support"
+4f0f6688-bc98-58ba-a198-3f0c85b464aa,framework:10,155,10,Unidentified occupation-specific framework,,Development and Implementation– User Experience Analysis
+374bdad4-9c3a-513d-885f-50d308f87a04,framework:10,156,10,Unidentified occupation-specific framework,,Development and Implementation – User Experience Design
+5c5e55bc-41b2-5f7b-90b7-379a5041dfda,framework:10,157,10,Unidentified occupation-specific framework,,Development and Implementation– User Experience Evaluation
+59baa117-7fe9-5ab4-b5c5-fd85fe197e8c,framework:6,158,6,Information and Communication Technology (ICT),UNAN,Development and Implementation – User Experience – User Experience Analysis
+4c372393-e5e3-517f-9c54-cf98dfb1bf8e,framework:6,159,6,Information and Communication Technology (ICT),HCEV,Development and Implementation– User Experience – User Experience Design
+dd193c47-52d3-52a6-bc03-15b272ecb0cd,framework:6,160,6,Information and Communication Technology (ICT),USEV,Development and Implementation– User Experience – User Experience Evaluation
+e822ff04-7276-5689-9e23-66533fa44a02,framework:6,161,6,Information and Communication Technology (ICT),TECH,"Strategy and Architecture – Advice and Guidance, Specialist Advice"
+83fbc1c3-6cec-5d2c-8c34-90934aa4ad75,framework:6,162,6,Information and Communication Technology (ICT),USEV,Development and Implementation– System Development – System Design
+54f74988-73ba-5a2d-a258-3416c92adea5,framework:6,163,6,Information and Communication Technology (ICT),TEST,"Delivery and Implementation, Systems Development, Testing"
+e25b8280-3546-5df4-b192-9c4e92591d86,framework:6,164,6,Information and Communication Technology (ICT),QUAS,"Skills and Quality, Quality & Conformance, Quality Assurance"
+edb44672-da49-5ade-82ff-db5a70376554,framework:6,165,6,Information and Communication Technology (ICT),QUMG,"Skills and Quality, Quality & Conformance, Quality Management"
+17e2c06a-ff05-5f70-811c-4f23f3f8a4ab,framework:6,166,6,Information and Communication Technology (ICT),BPTS,"Change & Transformation, Business Change management, Business process testing"
+097aa025-f59f-5782-b67a-ebbd9ab4d4b8,framework:8,167,8,Procurement,,Strategic Procurement Leadership
+27ff0896-e471-5d1d-b528-4d394a8a2ff9,framework:8,168,8,Procurement,,Procurement Analysis
+9e0c1437-7359-5d22-92fc-54d91e5b413a,framework:8,169,8,Procurement,,Strategic Sourcing
+c74e254d-0b81-5783-a197-ba693790b6e4,framework:8,170,8,Procurement,,Commercial Negotiation
+5db09996-8e0f-5c36-ae37-998a110224ce,framework:8,171,8,Procurement,,Procurement Risk Management
+c56681eb-f257-5fcf-99ed-08b84349d98c,framework:8,172,8,Procurement,,Supplier Relationship Management
+dc08277d-4795-57a3-9424-e8c33dd77159,framework:8,173,8,Procurement,,Legislative and Policy Environment
+77393298-788e-5572-904d-a259c1b6b8b7,framework:8,174,8,Procurement,,Cost Management
+4b80aff9-4e1d-5baa-9bc0-1d35bd54ca33,framework:10,175,10,Unidentified occupation-specific framework,,"Change and Transformation, Business Change implementation"
+0632ccd7-b5fa-5ef6-a71e-e91ff319ab30,framework:10,176,10,Unidentified occupation-specific framework,,"Relationship and engagement, Stakeholder Management"
+8b473519-d2ff-511c-ae91-2732f3d593d7,framework:6,177,6,Information and Communication Technology (ICT),PROF,"Change and Transformation, Business Change implementation, Portfolio, programme and project support"
+3e607b8a-e26d-5e9a-b00c-161171e0f6a5,framework:6,178,6,Information and Communication Technology (ICT),RLMT,"Relationship and engagement, Stakeholder Management, Relationship Management"
+36005557-37e5-5b88-b788-ad9685563e7d,framework:10,179,10,Unidentified occupation-specific framework,,"Delivery & Operation,"
+5b8a8da2-a002-5fd2-8f11-25f8039a7b80,framework:10,180,10,Unidentified occupation-specific framework,,Delivery & Operation
+2aa0c35c-c50c-58d1-818e-e87c1cc73896,framework:6,181,6,Information and Communication Technology (ICT),SCAD,"Delivery & Operation, Service Operation, Security Administration"
+774ba50f-2518-5510-b92d-420b469eaf46,framework:6,182,6,Information and Communication Technology (ICT),PENT,"Delivery & Operation, Service Operation, Penetration Testing"
+ea3e210c-4a82-532a-9c9d-cd6185939c19,framework:6,183,6,Information and Communication Technology (ICT),PBMG,"Delivery & Operation, Service Operation, Problem Management"
+0edcac85-7e3a-5801-bad3-a5a310d37038,framework:6,184,6,Information and Communication Technology (ICT),USUP,"Delivery & Operation, Service Operation, Incident Management"
+67c0623b-a3a9-5ea1-97fb-2f68ec5eb2e8,framework:6,185,6,Information and Communication Technology (ICT),SEAC,"Delivery and Operation, Service Transition, Service Acceptance"
+301e712e-f727-5549-88be-78b03bf56981,framework:10,186,10,Unidentified occupation-specific framework,,Development and Implementation – System development
+a8784619-8267-5fbd-980b-975d0f1b0e04,framework:10,187,10,Unidentified occupation-specific framework,,"Relationships and engagement, Stakeholder engagement"
+f6f566d4-00a1-5e55-988e-d70b95835b6f,framework:10,188,10,Unidentified occupation-specific framework,,"Strategy & Architecture, Advice & Guidance, Consultancy"
+8514e0f7-b7cf-547d-ab74-d7c43969f73f,framework:10,189,10,Unidentified occupation-specific framework,,"Strategy & Architecture, Information & Strategy, Analytics"
+025e965f-c066-5bfd-b109-9cad2d353135,framework:10,190,10,Unidentified occupation-specific framework,,"Strategy & Architecture, Technical Strategy & Planning, Data Mgt"
+c41f706f-45f6-588c-80b5-40e2561e04b6,framework:10,191,10,Unidentified occupation-specific framework,,"Development & Implementation, Systems Development, Data Modelling & Design"
+cb94136d-e36a-5cbb-86f6-0efb160122c6,framework:6,192,6,Information and Communication Technology (ICT),ARCH,Strategy and Architecture – Technical Strategy and Planning Solution Architecture
+44a51186-ece1-542b-b4c3-9df0a068494c,framework:6,193,6,Information and Communication Technology (ICT),BUAN,Change and Transformation – Business Change Implementation – Business Analysis
+06f7956c-f298-58ef-9b2d-c9a27deb3b98,framework:6,194,6,Information and Communication Technology (ICT),DESN,System Design
+f05131a8-7c87-54c7-9a46-0ec3fae4a5c5,framework:3,195,3,Finance,,Audit and Assurance
+aff40f87-38a1-5725-83f6-9c8a423be956,framework:3,196,3,Finance,,Taxation
+b2e9f898-185a-56c0-a34b-710147d8d2e3,framework:10,197,10,Unidentified occupation-specific framework,,Processes and Practices
+b9f86208-72aa-5997-b6ba-05c9e8fabdd9,framework:10,198,10,Unidentified occupation-specific framework,STMG,Storage Management
+c09e265b-e2f4-5d8f-97a7-f65587f53a4a,framework:10,199,10,Unidentified occupation-specific framework,TECH,Specialist Advice
+245de839-130b-5b1c-889d-205de7ea16d0,framework:10,200,10,Unidentified occupation-specific framework,DESN,System Design
+128d1058-0ea9-5471-9d6f-6deed4aa1dbf,framework:10,201,10,Unidentified occupation-specific framework,ITOP,IT Infrastructure
+1cd50f35-97fe-55f4-a4fa-6164343f21c0,framework:10,202,10,Unidentified occupation-specific framework,,Available Management
+ded7f908-17fb-5d29-9574-8862be669638,framework:6,203,6,Information and Communication Technology (ICT),URCH,User Research
+f1dae041-9250-5c74-8bb0-75c9b7cd1453,framework:6,204,6,Information and Communication Technology (ICT),,User Experience Analysis
+a17b6dbc-cb92-5920-8efe-56bfca61be67,framework:6,205,6,Information and Communication Technology (ICT),,User Experience Evaluation
+bcf84e10-9065-54e6-9b52-c7064abf80c6,framework:6,206,6,Information and Communication Technology (ICT),HCEV,User Experience Design
+83258c69-4d4a-5e9f-b96e-efada123098b,framework:10,207,10,Unidentified occupation-specific framework,,Solution Architecture
+ed4f2059-1fb0-5c45-b72e-4efc9a1cddcb,framework:10,208,10,Unidentified occupation-specific framework,BUAN,Business Analysis
+775bf59a-f881-5d28-96b0-d18b4aa8ec05,framework:10,209,10,Unidentified occupation-specific framework,COPL,Continuity Management
+d45055b2-ab75-5e53-a734-d69e65310b4b,framework:10,210,10,Unidentified occupation-specific framework,BURM,Business Risk Management
+d02db9ac-4708-598e-af9c-cf4243777e65,framework:10,211,10,Unidentified occupation-specific framework,,"Information Strategy, Information Security"
+a84756d1-b8fb-5ba2-a31c-1ffcba84c683,framework:10,212,10,Unidentified occupation-specific framework,,"Advice & Guidance, Specialist Advice"
+c1091534-c084-5138-97e0-514d8d685a54,framework:10,213,10,Unidentified occupation-specific framework,,"Service Operation, Security Administration"
+730ebb30-9fd4-5464-907a-bec327f85f10,framework:10,214,10,Unidentified occupation-specific framework,,Program Management
+a25b0448-dc8b-5467-9293-b1f33ddac5e1,framework:10,215,10,Unidentified occupation-specific framework,,Stakeholder Relationship Management
+13cd3d2a-2266-5f04-8a91-31bee7533c23,framework:10,216,10,Unidentified occupation-specific framework,USUP,Incident Management
+4a243b7a-6ac3-5f31-9039-75a959e3fe97,framework:10,217,10,Unidentified occupation-specific framework,PBMG,Problem Management
+2e9dd4ee-7c41-583f-87c6-40f1edc5d8d0,framework:10,218,10,Unidentified occupation-specific framework,STPL,Enterprise & Business Architecture Development
+9b840ec0-b0a1-586a-98d1-810c76246a75,framework:10,219,10,Unidentified occupation-specific framework,CNSL,Consultancy
+ea2b5a61-8938-5490-956a-8726f7642ef7,framework:10,220,10,Unidentified occupation-specific framework,ISCO,Information Systems Co-Ordination
+ee45d310-0549-5fb4-b83d-5a03397aa638,framework:10,221,10,Unidentified occupation-specific framework,EMRG,Emerging Technology Monitoring
+c976e35d-55da-504d-9bf2-80457fea9aeb,framework:6,222,6,Information and Communication Technology (ICT),HSIN,Systems Installation / Decommissioning
+1521c4d2-fda1-5da3-b7a5-218c85ca96b7,framework:6,223,6,Information and Communication Technology (ICT),CFMG,Configuration Management
+fbfe0f07-5a6d-55b7-ba66-3047df889359,framework:10,224,10,Unidentified occupation-specific framework,KNOW,Knowledge Management
+81fbe4dd-5b1e-58b4-9fa8-b55a564c83b1,framework:10,225,10,Unidentified occupation-specific framework,CSMG,Customer Service Support
+407fe972-6489-5e86-8c68-466d503997a7,framework:10,226,10,Unidentified occupation-specific framework,METL,Methods and Tools
+c8168f63-0817-5242-b130-08e009928c99,framework:10,227,10,Unidentified occupation-specific framework,INOV,Innovation
+8c43752a-7608-5de1-9eda-e90bef8c3b77,framework:10,228,10,Unidentified occupation-specific framework,IRMG,INFORMATION MANAGEMENT
+f5e22179-a077-5670-9c28-c7c5478eb918,framework:10,229,10,Unidentified occupation-specific framework,DATM,DATA MANAGEMENT
+e50ad725-e515-5d6d-a3ea-355d4fc9667a,framework:10,230,10,Unidentified occupation-specific framework,BSMO,BUSINESS MODELLING
+91ae4a89-5658-5c06-b95e-a4b0fe3c57e2,framework:10,231,10,Unidentified occupation-specific framework,DLMG,Systems Development Management
+8d8ca035-9e77-5bf6-a107-6da29e37f292,framework:10,232,10,Unidentified occupation-specific framework,HCEV,User Experience Design
+8d5dacf8-f2e8-5c2f-8748-88b6fa295a47,framework:10,233,10,Unidentified occupation-specific framework,SINT,Systems Integration And Build
+958a4c92-631b-573c-919a-c47cfede2c34,framework:10,234,10,Unidentified occupation-specific framework,,INFORMATION SECURITY
+2adfd7fd-7d9b-57db-974b-ef96c6d6d7eb,framework:10,235,10,Unidentified occupation-specific framework,TECH,SPECIALIST ADVICE
+a7036014-c098-5d5c-81a2-5e3cfddfb5ed,framework:10,236,10,Unidentified occupation-specific framework,,INFORMATION GOVERNANCE
+e36b5ccd-1589-589c-9fcd-b4c888771848,framework:10,237,10,Unidentified occupation-specific framework,,SECURITY ADMINISTRATION
+2d04e61d-e7bf-5d5a-a9f5-3426a883e2e2,framework:10,238,10,Unidentified occupation-specific framework,DESN,SYSTEMS DESIGN
+3f200cce-79d1-58d2-9491-2cab4579bb08,framework:10,239,10,Unidentified occupation-specific framework,ITOP,IT INFRASTRUCTURE
+b085dac8-2fd6-503e-8956-d3a1e331c831,framework:10,240,10,Unidentified occupation-specific framework,AVMT,AVAILABILITY MANAGEMENT
+d71897bd-9cb7-508f-91e4-a8bd13c848f9,framework:10,241,10,Unidentified occupation-specific framework,METL,METHODS AND TOOLS
+723b8154-9b84-5e0e-ad62-e221eaf4c2ba,framework:10,242,10,Unidentified occupation-specific framework,SUPP,SUPPLIER MANAGEMENT
+3365f122-437f-5d3e-a994-205a591cdbc9,framework:10,243,10,Unidentified occupation-specific framework,RLMT,RELATIONSHIP MANAGEMENT
+b0d5159c-1ed8-5564-b88c-205cf17ff49c,framework:10,244,10,Unidentified occupation-specific framework,ITSP,Strategic Planning
+78d53b23-4992-532e-b1c0-eaa4b4621547,framework:10,245,10,Unidentified occupation-specific framework,,Application Support
+9f2907bb-80fe-5dfd-b648-f0aac5b364c6,framework:6,246,6,Information and Communication Technology (ICT),TEST,Testing
+275f728e-02bf-5806-bc69-420ba75a8830,framework:6,247,6,Information and Communication Technology (ICT),NTAS,Network Support
+bb966a1a-5b26-5fa2-a8c7-36f7dcc4f99f,framework:6,248,6,Information and Communication Technology (ICT),PBMG,Problem Management
+d7be7217-af97-5780-a6a6-67064587debd,framework:10,249,10,Unidentified occupation-specific framework,PRMG,Project Management
+9ced7cbb-ed43-54b6-92b6-d6ab0579b05c,framework:10,250,10,Unidentified occupation-specific framework,ARCH,Solutions Architecture
+984caafa-8966-5904-af82-4fbb0ddf5792,framework:10,251,10,Unidentified occupation-specific framework,SLMO,Service Level Management
+3609d7bf-d42c-5944-a178-0f056bece16d,framework:10,252,10,Unidentified occupation-specific framework,SEAC,Service Acceptance
+edf51582-68be-5135-a5b6-8f9b95fd8869,framework:10,253,10,Unidentified occupation-specific framework,PEMT,Performance Management
+23aaaa0a-581a-5f35-aaa9-a50d46eb9421,framework:10,254,10,Unidentified occupation-specific framework,RESC,Resourcing
+bf1bf9ab-8be6-52f8-8a0a-62b7e63b4ac9,framework:10,255,10,Unidentified occupation-specific framework,IRMG,Information Governance
+a39adbd2-299c-5da5-8f71-2d1406c47045,framework:10,256,10,Unidentified occupation-specific framework,SCTY,Information Security
+bff58244-8af1-5419-8f6e-a9f9b075e872,framework:10,257,10,Unidentified occupation-specific framework,SCAD,Security Administration
+fe2346a5-b39c-59e2-a3d5-655454197628,framework:10,258,10,Unidentified occupation-specific framework,PENT,Penetration Testing
+912d1cd1-7ffa-52c9-9873-8f8e34f82af8,framework:10,259,10,Unidentified occupation-specific framework,CORE,Conformance Review
+bc064cb1-b0a9-5137-b69b-79a523ddd501,framework:10,260,10,Unidentified occupation-specific framework,DESN,Systems Design
+db4a90d6-c1f6-5ed3-ae98-8531dd3d5c43,framework:10,261,10,Unidentified occupation-specific framework,HSIN,Systems Instillation / Decommissioning
+5f4f8a87-58ea-5236-9916-7b4eea0572e6,framework:10,262,10,Unidentified occupation-specific framework,ASMG,Asset Management
+0f57a152-df9a-58b1-b38f-d04e3ea68c00,framework:10,263,10,Unidentified occupation-specific framework,NTAS,Network Support
+d4f1df4d-a960-5f36-bc3d-a81812b4f254,framework:6,264,6,Information and Communication Technology (ICT),ITOP,IT Infrastructure
+2c1ebca2-945c-5eb2-916b-716012906a3c,framework:6,265,6,Information and Communication Technology (ICT),EMRG,Emerging Technology Monitoring
+64a7135a-e3ea-5dad-b237-d28b2f8f0b34,framework:10,266,10,Unidentified occupation-specific framework,ITMG,IT Management
+6cee703d-d1f0-5fae-9c44-eab19d3cdfa4,framework:10,267,10,Unidentified occupation-specific framework,NTDS,Network Design
+aeec380e-3db7-5e5d-a947-aa3606861b36,framework:10,268,10,Unidentified occupation-specific framework,SUPP,Supplier Management
+817c484f-4d00-5486-bd23-e92e774440a1,framework:10,269,10,Unidentified occupation-specific framework,RLMT,Relationship Management
+0c0d46ce-9649-5020-b6fd-cc1ea365f68c,framework:10,270,10,Unidentified occupation-specific framework,PROG,Programming / Software Development
+cb038a53-080a-55fa-b27b-ebd9498fbeba,framework:10,271,10,Unidentified occupation-specific framework,SINT,Systems Integration and Build
+ec7e5644-5eac-56d5-b0b2-3a37978d49de,framework:10,272,10,Unidentified occupation-specific framework,SCAD,Security Operations
+da6f2a50-c7e5-5cf6-beb6-efe08480ff36,framework:10,273,10,Unidentified occupation-specific framework,STPL,Enterprise and Business Architecture
+bc66c6c4-fec6-532e-a7de-5054b4fef247,framework:10,274,10,Unidentified occupation-specific framework,BPRE,Business Process Improvement
+1e6a82e6-426e-5b4b-bcae-82a2bbf7f265,framework:10,275,10,Unidentified occupation-specific framework,INAN,Analytics
+478fd087-c4da-5eb7-b6b0-0230c429b90b,framework:10,276,10,Unidentified occupation-specific framework,DTAN,Data Modelling and Design
+9d78ed02-65c5-5b85-a235-594148241593,framework:10,277,10,Unidentified occupation-specific framework,CPMG,Capacity Management
+848f4354-4656-5860-8aa5-536ba8cdbe0c,framework:10,278,10,Unidentified occupation-specific framework,AVMT,Availability Management
+1bf390d0-0843-5ba5-a8fe-23d8d0256c13,framework:10,279,10,Unidentified occupation-specific framework,SYSP,System Software
+5a47b562-e0a9-532c-b93f-f3afe7712b55,framework:6,280,6,Information and Communication Technology (ICT),RELM,Release and Deployment
+63907e8a-c1c0-53a7-a5e0-741296e1b2eb,framework:6,281,6,Information and Communication Technology (ICT),METL,Methods and Tools
+b03aa2f6-9d1a-531a-97be-91c3c22be8d2,framework:6,282,6,Information and Communication Technology (ICT),BPRE,Business Process Improvement
+3145f59e-aae9-5d29-b032-aacd4bd7f41d,framework:6,283,6,Information and Communication Technology (ICT),DLMG,System Development Management
+01baf17c-6461-5e91-ac21-3b9048b241f8,framework:6,284,6,Information and Communication Technology (ICT),ASMG,Asset Management
+26399ae9-df31-5afe-9134-dc903f16283c,framework:10,285,10,Unidentified occupation-specific framework,ICPM,Information Content Publishing
+24e4b183-b3e5-5593-86ea-b63b6f6c7ea3,framework:10,286,10,Unidentified occupation-specific framework,INCA,Information Content Authoring
+3950faf8-fec7-5531-bd99-9b9f181c664a,framework:10,287,10,Unidentified occupation-specific framework,DTAN,Data Modelling & Design
+37a92691-54cf-5626-8aa2-3b40ea73b39d,framework:10,288,10,Unidentified occupation-specific framework,DBAD,Database Administration
+1d33b97a-bbfa-5521-94e5-689d0989a358,framework:10,289,10,Unidentified occupation-specific framework,DEMM,Demand Management
+17491091-fde3-5285-b3ba-456a61482f8d,framework:10,290,10,Unidentified occupation-specific framework,CHMG,Change Management
+c885ec4a-f04a-5700-8be3-8e4bef3bb0d1,framework:10,291,10,Unidentified occupation-specific framework,,Change Implementation Planning and Management
+08c8443c-ecd2-59e9-8e2d-859dd8bb800d,framework:6,292,6,Information and Communication Technology (ICT),,"Delivery and Operation, Service Transition, Release and Deployment"
+0a48a8d4-65d2-5bb9-9095-cc826a7dc4b7,framework:6,293,6,Information and Communication Technology (ICT),,Management
+d9a2b102-9a07-5dc2-a7cc-71c40718f5b2,framework:10,294,10,Unidentified occupation-specific framework,PROF,"Portfolio, Programme and Project Support"
+99b07f13-4bce-5823-96e4-4a1442436ec8,framework:10,295,10,Unidentified occupation-specific framework,TECH,Special Advice
+42ba69a0-2967-5900-b407-4b3f24f2bcc7,framework:10,296,10,Unidentified occupation-specific framework,HSIN,System Installation / Decommissioning
+ef5ea8f5-374d-5890-a311-4476e17c38e5,framework:10,297,10,Unidentified occupation-specific framework,RELM,Release and Deployment
+d6af1a6f-0393-5750-bbb5-4a46124cce8a,framework:10,298,10,Unidentified occupation-specific framework,FMIT,Financial Management
+30ed3d2c-5628-5a50-a670-a3fe1ee33717,framework:10,299,10,Unidentified occupation-specific framework,ERMG,Emerging Technologies
+1dceb744-aa8a-5224-afd1-bc962d821718,framework:6,300,6,Information and Communication Technology (ICT),,"Delivery Operation, Service Design, Service Level Management"
+87d99b46-35fb-5c4d-9938-cb48dd9beefe,framework:6,301,6,Information and Communication Technology (ICT),TECH,Specialist Advice
+adf031fe-f8a6-54e4-8b01-2a6364dba1ee,framework:10,302,10,Unidentified occupation-specific framework,,"Relationships and Engagement, Stakeholder Management, Supplier Management"
+dd4a6fa3-9bc8-5089-9d6d-edf2521cdf95,framework:10,303,10,Unidentified occupation-specific framework,,"Strategy and Architecture, Business Strategy and Planning, Business Risk Management"
+facd630a-7923-5026-b4c5-3bea7bfbcc84,framework:10,304,10,Unidentified occupation-specific framework,,"Strategy and Architecture, Business Strategy and Planning, IT Management"
+0c9dc118-8d63-55df-8033-d175324371ce,framework:10,305,10,Unidentified occupation-specific framework,POMG,Portfolio Management
+32608b7a-ecdb-5855-b3e8-c4bba9ac38f4,framework:10,306,10,Unidentified occupation-specific framework,PGMG,Programme Management
+866a5c4f-7229-55e9-a863-92d93d67eac2,framework:10,307,10,Unidentified occupation-specific framework,PROG,Program/Software Development
+34e6075c-fad0-5b25-bd34-252d0162dd69,framework:10,308,10,Unidentified occupation-specific framework,CFMG,Service Configuration Management
+30f7ffe3-96aa-5ba5-a046-6179b16829bb,framework:10,309,10,Unidentified occupation-specific framework,SORC,Sourcing
+97d83af6-8c8f-5d0f-8429-a2d409756fb8,framework:6,310,6,Information and Communication Technology (ICT),,Skills and Quality Learning design and development (TMCR)
+362ee02f-9f72-56b8-8d1c-2bae3f3c7769,framework:6,311,6,Information and Communication Technology (ICT),,"Change and transformation, Business change management, Organisational capability development (OCDV)"
+d8686d32-70a2-5ed3-b7f4-ef1ae2359932,framework:10,312,10,Unidentified occupation-specific framework,STPL,Enterprise & Business Architecture
+28b9a020-e914-55e1-bdff-602d81977362,framework:8,313,8,Procurement,,Contract Management
+c8fb7c25-9877-51fb-8fc0-414b0bc3d266,framework:8,314,8,Procurement,,Contract Law
+f4c568da-eff3-5f52-aea4-6eb803a71611,framework:6,315,6,Information and Communication Technology (ICT),CSMG,Service Catalogue Management

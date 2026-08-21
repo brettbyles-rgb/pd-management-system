@@ -1,0 +1,129 @@
+framework_name,raw_level,normalized_level,assignment_count,interpretation_status
+Finance,Level 1,1.0,11,mapped
+Finance,Level 2,2.0,20,mapped
+Finance,Level 3,3.0,9,mapped
+Finance,Level 4,4.0,18,mapped
+Finance,Level 5,5.0,11,mapped
+Human resources,Level 1,1.0,6,mapped
+Human resources,Level 2,2.0,35,mapped
+Human resources,Level 3,3.0,23,mapped
+Human resources,Level 4,4.0,12,mapped
+Information and Communication Technology (ICT),Level 3,3.0,6,mapped
+Information and Communication Technology (ICT),Level 4,4.0,45,mapped
+Information and Communication Technology (ICT),Level 5,5.0,71,mapped
+Information and Communication Technology (ICT),Level 6,6.0,8,mapped
+NSW Public Sector Capability Framework,Adept,3.0,7694,mapped
+NSW Public Sector Capability Framework,Advanced,4.0,3284,mapped
+NSW Public Sector Capability Framework,Foundational,1.0,2813,mapped
+NSW Public Sector Capability Framework,Highly Advanced,5.0,300,mapped
+NSW Public Sector Capability Framework,Intermediate,2.0,6113,mapped
+Procurement,Level 1,1.0,6,mapped
+Procurement,Level 2,2.0,25,mapped
+Procurement,Level 3,3.0,12,mapped
+Procurement,Level 4,4.0,6,mapped
+Procurement,Level 5,5.0,1,mapped
+Unidentified occupation-specific framework,Level (PBMG),,1,review_required
+Unidentified occupation-specific framework,Level - SCAD,,1,review_required
+Unidentified occupation-specific framework,Level 1,1.0,4,mapped
+Unidentified occupation-specific framework,Level 2,2.0,15,mapped
+Unidentified occupation-specific framework,Level 3,3.0,7,mapped
+Unidentified occupation-specific framework,Level 3 - CSMG,3.0,3,mapped
+Unidentified occupation-specific framework,Level 3 - SCAD,3.0,2,mapped
+Unidentified occupation-specific framework,Level 3 - SUPP,3.0,1,mapped
+Unidentified occupation-specific framework,Level 3 - USUP,3.0,1,mapped
+Unidentified occupation-specific framework,Level 3 – CSMG,3.0,1,mapped
+Unidentified occupation-specific framework,Level 3 – NTAS,3.0,2,mapped
+Unidentified occupation-specific framework,Level 3 – PBMG,3.0,1,mapped
+Unidentified occupation-specific framework,Level 3 – USUP,3.0,1,mapped
+Unidentified occupation-specific framework,Level 4,4.0,51,mapped
+Unidentified occupation-specific framework,Level 4 (BUAN),4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 (INAN),4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 (SINT),4.0,5,mapped
+Unidentified occupation-specific framework,Level 4 (SYSP),4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 - CSMG,4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 - IRMG,4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 - METL,4.0,2,mapped
+Unidentified occupation-specific framework,Level 4 - PBMG,4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 - RLMT,4.0,3,mapped
+Unidentified occupation-specific framework,Level 4 - SEAC,4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 - SINT,4.0,3,mapped
+Unidentified occupation-specific framework,Level 4 - STAM,4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 - TECH,4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 - TEST,4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 - USEV,4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 - USUP,4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 ITOP,4.0,2,mapped
+Unidentified occupation-specific framework,Level 4 NTAS,4.0,2,mapped
+Unidentified occupation-specific framework,Level 4 RELM,4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 RLMT,4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 SCAD,4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 – ARCH,4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 – CSMG,4.0,2,mapped
+Unidentified occupation-specific framework,Level 4 – DATM,4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 – DBAD,4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 – EMRG,4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 – HSIN,4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 – INAN,4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 – ITOP,4.0,3,mapped
+Unidentified occupation-specific framework,Level 4 – METL,4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 – PBMG,4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 – PROG,4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 – SLMO,4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 – TECH,4.0,1,mapped
+Unidentified occupation-specific framework,Level 4 – USUP,4.0,1,mapped
+Unidentified occupation-specific framework,Level 4- ITOP,4.0,1,mapped
+Unidentified occupation-specific framework,Level 5,5.0,116,mapped
+Unidentified occupation-specific framework,Level 5 (BPRE),5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 (PROG),5.0,4,mapped
+Unidentified occupation-specific framework,Level 5 - ASMG,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 - ASUP,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 - BPTS,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 - CIRM,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 - CNSL,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 - DESN,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 - EMRG,5.0,3,mapped
+Unidentified occupation-specific framework,Level 5 - HCEV,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 - IRMG,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 - ITMG,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 - PGMG,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 - PROD,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 - PROG,5.0,2,mapped
+Unidentified occupation-specific framework,Level 5 - QUAS,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 - QUMG,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 - RELM,5.0,2,mapped
+Unidentified occupation-specific framework,Level 5 - RESC,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 - RLMT,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 - SLMO,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 - SUPP,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 - TECH,5.0,2,mapped
+Unidentified occupation-specific framework,Level 5 - TEST,5.0,2,mapped
+Unidentified occupation-specific framework,Level 5 - UNAN,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 INOV,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 ITSP,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 NTDS,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 – ARCH,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 – CNSL,5.0,2,mapped
+Unidentified occupation-specific framework,Level 5 – DATM,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 – INAN,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 – METL,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 – NTAS,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 – PENT,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 – PROF,5.0,3,mapped
+Unidentified occupation-specific framework,Level 5 – PROG,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 – QUAS,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 – QUMG,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 – RLMT,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 – SCAD,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 – STPL,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 – SYSP,5.0,1,mapped
+Unidentified occupation-specific framework,Level 5 – TEST,5.0,2,mapped
+Unidentified occupation-specific framework,Level 6,6.0,37,mapped
+Unidentified occupation-specific framework,Level 6 - BURM,6.0,1,mapped
+Unidentified occupation-specific framework,Level 6 - IRMG,6.0,1,mapped
+Unidentified occupation-specific framework,Level 6 - KNOW,6.0,2,mapped
+Unidentified occupation-specific framework,Level 6 - PRMG,6.0,1,mapped
+Unidentified occupation-specific framework,Level 6 - RELM,6.0,1,mapped
+Unidentified occupation-specific framework,Level 6 - RLMT,6.0,1,mapped
+Unidentified occupation-specific framework,Level 6 – ARCH,6.0,1,mapped
+Unidentified occupation-specific framework,Level 7,7.0,2,mapped
+Unidentified occupation-specific framework,Tevel 5 – BPTS,,1,review_required

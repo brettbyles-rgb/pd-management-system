@@ -1,0 +1,551 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mapping Assistant - Stitch Handoff Mock</title>
+  <style>
+    :root {
+      --ink: #05284a;
+      --muted: #627088;
+      --purple: #4b1482;
+      --purple-soft: #f6f0fb;
+      --line: #d9e0ea;
+      --panel: #ffffff;
+      --page: #f5f7fa;
+      --teal: #0f6e86;
+      --green: #e5f6ed;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: var(--page);
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      line-height: 1.45;
+    }
+
+    .app {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 18px 24px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      margin-bottom: 20px;
+    }
+
+    .brand {
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .nav {
+      display: flex;
+      gap: 24px;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .nav span:first-child {
+      color: var(--purple);
+      border-bottom: 3px solid var(--purple);
+      padding-bottom: 5px;
+    }
+
+    .screen {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 30px;
+    }
+
+    .summary {
+      display: grid;
+      grid-template-columns: 1.3fr 0.7fr;
+      gap: 22px;
+      padding-bottom: 26px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    h1, h2, h3, p { margin-top: 0; }
+
+    h1 {
+      font-size: 34px;
+      margin-bottom: 8px;
+      letter-spacing: -0.03em;
+    }
+
+    h2 {
+      font-size: 26px;
+      margin-bottom: 8px;
+      letter-spacing: -0.02em;
+    }
+
+    h3 {
+      font-size: 20px;
+      margin-bottom: 8px;
+    }
+
+    .muted { color: var(--muted); }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      width: fit-content;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: var(--green);
+      color: #0b7c45;
+      font-weight: 800;
+      font-size: 14px;
+    }
+
+    .meta {
+      display: grid;
+      gap: 10px;
+      align-content: start;
+      background: #fafbfd;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 18px;
+    }
+
+    .meta-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      font-size: 15px;
+    }
+
+    .meta-row strong { color: var(--ink); }
+
+    .guide {
+      padding-top: 28px;
+    }
+
+    .guide-intro {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .guide-intro p {
+      max-width: 850px;
+      margin-bottom: 0;
+      color: var(--muted);
+      font-size: 17px;
+    }
+
+    .pager {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      white-space: nowrap;
+    }
+
+    button {
+      border: 1px solid var(--purple);
+      border-radius: 12px;
+      padding: 11px 16px;
+      color: var(--purple);
+      background: white;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button.primary {
+      background: var(--purple);
+      color: white;
+    }
+
+    .family-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px;
+      margin-bottom: 22px;
+    }
+
+    .family-card {
+      min-height: 150px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 22px;
+      background: white;
+      display: grid;
+      gap: 12px;
+      align-content: start;
+    }
+
+    .family-card.active {
+      border-color: var(--purple);
+      box-shadow: 0 10px 30px rgba(75,20,130,0.08);
+      background: linear-gradient(180deg, #ffffff 0%, var(--purple-soft) 100%);
+    }
+
+    .rank {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--purple);
+      color: white;
+      display: inline-grid;
+      place-items: center;
+      font-weight: 900;
+    }
+
+    .family-name {
+      font-size: 24px;
+      font-weight: 900;
+      line-height: 1.15;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+    }
+
+    .scoreline {
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 14px;
+    }
+
+    .drilldown {
+      display: grid;
+      grid-template-columns: 0.9fr 1.1fr;
+      gap: 22px;
+      align-items: start;
+      border-top: 1px solid var(--line);
+      padding-top: 24px;
+    }
+
+    .subfamily-list {
+      display: grid;
+      gap: 14px;
+    }
+
+    .subfamily {
+      padding: 18px;
+      border-radius: 16px;
+      border: 1px solid #b8d4dc;
+      background: #eef8fb;
+      cursor: pointer;
+    }
+
+    .subfamily.active {
+      background: var(--teal);
+      color: white;
+      border-color: #064457;
+    }
+
+    .subfamily-title {
+      font-size: 19px;
+      font-weight: 900;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+
+    .subfamily .scoreline {
+      color: inherit;
+      opacity: 0.82;
+      margin-top: 6px;
+    }
+
+    .detail-panel {
+      min-height: 430px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 22px;
+      background: #fbfdff;
+    }
+
+    .detail-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .specialisation-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .spec {
+      display: flex;
+      flex-direction: column;
+      min-height: 230px;
+      padding: 18px;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+    }
+
+    .spec-title {
+      font-weight: 900;
+      font-size: 18px;
+      line-height: 1.25;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+
+    .spec p {
+      color: var(--muted);
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
+
+    .spec button {
+      margin-top: auto;
+      width: 100%;
+    }
+
+    .review {
+      margin-top: 24px;
+      border-top: 1px solid var(--line);
+      padding-top: 24px;
+    }
+
+    .review-items {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .review-card {
+      border: 1px solid var(--purple);
+      border-radius: 14px;
+      padding: 14px 16px;
+      background: var(--purple-soft);
+      min-width: 240px;
+    }
+
+    .evidence {
+      margin-top: 24px;
+      border-top: 1px solid var(--line);
+      padding-top: 24px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      overflow: hidden;
+    }
+
+    th, td {
+      text-align: left;
+      padding: 13px 14px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+    }
+
+    th {
+      background: var(--purple-soft);
+      color: var(--purple);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+
+    .note {
+      margin-top: 22px;
+      padding: 16px;
+      background: #fff8e5;
+      border: 1px solid #f1dfaa;
+      border-radius: 14px;
+      color: #5c4a10;
+      font-size: 15px;
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <nav class="topbar">
+      <div class="brand">PD Management System</div>
+      <div class="nav">
+        <span>Mapping Assistant</span>
+        <span>Search</span>
+        <span>Validation Queue</span>
+        <span>Admin</span>
+      </div>
+    </nav>
+
+    <section class="screen">
+      <div class="summary">
+        <div>
+          <p class="pill">Validated PD</p>
+          <h1>10045-02 - Support Officer</h1>
+          <p class="muted">Use the assistant to compare likely framework mappings. The system recommends options; the final mapping remains a human decision.</p>
+        </div>
+        <aside class="meta">
+          <div class="meta-row"><span>Classification</span><strong>TWL4</strong></div>
+          <div class="meta-row"><span>Grade cohort</span><strong>TWL1-TWL4</strong></div>
+          <div class="meta-row"><span>Current mapping</span><strong>Business Support</strong></div>
+          <div class="meta-row"><span>Mapping validated</span><strong>Yes</strong></div>
+        </aside>
+      </div>
+
+      <section class="guide">
+        <div class="guide-intro">
+          <div>
+            <h2>Recommended job families</h2>
+            <p>Ranked using similar mapped roles, framework definitions, and grade proximity. Select a job family to reveal likely sub-families.</p>
+          </div>
+          <div class="pager">
+            <button>Previous</button>
+            <span class="muted">Showing 1-3 of 11</span>
+            <button>Next</button>
+          </div>
+        </div>
+
+        <div class="family-grid">
+          <article class="family-card active">
+            <span class="rank">1</span>
+            <div class="family-name">Business Support</div>
+            <div class="scoreline">score 0.850 | evidence 0.924 | framework 0.553 | 13 validated</div>
+          </article>
+          <article class="family-card">
+            <span class="rank">2</span>
+            <div class="family-name">Program and Project Management</div>
+            <div class="scoreline">score 0.814 | evidence 0.904 | framework 0.454 | 6 validated</div>
+          </article>
+          <article class="family-card">
+            <span class="rank">3</span>
+            <div class="family-name">Information Technology</div>
+            <div class="scoreline">score 0.790 | evidence 0.829 | framework 0.631 | 3 validated</div>
+          </article>
+        </div>
+
+        <div class="drilldown">
+          <section>
+            <h2>Likely sub-families</h2>
+            <div class="subfamily-list">
+              <article class="subfamily active">
+                <div class="subfamily-title">Administration</div>
+                <div class="scoreline">#1 under Business Support | score 0.875 | 10 validated</div>
+              </article>
+              <article class="subfamily">
+                <div class="subfamily-title">Executive Support</div>
+                <div class="scoreline">#2 under Business Support | score 0.712 | 1 validated</div>
+              </article>
+              <article class="subfamily">
+                <div class="subfamily-title">Business Coordination</div>
+                <div class="scoreline">#3 under Business Support | score 0.644 | 2 validated</div>
+              </article>
+            </div>
+          </section>
+
+          <aside class="detail-panel">
+            <div class="detail-head">
+              <div>
+                <h2>Specialisations under Administration</h2>
+                <p class="muted">Only options above the minimum threshold are shown. Mark options to compare before assigning a final mapping.</p>
+              </div>
+              <button>Close</button>
+            </div>
+
+            <div class="specialisation-grid">
+              <article class="spec">
+                <div class="spec-title">Office Administration</div>
+                <p>General administrative support, coordination, records, scheduling, correspondence and local process support.</p>
+                <div class="scoreline">score 0.692 | evidence 0.744 | framework 0.484</div>
+                <button class="primary">Mark for review</button>
+              </article>
+              <article class="spec">
+                <div class="spec-title">Service Support</div>
+                <p>Support for customer-facing or operational service environments where process consistency is important.</p>
+                <div class="scoreline">score 0.641 | evidence 0.690 | framework 0.444</div>
+                <button class="primary">Mark for review</button>
+              </article>
+              <article class="spec">
+                <div class="spec-title">Business Administration</div>
+                <p>Administrative support connected to business units, internal services, process tracking and stakeholder coordination.</p>
+                <div class="scoreline">score 0.611 | evidence 0.658 | framework 0.423</div>
+                <button class="primary">Mark for review</button>
+              </article>
+            </div>
+          </aside>
+        </div>
+
+        <section class="review">
+          <h2>Marked for review</h2>
+          <div class="review-items">
+            <article class="review-card">
+              <strong>Administration</strong>
+              <div class="muted">Sub-family under Business Support</div>
+            </article>
+            <article class="review-card">
+              <strong>Office Administration</strong>
+              <div class="muted">Specialisation under Administration</div>
+            </article>
+          </div>
+        </section>
+
+        <section class="evidence">
+          <h2>Evidence: similar mapped roles</h2>
+          <table>
+            <thead>
+              <tr>
+                <th>Similarity</th>
+                <th>PD</th>
+                <th>Role</th>
+                <th>Classification</th>
+                <th>Mapped family</th>
+                <th>Validated</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>0.924</td>
+                <td>10041-01</td>
+                <td>Administrative Officer</td>
+                <td>TWL4</td>
+                <td>Business Support → Administration</td>
+                <td>Yes</td>
+              </tr>
+              <tr>
+                <td>0.889</td>
+                <td>10482-01</td>
+                <td>Business Support Officer</td>
+                <td>TWL5</td>
+                <td>Business Support → Administration</td>
+                <td>Yes</td>
+              </tr>
+              <tr>
+                <td>0.861</td>
+                <td>10614-02</td>
+                <td>Customer Support Administrator</td>
+                <td>TWL4</td>
+                <td>Business Support → Service Support</td>
+                <td>Yes</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <div class="note">
+          Stitch instruction: this is a static handoff mock. Improve visual hierarchy, spacing and progressive-disclosure behaviour, but keep the product calm and workflow-oriented. Do not redesign it as a dashboard.
+        </div>
+      </section>
+    </section>
+  </main>
+</body>
+</html>

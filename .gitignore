@@ -1,0 +1,31 @@
+# Python environments and caches
+.venv/
+.activity-venv/
+__pycache__/
+.pytest_cache/
+*.py[cod]
+*.egg-info/
+
+# JavaScript dependencies
+node_modules/
+
+# Local processing and generated output
+output/
+work/
+data/generated/
+data/backups/
+data/qa/
+
+# Raw/imported source snapshots (canonical sources remain versioned)
+data/source/original/
+data/source/onedrive_exports/
+
+# Duplicate local document samples (tests/fixtures remains versioned)
+samples/
+
+# Local databases, logs and secrets
+*.sqlite3
+*.log
+.env
+.env.*
+!.env.example

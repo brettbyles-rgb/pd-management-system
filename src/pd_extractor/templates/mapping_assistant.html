@@ -1,0 +1,820 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mapping Assistant</title>
+<style>
+  :root{
+    --ink:#05284a; --muted:#627088; --purple:#4b1482; --purple-soft:#f6f0fb;
+    --line:#dbe2ec; --line-soft:#eef2f7; --panel:#fff; --page:#f4f7fb; --teal:#0f6e86;
+    --strong:#0f6e86; --good:#4b1482; --possible:#6b5ca5; --weak:#93a1b4;
+    --ok:#0b7c45; --ok-soft:#e6f6ed; --warn-soft:#fff7e4; --warn-line:#efdca6; --warn-ink:#6a5410;
+    --radius:14px; --shadow:0 12px 34px rgba(12,26,54,.09);
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--page);color:var(--ink);
+    font-family:Arial,Helvetica,system-ui,sans-serif;line-height:1.5;font-size:15px}
+  .app{max-width:1340px;margin:0 auto;padding:24px}
+  h1,h2,h3,h4,p{margin:0}
+  button{font-family:inherit;cursor:pointer}
+  .muted{color:var(--muted)}
+
+  .topbar{display:flex;justify-content:space-between;align-items:center;
+    padding:15px 22px;background:var(--panel);border:1px solid var(--line);border-radius:16px;margin-bottom:18px}
+  .brand{font-size:19px;font-weight:800;letter-spacing:-.02em;color:var(--ink);text-decoration:none;white-space:nowrap}
+  .nav{display:flex;gap:18px;color:var(--muted);font-weight:700;font-size:13px;align-items:center}
+  .nav a{color:var(--muted);text-decoration:none;border-bottom:3px solid transparent;padding:5px 0 3px;white-space:nowrap}
+  .nav a:hover,.nav a.active{color:var(--purple);border-bottom-color:var(--purple)}
+
+  .summary{background:var(--panel);border:1px solid var(--line);border-radius:16px;
+    padding:22px 24px;margin-bottom:18px;display:grid;grid-template-columns:1.5fr .9fr;gap:24px}
+  .pill{display:inline-flex;align-items:center;gap:7px;padding:5px 11px;border-radius:999px;
+    background:var(--ok-soft);color:var(--ok);font-weight:800;font-size:12.5px;margin-bottom:10px}
+  .pill.pending{background:var(--warn-soft);color:var(--warn-ink)}
+  .summary h1{font-size:27px;letter-spacing:-.03em;margin-bottom:6px}
+  .summary .lead{color:var(--muted);max-width:60ch}
+  .meta{align-self:center;display:grid;gap:9px;background:#fafcff;border:1px solid var(--line-soft);border-radius:13px;padding:16px 18px}
+  .meta-row{display:flex;justify-content:space-between;gap:14px;font-size:14px}
+  .meta-row span{color:var(--muted)} .meta-row strong{color:var(--ink)}
+
+  .work{display:grid;grid-template-columns:1fr 320px;gap:18px}
+  .col-main{min-width:0}
+  .panelhead h2{font-size:21px;letter-spacing:-.02em}
+  .panelhead p{color:var(--muted);font-size:13.5px;margin:4px 0 14px;max-width:66ch}
+
+  .fam{background:var(--panel);border:1px solid var(--line);border-radius:14px;margin-bottom:12px;
+    overflow:hidden;transition:border-color .18s,box-shadow .18s}
+  .fam.open{border-color:#c9b6e4;box-shadow:var(--shadow)}
+  .fam-head{display:grid;grid-template-columns:34px 1fr 220px auto;gap:16px;align-items:center;
+    width:100%;text-align:left;border:0;background:transparent;padding:16px 18px}
+  .fam-head:hover{background:#fcfbfe}
+  .rank{width:30px;height:30px;border-radius:50%;background:var(--purple);color:#fff;display:grid;place-items:center;font-weight:800;font-size:14px}
+  .fam-name{font-size:18px;font-weight:800;letter-spacing:-.01em}
+  .fam-note{color:var(--muted);font-size:12.5px;margin-top:5px;line-height:1.45;max-width:64ch;white-space:normal}
+  .chev{color:var(--muted);font-size:13px;font-weight:800;justify-self:end;transition:transform .18s}
+  .fam.open .chev{transform:rotate(90deg)}
+
+  .score{display:grid;gap:5px}
+  .score-top{display:flex;justify-content:space-between;align-items:baseline;font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.03em}
+  .band-Strong{color:var(--strong)} .band-Good{color:var(--good)} .band-Possible{color:var(--possible)} .band-Weak{color:var(--weak)}
+  .score-top .cnt{color:var(--muted);font-weight:700;letter-spacing:0;text-transform:none}
+  .track{height:7px;border-radius:99px;background:var(--line-soft);overflow:hidden}
+  .fill{height:100%;border-radius:99px}
+  .fill.Strong{background:var(--strong)} .fill.Good{background:var(--good)} .fill.Possible{background:var(--possible)} .fill.Weak{background:var(--weak)}
+  .score.mini .score-top{font-size:10px} .score.mini .track{height:5px}
+
+  .fam-body{display:none;padding:14px 18px 18px;border-top:1px solid var(--line-soft)}
+  .fam.open .fam-body{display:block}
+
+  .tree{border:1px solid var(--line-soft);border-radius:12px;padding:6px;background:#fcfdff}
+  .thr-note{display:flex;justify-content:space-between;align-items:center;font-size:12px;color:var(--muted);padding:7px 9px 5px}
+  .link{background:none;border:0;color:var(--purple);font-weight:700;font-size:12px;cursor:pointer;padding:0}
+  .link:hover{text-decoration:underline}
+
+  .trow{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;row-gap:6px;
+    padding:11px 12px;border-radius:9px;cursor:pointer;border:1px solid transparent}
+  .trow:hover{background:#f3f6fc}
+  .trow.sel{background:var(--purple-soft);border-color:#dcc9f0}
+  .trow.dim{opacity:.55}
+  .trow.static{cursor:default} .trow.static:hover{background:transparent}
+  .lbl{display:flex;align-items:center;gap:8px;min-width:0;flex:1}
+  .tw{width:16px;flex:none;text-align:center;color:var(--muted);font-size:11px;font-weight:800}
+  .tw.pl{cursor:pointer;border-radius:4px} .tw.pl:hover{background:#e7ddf5;color:var(--purple)}
+  .tname{font-weight:800;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rowbar{width:180px;flex:none}
+  .rowright{display:flex;align-items:center;gap:12px;flex:none}
+  .rowbtn{min-width:132px;justify-content:center;text-align:center}
+  .spec-row .lbl{padding-left:24px}
+  .spec-row .tname{font-weight:600;font-size:13.5px}
+
+  .tdetail{padding:0 12px 15px 44px;max-width:80ch}
+  .tdetail.spec{padding-left:62px}
+  .tdetail .def{font-size:13.5px;color:#31435c;margin:8px 0 13px}
+  .specnote{display:inline-block;font-size:12.5px;margin:2px 0 0;border:0;background:none;padding:0}
+  .specnote.toggle{color:var(--purple);font-weight:800;cursor:pointer}
+  .specnote.toggle:hover{text-decoration:underline}
+  .specnote.none{color:var(--muted);font-weight:600}
+  .tdetail .below{color:var(--muted);font-style:italic;font-size:13px;margin:8px 0 0}
+  .leaf-body{border:1px solid var(--line-soft);border-radius:12px;background:#fcfdff;padding:18px 20px;max-width:82ch}
+  .leaf-body .crumb{font-size:12px;color:var(--muted);margin-bottom:5px}
+  .leaf-body h3{font-size:18px;letter-spacing:-.01em;margin-bottom:12px}
+  .leaf-body .def{font-size:13.5px;color:#31435c;margin:12px 0 15px}
+
+  .btn{border:1px solid var(--purple);border-radius:10px;padding:9px 13px;color:var(--purple);background:#fff;font-weight:800;font-size:13px}
+  .btn:hover{background:var(--purple-soft)}
+  .btn.primary{background:var(--purple);color:#fff} .btn.primary:hover{background:#3d0f6b}
+  .btn.ghost{border-color:var(--line);color:var(--ink)} .btn.ghost:hover{background:#f4f6fa}
+  .btn.sm{padding:6px 10px;font-size:12px}
+  .btn.full{width:100%}
+  .btn:disabled{opacity:.45;cursor:not-allowed}
+  .btn.added{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+  .pager{display:flex;align-items:center;gap:10px;font-size:13px;margin-top:2px}
+
+  .rail{position:sticky;top:18px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}
+  .rail h3{font-size:15px;display:flex;align-items:center;gap:8px}
+  .rail .count{background:var(--purple);color:#fff;font-size:12px;font-weight:800;min-width:22px;height:22px;border-radius:99px;display:inline-grid;place-items:center;padding:0 6px}
+  .rail .hint{color:var(--muted);font-size:12.5px;margin:6px 0 14px}
+  .chip{border:1px solid var(--line);border-left:3px solid var(--purple);border-radius:10px;padding:10px 11px;margin-bottom:9px;background:#fff}
+  .chip.d2{border-left-color:var(--teal)} .chip.d3{border-left-color:#b58bdf}
+  .chip .path{font-size:12px;color:var(--muted);margin-bottom:2px}
+  .chip .leaf{font-weight:800;font-size:14px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+  .x{border:0;background:none;color:var(--muted);font-size:17px;line-height:1;padding:0 2px;cursor:pointer}
+  .x:hover{color:#b0243a}
+  .rail-empty{border:1px dashed var(--line);border-radius:11px;padding:18px 14px;color:var(--muted);font-size:13px;text-align:center;background:#fafcff}
+  .rail-actions{margin-top:6px;display:grid;gap:8px}
+
+  .toast{position:fixed;left:50%;bottom:26px;transform:translateX(-50%) translateY(16px);background:var(--ink);color:#fff;
+    padding:12px 18px;border-radius:11px;font-weight:700;font-size:14px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:opacity .22s,transform .22s;z-index:50}
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+  .compare{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:24px}
+  .cmp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin:18px 0}
+  .cmp-card{border:1px solid var(--line);border-radius:14px;padding:18px;display:flex;flex-direction:column;position:relative}
+  .cardx{position:absolute;top:11px;right:12px;border:0;background:none;color:var(--muted);font-size:18px;line-height:1;cursor:pointer;padding:2px 4px;border-radius:6px}
+  .cardx:hover{color:#b0243a;background:#fbeaec}
+  .cardx:disabled{opacity:.28;cursor:not-allowed}
+  .cardx:disabled:hover{color:var(--muted);background:none}
+  .assign-bar .summ .am-head{font-size:12.5px;color:var(--muted);margin-bottom:6px}
+  .assign-bar .summ .am{font-size:13px;color:var(--ink);display:flex;align-items:baseline;gap:8px;margin:3px 0}
+  .ambadge{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.03em;color:#fff;background:var(--purple);border-radius:99px;padding:2px 8px;flex:none}
+  .ambadge.sec{background:var(--muted)}
+  .undo{margin-left:6px}
+  .cmp-card.incl{border-color:var(--purple);box-shadow:var(--shadow)}
+  .cmp-path{font-size:12px;color:var(--muted);margin-bottom:3px}
+  .cmp-leaf{font-size:18px;font-weight:800;letter-spacing:-.01em;margin-bottom:12px}
+  .cmp-card .score{margin-bottom:14px}
+  .cmp-def{font-size:13px;color:#31435c;margin-bottom:10px}
+  .cmp-supp{font-size:12.5px;color:var(--muted);margin-bottom:12px}
+  .cmp-excl{font-size:12.5px;background:var(--warn-soft);border:1px solid var(--warn-line);color:var(--warn-ink);border-radius:9px;padding:8px 10px;margin-bottom:12px}
+  .cmp-ev{margin:2px 0 14px;font-size:12.5px}
+  .cmp-ev h4{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:6px}
+  .cmp-ev .r{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px solid var(--line-soft)}
+  .cmp-ev .r:last-child{border-bottom:0}
+  .cmp-ev .sim{font-weight:800;color:var(--teal)}
+  .cmp-controls{margin-top:auto;display:grid;gap:9px;border-top:1px solid var(--line-soft);padding-top:12px}
+  .check{display:flex;align-items:center;gap:9px;font-weight:800;font-size:14px;cursor:pointer}
+  .check input{width:17px;height:17px;accent-color:var(--purple)}
+  .primary-row{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--muted)}
+  .primary-row input{accent-color:var(--purple)}
+  .assign-bar{display:flex;justify-content:space-between;align-items:center;gap:16px;border-top:1px solid var(--line);padding-top:18px;margin-top:4px;flex-wrap:wrap}
+  .assign-bar .summ{font-size:14px;color:var(--muted)}
+  .cluster{margin-bottom:20px}
+  .cluster-label{font-size:12px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin:2px 0 8px}
+  .cluster .cmp-grid{margin:0}
+  .rollup{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;
+    background:var(--purple-soft);border:1px solid #dcc9f0;border-radius:12px;padding:12px 16px;margin-bottom:10px}
+  .rollup.insistent{background:#efe4fb;border-color:#b58bdf}
+  .rollup-txt{font-size:13.5px;color:var(--ink);max-width:72ch}
+  .rollup-act{display:flex;gap:8px;flex:none}
+  .rollup-dismissed{font-size:12.5px;color:var(--muted);background:#fafcff;border:1px dashed var(--line);border-radius:10px;padding:8px 12px;margin-bottom:10px}
+  .cmp-rolled{font-size:12px;font-weight:800;color:var(--purple);background:var(--purple-soft);border-radius:8px;padding:4px 9px;display:inline-block;margin-bottom:9px}
+  .cmp-roster{border-top:1px solid var(--line-soft);margin-top:4px;padding-top:11px}
+  .roster-toggle{background:none;border:0;color:var(--purple);font-weight:800;font-size:12.5px;cursor:pointer;padding:0}
+  .roster-toggle:hover{text-decoration:underline}
+  .roster-list{margin-top:9px;font-size:12.5px}
+  .roster-list .rr{display:flex;align-items:center;gap:9px;padding:5px 0;border-bottom:1px solid var(--line-soft)}
+  .roster-list .rr:last-child{border-bottom:0}
+  .rrole{font-weight:700;background:none;border:0;padding:0;font-family:inherit;font-size:12.5px;color:var(--ink);
+    cursor:pointer;text-align:left;border-bottom:1px dotted #9aa8bd}
+  .rrole:hover,.rrole[aria-expanded="true"]{color:var(--purple);border-bottom-color:var(--purple)}
+  .rolepop{position:fixed;z-index:80;width:360px;max-width:calc(100vw - 24px);background:#fff;
+    border:1px solid var(--line);border-radius:13px;box-shadow:0 18px 44px rgba(12,26,54,.18);
+    padding:16px 18px;display:none;font-size:13px;line-height:1.5}
+  .rolepop.show{display:block}
+  .rolepop .rp-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px}
+  .rolepop .rp-title{font-size:15px;font-weight:800;letter-spacing:-.01em}
+  .rolepop .rp-pd{color:var(--muted);font-size:12px;margin-bottom:11px}
+  .rolepop h5{margin:0 0 5px;font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:800}
+  .rolepop .rp-purpose{margin:0 0 13px;color:#31435c}
+  .rolepop ul{margin:0;padding-left:17px;color:#31435c}
+  .rolepop li{margin:3px 0}
+  .rolepop .rp-more{margin-top:9px;font-size:12px;color:var(--muted)}
+  .rolepop .rp-close{position:absolute;top:9px;right:11px;border:0;background:none;color:var(--muted);
+    font-size:17px;line-height:1;cursor:pointer;padding:2px 5px;border-radius:6px}
+  .rolepop .rp-close:hover{color:var(--ink);background:#f1f4f9}
+  .rgrade{font-size:11px;font-weight:800;color:var(--teal);background:#e6f2f5;border-radius:6px;padding:1px 7px;flex:none}
+  .rpd{color:var(--muted);font-size:12px}
+  .rfall{margin-bottom:6px} .rmore{margin-top:7px}
+  .maplink{display:inline-block;margin:11px 0 0;font-size:12.5px;font-weight:700;color:var(--purple);background:none;border:0;cursor:pointer;padding:0}
+  .maplink:hover{text-decoration:underline}
+  .rationale{background:#fafcff;border:1px solid var(--line);border-radius:14px;padding:16px 18px;margin:6px 0 16px}
+  .rationale h4{font-size:14px;display:flex;align-items:center;gap:8px;margin-bottom:9px}
+  .rationale .req{font-size:11px;font-weight:800;color:#8a1c2b;background:#fdeaec;border-radius:99px;padding:2px 9px;text-transform:uppercase;letter-spacing:.03em}
+  .rationale .opt{font-size:11px;font-weight:800;color:var(--muted);background:#eef2f7;border-radius:99px;padding:2px 9px;text-transform:uppercase;letter-spacing:.03em}
+  .rationale ul.stamps{margin:0 0 11px;padding-left:18px;font-size:12.5px;color:#4a3d6b}
+  .rationale ul.stamps li{margin:3px 0}
+  .rationale textarea{width:100%;min-height:82px;border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-family:inherit;font-size:13.5px;color:var(--ink);resize:vertical}
+
+  @media (max-width:980px){
+    .topbar{align-items:flex-start;flex-direction:column}.nav{flex-wrap:wrap;gap:10px 16px}
+    .work{grid-template-columns:1fr}.rail{position:static}.summary{grid-template-columns:1fr}
+    .fam-head{grid-template-columns:30px 1fr auto;grid-row-gap:8px}.fam-head .score{grid-column:1/-1}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+  :focus-visible{outline:3px solid #b58bdf;outline-offset:2px;border-radius:6px}
+</style>
+</head>
+<body>
+<main class="app">
+  <nav class="topbar">
+    <a class="brand" href="/">PD Management System</a>
+    <div class="nav" aria-label="Primary navigation"><a href="/#upload">Upload</a><a href="http://127.0.0.1:8765/">Validation Queue</a><a href="/#library">Search</a><a class="active" href="/mapping-assistant">Mapping Assistant</a><a href="/admin/classifications">Classification Admin</a><a href="/#workbook">Mapping Workbook Import</a></div>
+  </nav>
+  <section class="summary" id="summary"></section>
+  <div id="root"></div>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ============ Data ============
+   Names, definitions, hierarchy = real (TAFE NSW job family framework sheet).
+   Scores, validated counts and evidence = illustrative stand-ins for the ranking plumbing. */
+const PD={id:'10045-02',title:'Support Officer',classification:'TWL4',cohort:'TWL1–TWL4',current:'Business Support',assigned:null,executive:false};
+
+const FAMILIES=[
+ {id:'bs',name:'Business Support',score:.850,val:13,subsTotal:2,
+  main:'Business Support professionals provide administrative, clerical and executive support services, including document and records management, scheduling, correspondence and office coordination.',
+  subs:[
+   {id:'bs-adm',name:'Administration',score:.875,val:10,thr:true,specsTotal:0,
+    main:'Administration professionals deliver day-to-day administrative and clerical support across a range of business contexts, managing correspondence, records, scheduling and documents, and responding to enquiries to ensure business units operate efficiently.',
+    supp:'Perform a wide range of clerical and administrative tasks that support the day-to-day functioning of TAFE NSW — managing correspondence, entering and maintaining records, scheduling appointments, preparing documents and providing general office support.',
+    ev:[{sim:.92,role:'Administrative Officer',pd:'10041-01',cls:'TWL4'},{sim:.89,role:'Business Support Officer',pd:'10482-01',cls:'TWL5'},{sim:.86,role:'Records Officer',pd:'10614-02',cls:'TWL4'}],specs:[]},
+   {id:'bs-es',name:'Executive Support',score:.712,val:1,thr:true,specsTotal:0,
+    main:'Executive Support professionals provide high-level administrative and coordination support to executives, managing calendars, travel, meetings and confidential correspondence to support effective leadership.',
+    supp:'Provide high-level administrative, organisational and coordination assistance to TAFE NSW executives — managing calendars, coordinating meetings and travel, preparing confidential correspondence and liaising with stakeholders.',
+    ev:[{sim:.84,role:'Executive Assistant',pd:'10233-01',cls:'TWL5'}],specs:[]},
+  ]},
+
+ {id:'it',name:'Information Technology',score:.781,val:4,subsTotal:9,
+  main:'Information Technology professionals enable teaching, learning and business operations by designing, building and maintaining secure, reliable technology, data and cyber services.',
+  subs:[
+   {id:'it-sup',name:'IT Support and Service Management',score:.748,val:3,thr:true,specsTotal:3,
+    main:'IT Support and Service Management professionals ensure TAFE NSW users receive timely and effective technical assistance, overseeing service delivery processes, managing IT service frameworks and administering IT assets.',
+    supp:'Provide direct end-user support, implement and oversee IT service management (ITSM) frameworks, and manage the lifecycle of IT assets.',
+    ev:[{sim:.83,role:'ICT Support Officer',pd:'10903-01',cls:'TWL4'},{sim:.74,role:'Service Desk Officer',pd:'10921-02',cls:'TWL4'}],
+    specs:[
+     {id:'it-sup-hd',name:'Help Desk / Technical Support',score:.712,val:2,thr:true,
+      main:'Help Desk and Technical Support professionals provide first and second-level technical assistance to TAFE NSW users, diagnosing and resolving hardware, software and network issues and managing service requests.',
+      supp:'Diagnose and resolve problems with hardware, software and network access, manage service requests, and ensure timely user support within the service management framework.',
+      ev:[{sim:.81,role:'Service Desk Officer',pd:'10921-02',cls:'TWL4'},{sim:.72,role:'ICT Support Officer',pd:'10903-01',cls:'TWL4'}]},
+     {id:'it-sup-am',name:'IT Asset Management',score:.611,val:1,thr:true,
+      main:'IT Asset Management professionals develop and manage processes and systems for tracking and maintaining IT hardware and software assets across their lifecycle, ensuring licence compliance and optimising utilisation.',
+      supp:'Inventory tracking, licence compliance, asset procurement and disposal strategies, and optimising the value and utilisation of IT assets.',
+      ev:[{sim:.66,role:'ICT Asset Officer',pd:'10988-01',cls:'TWL4'}]},
+     {id:'it-sup-sm',name:'Service Management Process',score:.588,val:0,thr:true,
+      main:'Service Management Process professionals design, implement and continuously improve IT service management processes, including incident, problem, change and service level management.',
+      supp:'Define and optimise processes such as incident, problem, change, service request and service level management for consistent IT service delivery.',
+      ev:[]},
+    ]},
+   {id:'it-inf',name:'IT Infrastructure and Operations',score:.702,val:2,thr:true,specsTotal:3,
+    main:'IT Infrastructure and Operations professionals design, implement and maintain core technology platforms — servers, networks, databases and storage — ensuring reliability, security and performance.',
+    supp:'Ensure the reliability, availability, performance and security of foundational technology platforms including servers, networks, storage and data centres.',
+    ev:[{sim:.70,role:'Systems Officer',pd:'11002-01',cls:'TWL5'}],
+    specs:[
+     {id:'it-inf-sa',name:'Systems Administration',score:.664,val:1,thr:true,
+      main:'Systems Administration professionals install, configure and maintain server operating systems, associated hardware and core enterprise services, ensuring stability, security and performance of server environments.',
+      supp:'Install, configure, manage and maintain server operating systems and core enterprise services across on-premises or cloud-based environments.',
+      ev:[{sim:.68,role:'Systems Administrator',pd:'11015-02',cls:'TWL5'}]},
+     {id:'it-inf-db',name:'Database Administration',score:.402,val:0,thr:false,
+      main:'Database Administration professionals install, configure, maintain and secure database platforms, ensuring availability, integrity and performance of organisational data stores.',supp:'',ev:[]},
+     {id:'it-inf-ne',name:'Network Engineering and Administration',score:.388,val:0,thr:false,
+      main:'Network Engineering and Administration professionals design, implement and maintain network infrastructure to ensure secure, reliable connectivity.',supp:'',ev:[]},
+    ]},
+   {id:'it-dat',name:'Data Management and Analytics',score:.641,val:1,thr:true,specsTotal:4,
+    main:'Data Management and Analytics professionals govern and manage data as a strategic asset, overseeing data architecture, engineering, quality and governance so data is accurate, accessible and fit for decision-making.',
+    supp:'Data architecture, database administration, data engineering, quality assurance and the delivery of business intelligence and analytics solutions.',
+    ev:[],specs:[]},
+   {id:'it-cyb',name:'Cyber Security',score:.421,val:0,thr:false,specsTotal:4,main:'Cyber Security professionals protect information systems, networks and data from cyber threats, managing security risk and responding to incidents.',supp:'',ev:[],specs:[]},
+   {id:'it-app',name:'Enterprise Applications',score:.402,val:0,thr:false,specsTotal:0,main:'Enterprise Applications professionals manage, support and enhance core business systems, overseeing configuration, maintenance and integration.',supp:'',ev:[],specs:[]},
+   {id:'it-arc',name:'IT Architecture',score:.361,val:0,thr:false,specsTotal:2,main:'IT Architecture professionals design and govern the structure, standards and interrelationships of IT systems, applications and infrastructure.',supp:'',ev:[],specs:[]},
+   {id:'it-pjm',name:'IT Project Management',score:.351,val:0,thr:false,specsTotal:2,main:'IT Project Management professionals plan, manage and oversee technology projects from initiation to completion.',supp:'',ev:[],specs:[]},
+   {id:'it-str',name:'IT Strategy and Governance',score:.322,val:0,thr:false,specsTotal:2,main:'IT Strategy and Governance professionals define the long-term direction, policies and governance frameworks for the technology function.',supp:'',ev:[],specs:[]},
+   {id:'it-sol',name:'Solutions Development',score:.301,val:0,thr:false,specsTotal:6,main:'Solutions Development professionals design, build, test and deploy software applications and integrations that meet specific business needs.',supp:'',ev:[],specs:[]},
+  ]},
+
+ {id:'hr',name:'Human Resources',score:.744,val:3,subsTotal:12,
+  main:'HR professionals design and implement strategies, programs and services to provide TAFE NSW with a capable, engaged, safe, diverse and productive workforce.',
+  subs:[
+   {id:'hr-ops',name:'HR Operations',score:.729,val:3,thr:true,specsTotal:3,
+    main:'HR Operations professionals deliver transactional HR services and manage and maintain the core HR systems and processes that support people management across TAFE NSW.',
+    supp:'Ensure data integrity, process efficiency, system functionality and responsive support for employees and managers across HR transactions.',
+    ev:[{sim:.78,role:'HR Officer',pd:'10770-01',cls:'TWL4'}],
+    specs:[
+     {id:'hr-ops-ad',name:'HR Administration',score:.712,val:3,thr:true,
+      main:'HR Administration professionals manage and maintain employee records and other HR information and documentation.',
+      supp:'Process HR transactions, ensure data integrity and support compliance with policies and legislative requirements throughout the employee lifecycle.',
+      ev:[{sim:.79,role:'HR Administration Officer',pd:'10770-01',cls:'TWL4'},{sim:.71,role:'People Services Officer',pd:'10812-02',cls:'TWL4'}]},
+     {id:'hr-ops-es',name:'Employee Services',score:.681,val:2,thr:true,
+      main:'Employee Services professionals assist TAFE NSW employees to resolve HR enquiries by providing information, advice and support.',
+      supp:'Interpret HR policies and procedures, guide employees on employment matters and escalate complex issues to ensure responsive service.',
+      ev:[{sim:.70,role:'People Services Officer',pd:'10812-02',cls:'TWL4'}]},
+     {id:'hr-ops-sy',name:'HR Systems',score:.602,val:1,thr:true,
+      main:'HR Systems professionals manage and maintain TAFE NSW’s core HR systems, ensuring functionality, data integrity, security and user accessibility.',
+      supp:'Maintain and optimise HR technology platforms and support HR operations and workforce reporting.',
+      ev:[]},
+    ]},
+   {id:'hr-org',name:'Organisation Design',score:.668,val:1,thr:true,specsTotal:0,
+    main:'Organisation Design professionals design organisation structures and processes and support the implementation of new designs.',
+    supp:'Analyse and design operating models, team structures and roles to align workforce capabilities with organisational objectives.',
+    ev:[{sim:.67,role:'Organisation Design Analyst',pd:'10990-01',cls:'TWL6'}],specs:[]},
+   {id:'hr-wfp',name:'Workforce Planning and Strategy',score:.612,val:0,thr:true,specsTotal:2,
+    main:'Workforce Planning and Strategy professionals analyse and determine TAFE NSW’s future workforce needs, and design and implement strategies and programs to address these needs.',
+    supp:'',ev:[],specs:[]},
+   {id:'hr-di',name:'Diversity and Inclusion',score:.402,val:0,thr:false,specsTotal:2,main:'Diversity and Inclusion professionals design and deliver strategies and programs to create and maintain a diverse, inclusive and culturally safe workplace.',supp:'',ev:[],specs:[]},
+   {id:'hr-bp',name:'HR Business Partnering',score:.388,val:0,thr:false,specsTotal:0,main:'HR Business Partners partner with designated business units to design and implement HR strategies and support delivery of HR services.',supp:'',ev:[],specs:[]},
+   {id:'hr-ra',name:'HR Reporting and Analytics',score:.377,val:0,thr:false,specsTotal:0,main:'HR Reporting and Analytics professionals collect and analyse workforce data to generate insights and develop and deliver HR reports.',supp:'',ev:[],specs:[]},
+   {id:'hr-od',name:'Organisational Development',score:.361,val:0,thr:false,specsTotal:2,main:'Organisational Development professionals design and implement strategies and programs to build workforce capability and enhance culture and employee experience.',supp:'',ev:[],specs:[]},
+   {id:'hr-pay',name:'Payroll',score:.344,val:0,thr:false,specsTotal:0,main:'Payroll professionals manage employee payments, ensuring accuracy, compliance and proper maintenance of payroll records.',supp:'',ev:[],specs:[]},
+   {id:'hr-rec',name:'Recruitment',score:.331,val:0,thr:false,specsTotal:4,main:'Recruitment professionals manage the end-to-end recruitment process for TAFE NSW.',supp:'',ev:[],specs:[]},
+   {id:'hr-rem',name:'Remuneration',score:.318,val:0,thr:false,specsTotal:0,main:'Remuneration professionals provide advice on remuneration policies and frameworks.',supp:'',ev:[],specs:[]},
+   {id:'hr-whs',name:'Work Health and Safety',score:.302,val:0,thr:false,specsTotal:4,main:'Work Health and Safety professionals design and implement strategies and programs that support the health, safety and wellbeing of TAFE NSW employees.',supp:'',ev:[],specs:[]},
+   {id:'hr-wr',name:'Workplace Relations',score:.291,val:0,thr:false,specsTotal:2,main:'Workplace Relations professionals manage industrial and employee relations matters across TAFE NSW.',supp:'',ev:[],specs:[]},
+  ]},
+
+ {id:'comm',name:'Communications',score:.655,val:0,subsTotal:0,
+  main:'Communications professionals design and deliver marketing, communication and creative activities that promote TAFE NSW’s education and training, strengthen its reputation, engage stakeholders and keep students and staff informed.',
+  supp:'Develop and manage strategies for communicating information and building relationships with internal and external stakeholders.',
+  subs:[]},
+];
+
+/* Position purpose + key accountabilities per PD — comes from parsed PD records (illustrative stand-in). */
+const PDDETAIL={
+ '10041-01':{purpose:'Provide administrative and clerical support to a business unit, ensuring records, correspondence and scheduling are maintained accurately and on time.',acc:['Maintain records and filing systems in line with records management policy','Coordinate meetings, diaries and travel arrangements for the team','Prepare routine correspondence, reports and documentation'],accTotal:6},
+ '10482-01':{purpose:'Deliver business support services across a directorate, coordinating administrative processes and acting as a first point of contact for internal enquiries.',acc:['Coordinate administrative processes and workflow across the directorate','Respond to internal enquiries and escalate complex matters','Maintain business systems, registers and reporting inputs'],accTotal:7},
+ '10233-01':{purpose:'Provide high-level executive and secretariat support to a senior executive, managing competing priorities and confidential correspondence.',acc:['Manage the executive’s diary, travel and competing commitments','Prepare briefing papers, agendas and confidential correspondence','Coordinate stakeholder liaison on behalf of the executive'],accTotal:6},
+ '10120-02':{purpose:'Coordinate day-to-day office operations for a campus or business site, ensuring facilities, supplies and local processes support service delivery.',acc:['Coordinate office facilities, supplies and local service arrangements','Support onboarding and workspace logistics for new staff','Maintain local process documentation and site registers'],accTotal:5},
+ '10614-02':{purpose:'Maintain organisational records in accordance with the State Records Act and internal records management policy.',acc:['Register, classify and archive records in the records system','Respond to records retrieval and access requests','Support disposal and retention scheduling activities'],accTotal:5},
+ '10777-03':{purpose:'Lead business operations for a directorate, overseeing administrative services, budget coordination and business planning support.',acc:['Oversee delivery of administrative and business support services','Coordinate directorate budget monitoring and reporting','Lead and develop a team of business support staff'],accTotal:8},
+ '10088-01':{purpose:'Provide entry-level administrative assistance, supporting document preparation, data entry and general office tasks.',acc:['Undertake data entry and maintain accurate records','Assist with document preparation and formatting','Provide general reception and office assistance'],accTotal:4},
+ '10155-02':{purpose:'Administer office systems and processes for a business unit, ensuring consistent application of administrative procedures.',acc:['Administer office systems, templates and process documentation','Coordinate purchasing and invoice processing for the unit','Support meeting coordination and minute-taking'],accTotal:6},
+ '10490-01':{purpose:'Provide senior administrative support and coordinate administrative activity across multiple teams within a directorate.',acc:['Coordinate administrative activity across multiple teams','Review and improve administrative processes and templates','Supervise and support junior administrative staff'],accTotal:7},
+ '10251-02':{purpose:'Provide executive support to a senior leader, coordinating correspondence, reporting and stakeholder engagement.',acc:['Coordinate executive correspondence and action tracking','Prepare reporting inputs and meeting materials','Manage stakeholder scheduling and follow-up'],accTotal:6},
+ '10299-01':{purpose:'Provide secretariat support to boards and committees, ensuring governance processes and records are properly maintained.',acc:['Coordinate board and committee agendas, papers and minutes','Maintain governance registers and action logs','Support compliance with governance and reporting obligations'],accTotal:6},
+ '10770-01':{purpose:'Deliver transactional HR services and maintain employee records across the employee lifecycle.',acc:['Process HR transactions across the employee lifecycle','Maintain employee records and ensure data integrity','Respond to HR enquiries from employees and managers'],accTotal:6},
+ '10812-02':{purpose:'Provide first-line people services support, resolving employee enquiries and guiding managers on HR policy and process.',acc:['Resolve employee and manager HR enquiries at first contact','Interpret and advise on HR policies and procedures','Escalate complex employment matters to specialists'],accTotal:6},
+ '10990-02':{purpose:'Partner with business units to design and deliver HR strategies that build workforce capability and support organisational objectives.',acc:['Partner with leaders on workforce and capability strategy','Advise on complex employee relations and change matters','Translate HR strategy into business unit delivery plans'],accTotal:8},
+ '10801-01':{purpose:'Coordinate HR programs and processes, supporting delivery of recruitment, onboarding and workforce activities.',acc:['Coordinate recruitment and onboarding activity','Support delivery of HR programs and workforce initiatives','Maintain HR process documentation and reporting inputs'],accTotal:6},
+ '10995-01':{purpose:'Analyse workforce data to generate insights that inform workforce planning and organisational decision-making.',acc:['Analyse workforce data and produce reporting and insights','Support workforce planning and forecasting activity','Maintain workforce datasets and reporting tools'],accTotal:6},
+ '10765-01':{purpose:'Provide administrative support to HR operations, assisting with records, transactions and enquiry handling.',acc:['Assist with HR transaction processing and record maintenance','Respond to routine HR enquiries and requests','Support HR document preparation and filing'],accTotal:4},
+ '10990-01':{purpose:'Analyse and design organisation structures, roles and operating models to align workforce capability with organisational objectives.',acc:['Analyse current-state structures and develop design options','Prepare organisation design documentation and role structures','Support consultation and implementation of new designs'],accTotal:7},
+ '10994-02':{purpose:'Lead organisation design engagements, advising senior leaders on structure, role architecture and operating model change.',acc:['Lead organisation design engagements with senior leaders','Advise on role architecture and structural change options','Guide consultation and change implementation approaches'],accTotal:8},
+ '10903-01':{purpose:'Provide ICT support to end users, diagnosing and resolving hardware, software and network access issues.',acc:['Diagnose and resolve end-user hardware and software issues','Log, triage and progress incidents and service requests','Support device provisioning and user access management'],accTotal:6},
+ '10921-02':{purpose:'Deliver first-line service desk support, ensuring incidents and requests are logged, triaged and resolved within service levels.',acc:['Log and triage incidents and service requests at first contact','Resolve first-line technical issues within service targets','Escalate unresolved incidents to specialist support teams'],accTotal:5},
+ '11015-02':{purpose:'Administer server operating systems and core enterprise services, ensuring stability, security and performance.',acc:['Install, configure and maintain server operating systems','Monitor system performance, capacity and availability','Apply patching, backup and security controls'],accTotal:7},
+ '10930-01':{purpose:'Provide general ICT operational support across systems, devices and user access under defined procedures.',acc:['Support day-to-day ICT operational tasks and procedures','Assist with device configuration and user access requests','Maintain operational documentation and asset records'],accTotal:5},
+ '10988-01':{purpose:'Manage ICT hardware and software assets across their lifecycle, ensuring accurate records and licence compliance.',acc:['Maintain ICT asset registers and lifecycle records','Support licence compliance and software entitlement tracking','Coordinate asset procurement, deployment and disposal'],accTotal:6},
+ '11002-01':{purpose:'Support the operation and maintenance of core technology platforms, ensuring reliability and performance of systems.',acc:['Monitor and maintain core systems and infrastructure','Respond to infrastructure incidents and service requests','Support change, patching and release activities'],accTotal:6},
+};
+const ROSTER={
+  bs:{total:112,roles:[{role:'Administrative Officer',pd:'10041-01',grade:'TWL4'},{role:'Business Support Officer',pd:'10482-01',grade:'TWL5'},{role:'Executive Assistant',pd:'10233-01',grade:'TWL5'},{role:'Office Coordinator',pd:'10120-02',grade:'TWL4'},{role:'Records Officer',pd:'10614-02',grade:'TWL4'},{role:'Business Manager',pd:'10777-03',grade:'TWL7'}]},
+  'bs-adm':{total:47,roles:[{role:'Administrative Officer',pd:'10041-01',grade:'TWL4'},{role:'Business Support Officer',pd:'10482-01',grade:'TWL5'},{role:'Records Officer',pd:'10614-02',grade:'TWL4'},{role:'Administrative Assistant',pd:'10088-01',grade:'TWL3'},{role:'Office Administrator',pd:'10155-02',grade:'TWL4'},{role:'Senior Administration Officer',pd:'10490-01',grade:'TWL6'}]},
+  'bs-es':{total:12,roles:[{role:'Executive Assistant',pd:'10233-01',grade:'TWL5'},{role:'Executive Support Officer',pd:'10251-02',grade:'TWL5'},{role:'Board Support Officer',pd:'10299-01',grade:'TWL6'}]},
+  hr:{total:63,roles:[{role:'HR Officer',pd:'10770-01',grade:'TWL4'},{role:'People Services Officer',pd:'10812-02',grade:'TWL4'},{role:'HR Business Partner',pd:'10990-02',grade:'TWL7'},{role:'HR Coordinator',pd:'10801-01',grade:'TWL5'},{role:'Workforce Analyst',pd:'10995-01',grade:'TWL6'}]},
+  'hr-ops':{total:21,roles:[{role:'HR Officer',pd:'10770-01',grade:'TWL4'},{role:'People Services Officer',pd:'10812-02',grade:'TWL4'},{role:'HR Coordinator',pd:'10801-01',grade:'TWL5'},{role:'HR Support Officer',pd:'10765-01',grade:'TWL3'}]},
+  'hr-org':{total:4,roles:[{role:'Organisation Design Analyst',pd:'10990-01',grade:'TWL6'},{role:'Org Design Consultant',pd:'10994-02',grade:'TWL7'}]},
+  it:{total:38,roles:[{role:'ICT Support Officer',pd:'10903-01',grade:'TWL4'},{role:'Service Desk Officer',pd:'10921-02',grade:'TWL4'},{role:'Systems Administrator',pd:'11015-02',grade:'TWL5'},{role:'ICT Officer',pd:'10930-01',grade:'TWL3'}]},
+  'it-sup':{total:14,roles:[{role:'Service Desk Officer',pd:'10921-02',grade:'TWL4'},{role:'ICT Support Officer',pd:'10903-01',grade:'TWL4'},{role:'ICT Asset Officer',pd:'10988-01',grade:'TWL4'}]},
+  'it-inf':{total:9,roles:[{role:'Systems Administrator',pd:'11015-02',grade:'TWL5'},{role:'Systems Officer',pd:'11002-01',grade:'TWL5'}]},
+  'it-sup-hd':{total:6,roles:[{role:'Service Desk Officer',pd:'10921-02',grade:'TWL4'},{role:'ICT Support Officer',pd:'10903-01',grade:'TWL4'}]},
+  'hr-ops-ad':{total:8,roles:[{role:'HR Administration Officer',pd:'10770-01',grade:'TWL4'},{role:'People Services Officer',pd:'10812-02',grade:'TWL4'}]},
+};
+
+/* ============ State ============ */
+const state={openFam:'bs',openSubs:new Set(),openSpecs:new Set(),showAll:new Set(),shownFam:3,
+  shortlist:[],view:'browse',include:new Set(),primary:null,
+  rollupDismissed:new Set(),rationale:'',rosterOpen:new Set()};
+
+/* ============ Helpers ============ */
+const $=(s,r=document)=>r.querySelector(s);
+const bandOf=s=>s>=0.85?'Strong':s>=0.75?'Good':s>=0.50?'Possible':'Weak';
+const pct=s=>Math.round(s*100);
+const fam=id=>FAMILIES.find(f=>f.id===id);
+function locate(nodeId){
+  for(const f of FAMILIES){
+    if(f.id===nodeId) return {f,ids:[f.id],names:[f.name],node:f,level:'family'};
+    for(const s of (f.subs||[])){
+      if(s.id===nodeId) return {f,s,ids:[f.id,s.id],names:[f.name,s.name],node:s,level:'sub'};
+      for(const sp of (s.specs||[])) if(sp.id===nodeId)
+        return {f,s,sp,ids:[f.id,s.id,sp.id],names:[f.name,s.name,sp.name],node:sp,level:'spec'};
+    }
+  }
+  return null;
+}
+function scoreBar(score,val,mini){
+  const b=bandOf(score);
+  return `<div class="score ${mini?'mini':''}">
+    <div class="score-top"><span class="band-${b}">${b}</span></div>
+    <div class="track"><div class="fill ${b}" style="width:${pct(score)}%"></div></div></div>`;
+}
+function toast(m){const t=$('#toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),2400);}
+
+const branchOverlap=(a,b)=>{const n=Math.min(a.length,b.length);for(let i=0;i<n;i++)if(a[i]!==b[i])return false;return true;};
+function addShortlist(nodeId){
+  const loc=locate(nodeId); if(!loc)return;
+  const key=loc.ids.join('>');
+  if(state.shortlist.some(x=>x.ids.join('>')===key)){toast('Already in shortlist');return;}
+  let replaced=false;
+  state.shortlist=state.shortlist.filter(x=>{if(branchOverlap(x.ids,loc.ids)){replaced=true;return false;}return true;});
+  state.shortlist.push({ids:loc.ids,names:loc.names,node:loc.node});
+  render();toast(replaced?'Shortlist updated — kept the most specific option':'Added to shortlist');
+}
+function removeShortlist(key){state.shortlist=state.shortlist.filter(x=>x.ids.join('>')!==key);
+  state.include.delete(key);if(state.primary===key)state.primary=null;render();}
+const isShortlisted=ids=>state.shortlist.some(x=>x.ids.join('>')===ids.join('>'));
+
+/* ============ Renderers ============ */
+function renderSummary(){
+  const a=PD.assigned;
+  $('#summary').innerHTML=`
+   <div><span class="pill ${a?'pending':''}">${a?'Assigned — awaiting validation':'Validated PD'}</span>
+     <h1>${PD.id} · ${PD.title}</h1>
+     <p class="lead">Compare likely framework mappings for this role. The assistant ranks options above a match threshold and shows evidence on review; the final mapping is your decision.</p></div>
+   <aside class="meta">
+     <div class="meta-row"><span>Classification</span><strong>${PD.classification}</strong></div>
+     <div class="meta-row"><span>Grade cohort</span><strong>${PD.cohort}</strong></div>
+     <div class="meta-row"><span>${a?'New mapping':'Current mapping'}</span><strong>${a||PD.current}</strong></div>
+     <div class="meta-row"><span>Status</span><strong>${a?'Awaiting validation':'Validated'}</strong></div></aside>`;
+}
+
+function treeRow(node,level){
+  const on=isShortlisted(locate(node.id).ids);
+  const hasSpecs=level==='sub' && node.specs && node.specs.some(s=>s.thr||state.showAll.has(state.openFam));
+  const open=state.openSubs.has(node.id);
+  const selSpec=(level==='spec' && state.openSpecs.has(node.id));
+  const tw= (level==='sub' && hasSpecs) ? (open?'▾':'▸') : '·';
+  const act= level==='sub' ? (hasSpecs?'togglesub':'') : 'selspec';
+  return `<div class="trow ${level==='spec'?'spec-row':''} ${selSpec?'sel':''} ${node.thr===false?'dim':''} ${act?'':'static'}"
+      ${act?`data-act="${act}"`:''} data-node="${node.id}">
+     <div class="lbl"><span class="tw">${tw}</span><span class="tname">${node.name}</span></div>
+     <div class="rowright">
+       <div class="rowbar">${scoreBar(node.score,node.val,true)}</div>
+       <button class="btn sm rowbtn ${on?'added':''}" data-act="${on?'unshort':'short'}" data-node="${node.id}">${on?'✓ In shortlist':'+ Shortlist'}</button>
+     </div>
+   </div>`;
+}
+
+/* inline definition, shown under the selected row (shortlist button now lives on the row) */
+function detailBlock(node,level){
+  const below=node.thr===false;
+  let note='';
+  if(level==='sub'){
+    const total=(node.specs||[]).length;
+    const above=(node.specs||[]).filter(s=>s.thr).length;
+    if(total===0){ note=`<p class="specnote none">No specialisations</p>`; }
+    else{ const open=state.openSubs.has(node.id);
+      note=`<button class="specnote toggle" data-act="togglesub" data-node="${node.id}">${open?'▾':'▸'} ${above} of ${total} specialisation${total>1?'s':''} above threshold</button>`; }
+  }
+  return `<div class="tdetail ${level==='spec'?'spec':''}">
+    ${below?`<p class="below">Below the match threshold — limited evidence for this mapping. Shown because you asked to see all options.</p>`:''}
+    <p class="def">${node.main||''}</p>
+    ${note}
+  </div>`;
+}
+
+function treeHTML(f){
+  const subsShown = state.showAll.has(f.id) ? f.subs : f.subs.filter(s=>s.thr);
+  const aboveCount = f.subs.filter(s=>s.thr).length;
+  let rows='';
+  for(const s of subsShown){
+    rows+=treeRow(s,'sub');
+    rows+=detailBlock(s,'sub');            // sub-family definition always shown on unroll
+    if(state.openSubs.has(s.id)){
+      const specsShown = state.showAll.has(f.id)? (s.specs||[]) : (s.specs||[]).filter(sp=>sp.thr);
+      for(const sp of specsShown){ rows+=treeRow(sp,'spec'); if(state.openSpecs.has(sp.id)) rows+=detailBlock(sp,'spec'); }
+    }
+  }
+  const note = f.subsTotal>aboveCount
+    ? `<div class="thr-note"><span>Top ${aboveCount} of ${f.subsTotal} sub-families above threshold</span>
+        <button class="link" data-act="showall" data-fam="${f.id}">${state.showAll.has(f.id)?'Show fewer':`Show all ${f.subsTotal}`}</button></div>`
+    : `<div class="thr-note"><span>${aboveCount} sub-${aboveCount===1?'family':'families'}</span></div>`;
+  return `<div class="tree">${note}${rows}</div>`;
+}
+
+function famBody(f){
+  if(!f.subs || f.subs.length===0){
+    const on=isShortlisted([f.id]);
+    return `<div class="leaf-body">
+      <p class="def" style="margin:0 0 14px">This job family has no sub-families — roles map at the job-family level.</p>
+      <button class="btn ${on?'added':'primary'}" data-act="${on?'unshort':'short'}" data-node="${f.id}">${on?'✓ In shortlist':'Shortlist this family'}</button>
+    </div>`;
+  }
+  const on=isShortlisted([f.id]);
+  return `<div style="display:flex;justify-content:flex-end;margin-bottom:10px">
+      <button class="btn sm ${on?'added':''}" data-act="${on?'unshort':'short'}" data-node="${f.id}">${on?'✓ Family shortlisted':'Shortlist whole family'}</button>
+    </div>
+    ${treeHTML(f)}`;
+}
+
+function famBand(f,rank){
+  const open=state.openFam===f.id;
+  return `<div class="fam ${open?'open':''}">
+    <button class="fam-head" data-act="togglefam" data-fam="${f.id}" aria-expanded="${open}">
+      <span class="rank">${rank}</span>
+      <span><span class="fam-name">${f.name}</span>
+        <div class="fam-note">${f.main}</div></span>
+      ${scoreBar(f.score,f.val)}<span class="chev">›</span>
+    </button>
+    <div class="fam-body">${open?famBody(f):''}</div>
+  </div>`;
+}
+
+function renderBrowse(){
+  closePop();
+  const shown=FAMILIES.slice(0,state.shownFam);
+  const more=FAMILIES.length-state.shownFam;
+  $('#root').innerHTML=`
+   <div class="work"><div class="col-main">
+     <div class="panelhead"><h2>Recommended job families</h2>
+       <p>Ranked by the assistant using similar mapped roles, framework definitions and grade proximity. Open a family to explore its likely sub-families and specialisations; shortlist anything plausible.</p></div>
+     <div>${shown.map((f,i)=>famBand(f,i+1)).join('')}</div>
+     <div class="pager">${more>0
+        ?`<button class="btn ghost" data-act="morefam">Show ${Math.min(3,more)} more</button><span class="muted">Showing ${state.shownFam} of ${FAMILIES.length} recommended</span>`
+        :`<button class="btn ghost" data-act="lessfam">Show top 3</button><span class="muted">Showing all recommended</span>`}</div>
+   </div><aside>${railHTML()}</aside></div>`;
+}
+
+function railHTML(){
+  const n=state.shortlist.length;
+  return `<div class="rail"><h3>Shortlist <span class="count">${n}</span></h3>
+    <p class="hint">Options you’re considering. Only the most specific choice per branch is kept.</p>
+    ${n? state.shortlist.map(x=>{const d=x.ids.length;const leaf=x.names[x.names.length-1];const p=x.names.slice(0,-1).join(' → ');
+      return `<div class="chip d${d}">${p?`<div class="path">${p} →</div>`:''}
+        <div class="leaf"><span>${leaf}</span><button class="x" title="Remove" data-act="unshort-key" data-key="${x.ids.join('>')}">×</button></div></div>`;}).join('')
+     :`<div class="rail-empty">Nothing shortlisted yet.<br>Mark plausible families, sub-families or specialisations as you explore.</div>`}
+    <div class="rail-actions"><button class="btn primary full" data-act="tocompare" ${n?'':'disabled'}>Review shortlist &amp; assign →</button></div></div>`;
+}
+
+/* ---- assign-screen helpers ---- */
+const gradeNum=g=>parseInt(String(g).replace(/\D/g,''))||0;
+const escapeHTML=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+function getRoster(ids){
+  for(let d=ids.length; d>=1; d--){
+    const entry=ROSTER[ids[d-1]];
+    if(entry){
+      const levelName = d===3?'specialisation':d===2?'sub-family':'family';
+      const sample=[...entry.roles].sort((a,b)=>Math.abs(gradeNum(a.grade)-gradeNum(PD.classification))-Math.abs(gradeNum(b.grade)-gradeNum(PD.classification))).slice(0,8);
+      return {levelName,total:entry.total,sample,fallback:d<ids.length};
+    }
+  }
+  return {levelName:'level',total:0,sample:[],fallback:false};
+}
+function rollupGroups(){
+  const order=[],map={};
+  for(const x of state.shortlist){
+    const key = x.ids.length>1 ? x.ids.slice(0,-1).join('>') : '§'+x.ids.join('>');
+    if(!map[key]){
+      const parentIds = x.ids.length>1 ? x.ids.slice(0,-1) : null;
+      const label = parentIds ? locate(parentIds[parentIds.length-1]).node.name : fam(x.ids[0]).name;
+      map[key]={key,parentIds,label,items:[]};order.push(key);
+    }
+    map[key].items.push(x);
+  }
+  return order.map(k=>map[k]);
+}
+function groupInfo(g){
+  // parentIds present and >=2 items => eligible; returns child-level label + total children
+  const n=g.items.length;
+  const childLevel = g.parentIds.length===1 ? 'sub-families' : 'specialisations';
+  const pnode = locate(g.parentIds[g.parentIds.length-1]).node;
+  const total = g.parentIds.length===1 ? (pnode.subs? pnode.subs.length : pnode.subsTotal||n) : ((pnode.specs||[]).length||n);
+  return {n,childLevel,total,name:g.label};
+}
+function rollUp(parentIds){
+  const pk=parentIds.join('>');
+  const under=x=>x.ids.length>parentIds.length && parentIds.every((id,i)=>x.ids[i]===id);
+  const children=state.shortlist.filter(under).map(c=>({ids:c.ids.slice(),names:c.names.slice(),node:c.node,rolledFrom:c.rolledFrom,rolledChildren:c.rolledChildren,rolledIncluded:c.rolledIncluded}));
+  const childIncluded=children.filter(c=>state.include.has(c.ids.join('>'))).map(c=>c.ids.join('>'));
+  const names=children.map(c=>c.names[c.names.length-1]);
+  state.shortlist.forEach(c=>{if(under(c)||c.ids.join('>')===pk){state.include.delete(c.ids.join('>'));if(state.primary===c.ids.join('>'))state.primary=null;}});
+  state.shortlist=state.shortlist.filter(x=>!under(x) && x.ids.join('>')!==pk);
+  const loc=locate(parentIds[parentIds.length-1]);
+  state.shortlist.push({ids:parentIds.slice(),names:loc.names.slice(),node:loc.node,rolledFrom:names,rolledChildren:children,rolledIncluded:childIncluded});
+  state.include.add(pk); if(!state.primary)state.primary=pk;
+}
+function undoRollUp(pk){
+  const idx=state.shortlist.findIndex(x=>x.ids.join('>')===pk);
+  if(idx<0)return; const parent=state.shortlist[idx];
+  if(!parent.rolledChildren){return;}
+  state.shortlist.splice(idx,1); state.include.delete(pk);
+  const wasPrimary=state.primary===pk; if(wasPrimary)state.primary=null;
+  parent.rolledChildren.forEach(c=>state.shortlist.push(c));
+  (parent.rolledIncluded||[]).forEach(k=>state.include.add(k));
+  if(wasPrimary){state.primary=(parent.rolledIncluded&&parent.rolledIncluded[0])||(parent.rolledChildren[0]&&parent.rolledChildren[0].ids.join('>'))||null;}
+}
+function stampsAndReq(){
+  const stamps=[]; let req=false;
+  const inc=state.shortlist.filter(x=>state.include.has(x.ids.join('>')));
+  const top=FAMILIES[0];
+  const prim=state.shortlist.find(x=>x.ids.join('>')===state.primary);
+  if(prim && prim.ids[0]!==top.id){stamps.push(`Assistant ranked <strong>${top.name}</strong> first; primary mapping assigned under <strong>${fam(prim.ids[0]).name}</strong>.`);req=true;}
+  inc.forEach(x=>{if(x.node&&x.node.thr===false){stamps.push(`<strong>${x.names[x.names.length-1]}</strong> assigned below the match threshold.`);req=true;}});
+  inc.forEach(x=>{if(x.rolledFrom&&x.rolledFrom.length){stamps.push(`Rolled up to <strong>${x.names[x.names.length-1]}</strong> — role spans ${x.rolledFrom.join(', ')}.`);req=true;}});
+  rollupGroups().forEach(g=>{if(g.parentIds && g.items.length>=2 && state.rollupDismissed.has(g.key)){const gi=groupInfo(g);stamps.push(`Considered mapping to <strong>${gi.name}</strong>; retained ${gi.n} separate ${gi.childLevel}.`);}});
+  return {stamps,req};
+}
+function rollupPrompt(g){
+  const gi=groupInfo(g);
+  return `<div class="rollup ${PD.executive?'insistent':''}">
+    <div class="rollup-txt">You've shortlisted <strong>${gi.n} of ${gi.total} ${gi.childLevel}</strong> under ${gi.name}.${PD.executive?' For a senior role, that often points to a broader mapping.':''} Map to <strong>${gi.name}</strong> instead?</div>
+    <div class="rollup-act">
+      <button class="btn sm primary" data-act="rollup-accept" data-parent="${g.key}">Map to ${gi.name}</button>
+      <button class="btn sm ghost" data-act="rollup-dismiss" data-parent="${g.key}">Keep separate</button>
+    </div></div>`;
+}
+
+function renderCompare(){
+  closePop();
+  const groups=rollupGroups();
+  const {stamps,req}=stampsAndReq();
+  const body=!groups.length
+    ? `<div class="rail-empty" style="margin:20px 0 4px">Shortlist is empty. Go back to the families to add options.</div>`
+    : groups.map(g=>{
+    const eligible = g.parentIds && g.items.length>=2;
+    let head='';
+    if(eligible && !state.rollupDismissed.has(g.key)) head=rollupPrompt(g);
+    else if(eligible && state.rollupDismissed.has(g.key)){const gi=groupInfo(g);
+      head=`<div class="rollup-dismissed">Considered mapping to ${gi.name} · retained ${gi.n} separate ${gi.childLevel}. <button class="link" data-act="rollup-reconsider" data-parent="${g.key}">reconsider</button></div>`;}
+    const label = g.parentIds ? `Under ${g.label}` : g.label;
+    return `<div class="cluster"><div class="cluster-label">${label}</div>${head}<div class="cmp-grid">${g.items.map(cmpCard).join('')}</div></div>`;
+  }).join('');
+  const showTail = groups.length>0;
+  $('#root').innerHTML=`<section class="compare">
+    <div class="panelhead" style="display:flex;justify-content:space-between;align-items:flex-end">
+      <div><h2>Review shortlist &amp; assign mapping</h2>
+        <p>Compare shortlisted mappings against the roles already mapped there, then choose which to assign. Remove anything that no longer fits. A role may carry more than one mapping — nominate one as primary.</p></div>
+      <button class="btn ghost" data-act="back">← Back to families</button></div>
+    ${body}
+    ${showTail?`<div class="rationale">
+      <h4>Rationale ${req?'<span class="req">Required</span>':'<span class="opt">Optional</span>'}</h4>
+      ${stamps.length?`<ul class="stamps">${stamps.map(s=>`<li>${s}</li>`).join('')}</ul>`:''}
+      <textarea id="rationaleField" placeholder="${req?'Required — this assignment overrides the assistant, rolls up to a parent, or maps below threshold. Note why.':'Optional notes on this mapping decision.'}">${escapeHTML(state.rationale)}</textarea>
+    </div>
+    <div class="assign-bar"><div class="summ" id="assignSumm"></div>
+      <div style="display:flex;gap:10px"><button class="btn ghost" data-act="back">Cancel</button>
+      <button class="btn primary" data-act="assign" id="assignBtn">Assign mapping</button></div>`:''}</section>`;
+  updateAssignBar();
+}
+function cmpCard(x){
+  const key=x.ids.join('>');const incl=state.include.has(key);const n=x.node;
+  const leaf=x.names[x.names.length-1];const path=x.names.slice(0,-1).join(' → ');
+  const roster=getRoster(x.ids); const rOpen=state.rosterOpen.has(key);
+  const canRollUp=x.ids.length>1; const parentName=x.names[x.names.length-2];
+  return `<article class="cmp-card ${incl?'incl':''}">
+    <button class="cardx" ${incl?'disabled title="Un-tick “Include in mapping” before removing"':`title="Remove from shortlist" data-act="unshort-key" data-key="${key}"`}>×</button>
+    <div class="cmp-path">${path?path+' →':'Job family'}</div>
+    <div class="cmp-leaf">${leaf}</div>
+    ${x.rolledFrom?`<div class="cmp-rolled">Rolled up from ${x.rolledFrom.join(', ')} <button class="link undo" data-act="rollup-undo" data-key="${key}">undo</button></div>`:''}
+    ${scoreBar(n.score,n.val||0)}
+    <p class="cmp-def">${n.main||''}</p>
+    ${n.supp?`<p class="cmp-supp">${n.supp}</p>`:''}
+    ${n.excl?`<div class="cmp-excl"><strong>Excludes:</strong> ${n.excl}</div>`:''}
+    <div class="cmp-roster">
+      <button class="roster-toggle" data-act="toggle-roster" data-key="${key}">${rOpen?'▾':'▸'} Other roles mapped here (${roster.total})</button>
+      ${rOpen?`<div class="roster-list">
+        ${roster.fallback?`<div class="muted rfall">Few at this level — showing the ${roster.levelName} population.</div>`:''}
+        ${roster.sample.length?roster.sample.map(r=>`<div class="rr"><button class="rrole" data-act="rolepop" data-pd="${r.pd}" data-role="${escapeHTML(r.role)}" data-grade="${r.grade}" aria-expanded="false">${r.role}</button><span class="rgrade">${r.grade}</span><span class="rpd">${r.pd}</span></div>`).join(''):`<div class="muted">No roles mapped here yet.</div>`}
+        ${roster.total>roster.sample.length?`<div class="muted rmore">Showing ${roster.sample.length} of ${roster.total}, nearest ${PD.classification} first.</div>`:''}
+      </div>`:''}
+    </div>
+    ${canRollUp?`<button class="link maplink" data-act="rollup-manual" data-key="${key}">↥ Map at parent level (${parentName})</button>`:''}
+    <div class="cmp-controls">
+      <label class="check"><input type="checkbox" data-act="incl" data-key="${key}" ${incl?'checked':''}> Include in mapping</label>
+      <label class="primary-row"><input type="radio" name="primary" data-act="prim" data-key="${key}" ${state.primary===key?'checked':''} ${incl?'':'disabled'}> Set as primary</label>
+    </div></article>`;
+}
+function updateAssignBar(){
+  const btn=$('#assignBtn');const s=$('#assignSumm');if(!btn||!s)return;
+  const inc=state.shortlist.filter(x=>state.include.has(x.ids.join('>')));
+  const {req}=stampsAndReq();
+  if(!inc.length){btn.disabled=true;s.textContent='Select at least one mapping to assign.';return;}
+  if(!state.primary||!state.include.has(state.primary)){btn.disabled=true;s.textContent=`${inc.length} selected — choose which is primary.`;return;}
+  if(req && !state.rationale.trim()){btn.disabled=true;s.innerHTML='A <strong>rationale is required</strong> — this assignment overrides the assistant, rolls up, or maps below threshold.';return;}
+  btn.disabled=false;
+  const prim=inc.find(x=>x.ids.join('>')===state.primary);
+  const others=inc.filter(x=>x.ids.join('>')!==state.primary);
+  s.innerHTML=`<div class="am-head">Assigning <strong>${inc.length}</strong> mapping${inc.length>1?'s':''}</div>
+    <div class="am"><span class="ambadge">Primary</span> ${prim.names.join(' → ')}</div>
+    ${others.map(o=>`<div class="am"><span class="ambadge sec">Also</span> ${o.names.join(' → ')}</div>`).join('')}`;
+}
+
+/* ============ Events ============ */
+/* ---- role detail popover: click to pin, hover to preview ---- */
+const pop={el:null,anchor:null,pinned:false,openT:null,closeT:null};
+function popEl(){
+  if(!pop.el){
+    pop.el=document.createElement('div');pop.el.className='rolepop';
+    pop.el.setAttribute('role','dialog');pop.el.setAttribute('aria-label','Role summary');
+    document.body.appendChild(pop.el);
+    pop.el.addEventListener('mouseenter',()=>{clearTimeout(pop.closeT);});
+    pop.el.addEventListener('mouseleave',()=>{if(!pop.pinned)schedClose();});
+    pop.el.addEventListener('click',e=>{if(e.target.closest('[data-act="pop-close"]'))closePop();});
+  }
+  return pop.el;
+}
+function openPop(anchor,pinned){
+  clearTimeout(pop.closeT);
+  const pd=anchor.dataset.pd,role=anchor.dataset.role,grade=anchor.dataset.grade;
+  const d=PDDETAIL[pd];
+  const el=popEl();
+  el.innerHTML=`<button class="rp-close" data-act="pop-close" aria-label="Close">×</button>
+    <div class="rp-head"><span class="rp-title">${role}</span><span class="rgrade">${grade}</span></div>
+    <div class="rp-pd">${pd}</div>
+    ${d?`<h5>Position purpose</h5><p class="rp-purpose">${d.purpose}</p>
+       <h5>Key accountabilities</h5><ul>${d.acc.map(a=>`<li>${a}</li>`).join('')}</ul>
+       ${d.accTotal>d.acc.length?`<div class="rp-more">Showing ${d.acc.length} of ${d.accTotal} accountabilities.</div>`:''}`
+      :`<p class="rp-purpose muted">No position summary available for this PD.</p>`}`;
+  el.classList.add('show');
+  pop.anchor=anchor;pop.pinned=!!pinned;
+  document.querySelectorAll('.rrole[aria-expanded="true"]').forEach(b=>b.setAttribute('aria-expanded','false'));
+  anchor.setAttribute('aria-expanded','true');
+  positionPop();
+}
+function positionPop(){
+  if(!pop.el||!pop.anchor||!pop.el.classList.contains('show'))return;
+  const a=pop.anchor.getBoundingClientRect(),p=pop.el.getBoundingClientRect();
+  const vw=window.innerWidth,vh=window.innerHeight,gap=10;
+  let left=a.right+gap;
+  if(left+p.width>vw-12) left=a.left-gap-p.width;      // flip to the left
+  if(left<12) left=Math.max(12,Math.min(a.left,vw-p.width-12)); // fall back: clamp
+  let top=a.top-8;
+  if(top+p.height>vh-12) top=vh-p.height-12;
+  if(top<12) top=12;
+  pop.el.style.left=left+'px';pop.el.style.top=top+'px';
+}
+function closePop(){
+  if(!pop.el)return;
+  pop.el.classList.remove('show');pop.pinned=false;
+  if(pop.anchor)pop.anchor.setAttribute('aria-expanded','false');
+  pop.anchor=null;
+}
+function schedClose(){clearTimeout(pop.closeT);pop.closeT=setTimeout(closePop,180);}
+
+document.addEventListener('mouseover',e=>{
+  const t=e.target.closest('[data-act="rolepop"]');
+  if(!t||!window.matchMedia('(hover:hover)').matches)return;
+  clearTimeout(pop.closeT);clearTimeout(pop.openT);
+  if(pop.anchor===t)return;
+  pop.openT=setTimeout(()=>openPop(t,false),320);
+});
+document.addEventListener('mouseout',e=>{
+  const t=e.target.closest('[data-act="rolepop"]');
+  if(!t)return;
+  clearTimeout(pop.openT);
+  if(!pop.pinned)schedClose();
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')closePop();});
+window.addEventListener('scroll',positionPop,true);
+window.addEventListener('resize',positionPop);
+document.addEventListener('click',e=>{
+  if(e.target.closest('.rolepop')||e.target.closest('[data-act="rolepop"]'))return;
+  closePop();
+},true);
+
+document.addEventListener('click',e=>{
+  const el=e.target.closest('[data-act]');if(!el)return;
+  const a=el.dataset.act;
+  switch(a){
+    case 'rolepop':{clearTimeout(pop.openT);
+      if(pop.anchor===el&&pop.pinned){closePop();}else{openPop(el,true);}break;}
+    case 'pop-close':closePop();break;
+    case 'togglefam':{const f=el.dataset.fam;
+      if(state.openFam===f){state.openFam=null;}
+      else{state.openFam=f;state.openSubs=new Set();state.openSpecs=new Set();}
+      renderBrowse();break;}
+    case 'togglesub':{const id=el.dataset.node;state.openSubs.has(id)?state.openSubs.delete(id):state.openSubs.add(id);renderBrowse();break;}
+    case 'selspec':{const id=el.dataset.node;state.openSpecs.has(id)?state.openSpecs.delete(id):state.openSpecs.add(id);renderBrowse();break;}
+    case 'showall':{const f=el.dataset.fam;state.showAll.has(f)?state.showAll.delete(f):state.showAll.add(f);renderBrowse();break;}
+    case 'short':addShortlist(el.dataset.node);break;
+    case 'unshort':{const loc=locate(el.dataset.node);removeShortlist(loc.ids.join('>'));break;}
+    case 'unshort-key':removeShortlist(el.dataset.key);break;
+    case 'morefam':state.shownFam=FAMILIES.length;renderBrowse();break;
+    case 'lessfam':state.shownFam=3;renderBrowse();break;
+    case 'tocompare':state.view='compare';render();break;
+    case 'back':state.view='browse';render();break;
+    case 'incl':{const k=el.dataset.key;if(state.include.has(k)){state.include.delete(k);if(state.primary===k)state.primary=null;}
+      else{state.include.add(k);if(!state.primary)state.primary=k;}renderCompare();break;}
+    case 'prim':state.primary=el.dataset.key;renderCompare();break;
+    case 'rollup-accept':rollUp(el.dataset.parent.split('>'));renderCompare();break;
+    case 'rollup-dismiss':state.rollupDismissed.add(el.dataset.parent);renderCompare();break;
+    case 'rollup-reconsider':state.rollupDismissed.delete(el.dataset.parent);renderCompare();break;
+    case 'rollup-undo':undoRollUp(el.dataset.key);renderCompare();break;
+    case 'rollup-manual':{const x=state.shortlist.find(i=>i.ids.join('>')===el.dataset.key);if(x&&x.ids.length>1)rollUp(x.ids.slice(0,-1));renderCompare();break;}
+    case 'toggle-roster':{const k=el.dataset.key;state.rosterOpen.has(k)?state.rosterOpen.delete(k):state.rosterOpen.add(k);renderCompare();break;}
+    case 'assign':{const inc=state.shortlist.filter(x=>state.include.has(x.ids.join('>')));const prim=state.shortlist.find(x=>x.ids.join('>')===state.primary);
+      PD.assigned=prim.names.join(' → ')+(inc.length>1?` (+${inc.length-1} more)`:'');
+      toast(`${inc.length} mapping${inc.length>1?'s':''} assigned — sent to validation queue`);
+      state.view='browse';state.shortlist=[];state.include=new Set();state.primary=null;
+      state.rollupDismissed=new Set();state.rationale='';state.rosterOpen=new Set();render();break;}
+  }
+});
+
+document.addEventListener('input',e=>{
+  if(e.target && e.target.id==='rationaleField'){state.rationale=e.target.value;updateAssignBar();}
+});
+
+function render(){closePop();renderSummary();state.view==='browse'?renderBrowse():renderCompare();}
+render();
+</script>
+</body>
+</html>

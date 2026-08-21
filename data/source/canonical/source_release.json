@@ -1,0 +1,82 @@
+{
+  "source_release": "f2fd372bffce0fa9",
+  "build_version": "1.1.0",
+  "source_files": [
+    {
+      "path": "data\\generated\\pd_management_unified.sqlite3",
+      "sha256": "75f02c69faf94d71186581b1b48a7e0ccb2baeb7c39b4fef9136e2e95b2af4b0",
+      "hash_scope": "maintained pathway input rows"
+    },
+    {
+      "path": "data\\source\\original\\activity-assigned-clustered-role-links-revised-high-all.xlsx",
+      "sha256": "2920e9400db59de4fc5586ba1ddc816a6714b6350a056a1beb496bf8674ff71c"
+    }
+  ],
+  "record_counts": {
+    "roles": 1171,
+    "role_capabilities": 20891,
+    "role_activities": 13936,
+    "activities": 1256,
+    "role_job_family_mappings": 1310,
+    "essential_requirements": 4689
+  },
+  "algorithm_version": "provisional-1.0.0",
+  "canonical_files": [
+    {
+      "path": "data\\source\\canonical\\capability_applicability.csv",
+      "sha256": "fa13017b19f83bb1bc2bdfcf8676f5deb34a64b686d6dfbc34978ccecf2b1abc"
+    },
+    {
+      "path": "data\\source\\canonical\\essential_requirements.csv",
+      "sha256": "ca89ff08dff72b4106a179cbd7c2db7e419e3eaf9d3297b635bb474ad0a62bad"
+    },
+    {
+      "path": "data\\source\\canonical\\role_activities.csv",
+      "sha256": "41c7576cdea8efb358b16d3bd9eff584900737e6a96d310ec80f5e4df2090180"
+    },
+    {
+      "path": "data\\source\\canonical\\role_capabilities.csv",
+      "sha256": "fd2939434026853a4f21ae8f75834084524a09b2c5b3bc1f37ed8ce2fae44ece"
+    },
+    {
+      "path": "data\\source\\canonical\\role_job_family_mappings.csv",
+      "sha256": "bd8e2ed2d2779602319da0d5f448acc1845acefda64dd421438c2ba802ae3e21"
+    },
+    {
+      "path": "data\\source\\canonical\\roles.csv",
+      "sha256": "02093a591d7b2b47cb50d974551daf152a0e4b77e5561ff263ce398a91562215"
+    },
+    {
+      "path": "data\\reference\\activities.csv",
+      "sha256": "6093cfb406ba7ecf59e0e3f2781566afbcb57967c46d8b957e42915487d2e10c"
+    },
+    {
+      "path": "data\\reference\\adjacency_rules.csv",
+      "sha256": "a7152f29c68664198d32bf49dbdb0a35564bc3b15ab4cc79640762955522ab1d"
+    },
+    {
+      "path": "data\\reference\\capabilities.csv",
+      "sha256": "0008ab3a7c076aee2cce768049e11a58c4f4f19806fef15b884945fec8044f37"
+    },
+    {
+      "path": "data\\reference\\capability_frameworks.csv",
+      "sha256": "9e073d5ba48b05fb9a86063d0392aaad5a16578cb04ad88176a7970eef2871a4"
+    },
+    {
+      "path": "data\\reference\\capability_level_rules.csv",
+      "sha256": "96c924f7ec107252b1c515b43d59b1d2ae7fb2f58e068d68272987e677cfcfa1"
+    },
+    {
+      "path": "data\\reference\\classification_aliases.csv",
+      "sha256": "399f763a1a7cec7279d3f58ecc396ac529db326cd9008ae671bd81dd54626206"
+    },
+    {
+      "path": "data\\reference\\job_family_nodes.csv",
+      "sha256": "9b4d3cb5f0e853a8eaec9808184916dfa28d77fcd3057ef8fe1b980fc0f3b758"
+    },
+    {
+      "path": "data\\source\\canonical\\build_config.json",
+      "sha256": "d824b744374c407b9f3e18f0a4ee28b223a67328073b8fe808f5a501df9f5c0d"
+    }
+  ]
+}

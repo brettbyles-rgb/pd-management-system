@@ -1,0 +1,15 @@
+{
+  "build_version": "1.1.0",
+  "algorithm_version": "provisional-1.0.0",
+  "neighbours_per_role": 25,
+  "weights": {
+    "target_focus_capability_readiness": 0.55,
+    "rarity_weighted_activity_similarity": 0.3,
+    "same_subfamily": 0.1,
+    "classification_proximity": 0.05
+  },
+  "activity_rarity_formula": "1 - roles_with_activity / total_active_roles",
+  "capability_normalisation": "source raw value retained; interpretation stored separately",
+  "capability_not_applicable_policy": "requires explicit per-role status; no cohort is inferred",
+  "complete_rebuild": true
+}

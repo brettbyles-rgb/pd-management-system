@@ -1,0 +1,70 @@
+classification_id,raw_label,display_label,abbreviation,cohort,seniority_order,enterprise_agreement,active,notes,updated_at
+1,TAFE Worker Level 9,TAFE Worker Level 9,TWL9,TWL8-TM1,90.0,"TAFE Commission of NSW Administrative, Support and Related Employees Enterprise Agreement",1,,2026-07-16 04:49:17
+2,TAFE Manager Level 1,TAFE Manager Level 1,TM1,TWL8-TM1,100.0,TAFE Managers Enterprise Agreement,1,,2026-07-16 04:49:17
+3,TAFE Worker Level 8,TAFE Worker Level 8,TWL8,TWL8-TM1,80.0,"TAFE Commission of NSW Administrative, Support and Related Employees Enterprise Agreement",1,,2026-07-16 04:49:17
+4,TAFE Worker Level 6,TAFE Worker Level 6,TWL6,TWL5-TWL7,60.0,"TAFE Commission of NSW Administrative, Support and Related Employees Enterprise Agreement",1,,2026-07-16 04:49:17
+5,TAFE Manager Level 2,TAFE Manager Level 2,TM2,TM2-TM4,110.0,TAFE Managers Enterprise Agreement,1,,2026-07-16 04:49:17
+6,TAFE Worker Level 4,TAFE Worker Level 4,TWL4,TWL1-TWL4,40.0,"TAFE Commission of NSW Administrative, Support and Related Employees Enterprise Agreement",1,,2026-07-16 04:49:17
+7,TAFE Manager Level 3,TAFE Manager Level 3,TM3,TM2-TM4,120.0,TAFE Managers Enterprise Agreement,1,,2026-07-16 04:49:17
+8,TAFE Manager Level 4,TAFE Manager Level 4,TM4,TM2-TM4,130.0,TAFE Managers Enterprise Agreement,1,,2026-07-16 04:49:17
+9,PSSE Band 1,PSSE Band 1,PSSE1,Senior Executive,160.0,Public Service Senior Executives,1,,2026-07-16 04:49:17
+10,Senior Education Officer,Senior Education Officer,SEO,TWL8-TM1,91.0,Educational Services,1,,2026-07-16 04:49:17
+11,TAFE Worker Level 3,TAFE Worker Level 3,TWL3,TWL1-TWL4,30.0,"TAFE Commission of NSW Administrative, Support and Related Employees Enterprise Agreement",1,,2026-07-16 04:49:17
+12,TAFE Worker Level 7,TAFE Worker Level 7,TWL7,TWL5-TWL7,70.0,"TAFE Commission of NSW Administrative, Support and Related Employees Enterprise Agreement",1,,2026-07-16 04:49:17
+13,TAFE Manager Level 5,TAFE Manager Level 5,TM5,TM5,140.0,TAFE Managers Enterprise Agreement,1,,2026-07-16 04:49:17
+14,TAFE Worker Level 5,TAFE Worker Level 5,TWL5,TWL5-TWL7,50.0,"TAFE Commission of NSW Administrative, Support and Related Employees Enterprise Agreement",1,,2026-07-16 04:49:17
+15,Chief Education Officer,Chief Education Officer,CEO,TWL8-TM1,101.0,Educational Services,1,,2026-07-16 04:49:17
+16,PSSE Band 2,PSSE Band 2,PSSE2,Senior Executive,170.0,Public Service Senior Executives,1,,2026-07-16 04:49:17
+17,TAFE Worker Level 2,TAFE Worker Level 2,TWL2,TWL1-TWL4,20.0,"TAFE Commission of NSW Administrative, Support and Related Employees Enterprise Agreement",1,,2026-07-16 04:49:17
+18,TAFE Manager Level 6,TAFE Manager Level 6,TM6,Senior Executive,150.0,TAFE Managers Enterprise Agreement,1,,2026-07-16 04:49:17
+19,Librarian Grade 2,Librarian Grade 2,LG2,Librarian,200.0,Specialist / legacy classification,1,,2026-07-16 04:49:17
+20,Librarian Grade 3,Librarian Grade 3,LG3,Librarian,200.0,Specialist / legacy classification,1,,2026-07-16 04:49:17
+21,Education Officer,Education Officer,EO,TWL8-TM1,81.0,Educational Services,1,,2026-07-16 04:49:17
+22,TAFE Manager 1,TAFE Manager Level 1,TM1,TWL8-TM1,100.0,TAFE Managers Enterprise Agreement,1,,2026-07-16 04:49:17
+23,Counsellor,Counsellor,Misc Other,Other / Unclassified,200.0,,1,,2026-07-16 04:49:17
+24,Education Support Officer,Education Support Officer,ESO,Other / Unclassified,200.0,,1,,2026-07-16 04:49:17
+25,Librarian Grade 1,Librarian Grade 1,LG1,Librarian,200.0,Specialist / legacy classification,1,,2026-07-16 04:49:17
+26,Librarian Grade 4,Librarian Grade 4,LG4,Librarian,200.0,Specialist / legacy classification,1,,2026-07-16 04:49:17
+27,Librarian Grade 5,Librarian Grade 5,LG5,Librarian,200.0,Specialist / legacy classification,1,,2026-07-16 04:49:17
+28,PSSE Band 3,PSSE Band 3,PSSE3,Senior Executive,180.0,Public Service Senior Executives,1,,2026-07-16 04:49:17
+29,TAFE Manager 3,TAFE Manager Level 3,TM3,TM2-TM4,120.0,TAFE Managers Enterprise Agreement,1,,2026-07-16 04:49:17
+30,TAFE Manager level 4,TAFE Manager Level 4,TM4,TM2-TM4,130.0,TAFE Managers Enterprise Agreement,1,,2026-07-16 04:49:17
+31,TAFE Worker Level 1,TAFE Worker Level 1,TWL1,TWL1-TWL4,10.0,"TAFE Commission of NSW Administrative, Support and Related Employees Enterprise Agreement",1,,2026-07-16 04:49:17
+32,TAFE Worker level 8,TAFE Worker Level 8,TWL8,TWL8-TM1,80.0,"TAFE Commission of NSW Administrative, Support and Related Employees Enterprise Agreement",1,,2026-07-16 04:49:17
+33,Trainee,Trainee,Misc Other,Other / Unclassified,200.0,,1,,2026-07-16 04:49:17
+34,10417-01,10417-01,,Other / Unclassified,200.0,,1,"Looks like a PD number, not a classification",2026-07-16 04:49:17
+35,Advanced Childcare Worker – ACCW,Advanced Childcare Worker – ACCW,Childcare,Other / Unclassified,200.0,,1,,2026-07-16 04:49:17
+36,Artist Model Draped or Artist Model Undraped,Artist Model Draped or Artist Model Undraped,Misc Other,Other / Unclassified,200.0,,1,,2026-07-16 04:49:17
+37,Assessor,Assessor,Assessor,Other / Unclassified,200.0,,1,,2026-07-16 04:49:17
+38,Assistant Director,Assistant Director,Misc Other,Other / Unclassified,200.0,,1,,2026-07-16 04:49:17
+39,Bradfield Learning Coordinator,Bradfield Learning Coordinator,Misc Other,Other / Unclassified,200.0,,1,,2026-07-16 04:49:17
+40,Casual/TAFE Worker Level 2,TAFE Worker Level 2,TWL2,TWL1-TWL4,20.0,"TAFE Commission of NSW Administrative, Support and Related Employees Enterprise Agreement",1,,2026-07-16 04:49:17
+41,Cluster Manager,Cluster Manager,Misc Other,Other / Unclassified,200.0,,1,,2026-07-16 04:49:17
+42,Contract Teacher,Contract Teacher,Misc Other,Other / Unclassified,200.0,,1,,2026-07-16 04:49:17
+43,Disability Class Support (Non-Teaching) Sign Language interpreter (per hour- casual only),Disability Class Support (Non-Teaching) Sign Language interpreter (per hour- casual only),Misc Other,Other / Unclassified,200.0,,1,,2026-07-16 04:49:17
+44,Disability Classroom Support (Non-Teaching),Disability Classroom Support (Non-Teaching),Misc Other,Other / Unclassified,200.0,,1,,2026-07-16 04:49:17
+45,Early Childhood Director,Early Childhood Director,Childcare,Other / Unclassified,200.0,,1,,2026-07-16 04:49:17
+46,Early Childhood Officer - ACCWQ,Early Childhood Officer - ACCWQ,Childcare,Other / Unclassified,200.0,,1,,2026-07-16 04:49:17
+47,Early Childhood Teacher,Early Childhood Teacher,Childcare,Other / Unclassified,200.0,,1,,2026-07-16 04:49:17
+48,Exam Supervisor Grade 1,Exam Supervisor Grade 1,Misc Other,Other / Unclassified,200.0,,1,,2026-07-16 04:49:17
+49,Exam Supervisor Grade 2,Exam Supervisor Grade 2,Misc Other,Other / Unclassified,200.0,,1,,2026-07-16 04:49:17
+50,Head Teacher Band 2,Head Teacher Band 2,Misc Other,Other / Unclassified,200.0,,1,,2026-07-16 04:49:17
+51,Head Teacher Band 3,Head Teacher Band 3,Misc Other,Other / Unclassified,200.0,,1,,2026-07-16 04:49:17
+52,Learning Coordinator,Learning Coordinator,Misc Other,Other / Unclassified,200.0,,1,,2026-07-16 04:49:17
+53,Librarian Technician Grade 1,Library Technician Grade 1,LTG1,Librarian,200.0,Specialist / legacy classification,1,,2026-07-16 04:49:17
+54,Library Technician Grade 1,Library Technician Grade 1,LTG1,Librarian,200.0,Specialist / legacy classification,1,,2026-07-16 04:49:17
+55,PSSE Band 1 / TCLC 1,PSSE Band 1 / TCLC 1,PSSE1,Senior Executive,160.0,Public Service Senior Executives,1,,2026-07-16 04:49:17
+56,Senior Counsellor,Senior Counsellor,Misc Other,Other / Unclassified,200.0,,1,,2026-07-16 04:49:17
+57,Special Program Coordinator,Special Program Coordinator,Misc Other,Other / Unclassified,200.0,,1,,2026-07-16 04:49:17
+58,TAFE Manager 2,TAFE Manager Level 2,TM2,TM2-TM4,110.0,TAFE Managers Enterprise Agreement,1,,2026-07-16 04:49:17
+59,TAFE Manager Level 8,TAFE Manager Level 8,TWL8,TWL8-TM1,80.0,TAFE Managers Enterprise Agreement,1,,2026-07-16 04:49:17
+60,TAFE Manager level 3,TAFE Manager Level 3,TM3,TM2-TM4,120.0,TAFE Managers Enterprise Agreement,1,,2026-07-16 04:49:17
+61,TAFE Manger Level 2,TAFE Manager Level 2,TM2,TM2-TM4,110.0,TAFE Managers Enterprise Agreement,1,Possible typo normalised,2026-07-16 04:49:17
+62,TAFE Manger Level 3,TAFE Manager Level 3,TM3,TM2-TM4,120.0,TAFE Managers Enterprise Agreement,1,Possible typo normalised,2026-07-16 04:49:17
+63,TAFE Manger Level 4,TAFE Manager Level 4,TM4,TM2-TM4,130.0,TAFE Managers Enterprise Agreement,1,Possible typo normalised,2026-07-16 04:49:17
+64,TAFE Woker Level 9,TAFE Worker Level 9,TWL9,TWL8-TM1,90.0,"TAFE Commission of NSW Administrative, Support and Related Employees Enterprise Agreement",1,Possible typo normalised,2026-07-16 04:49:17
+65,TAFE worker Level 9,TAFE Worker Level 9,TWL9,TWL8-TM1,90.0,"TAFE Commission of NSW Administrative, Support and Related Employees Enterprise Agreement",1,,2026-07-16 04:49:17
+66,Tafe worker level 1 / Tafe worker level 2 (Dependant on Award requirements),TAFE Worker Level 1,TWL1,TWL1-TWL4,10.0,"TAFE Commission of NSW Administrative, Support and Related Employees Enterprise Agreement",1,,2026-07-16 04:49:17
+67,Teacher,Teacher,Misc Other,Other / Unclassified,200.0,,1,,2026-07-16 04:49:17
+68,Teacher - Base Grade,Teacher - Base Grade,Misc Other,Other / Unclassified,200.0,,1,,2026-07-16 04:49:17
+69,Teacher – Base Grade,Teacher – Base Grade,Misc Other,Other / Unclassified,200.0,,1,,2026-07-16 04:49:17
