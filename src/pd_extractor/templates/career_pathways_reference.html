@@ -1,0 +1,1992 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career Pathways — proof of concept</title>
+<style>
+/* ============================================================
+   CAREER PATHWAYS — PROOF OF CONCEPT
+   Visual language aligned to the HR Role Console / mapping-assistant:
+   navy ink, purple primary, teal secondary, off-white page,
+   white panels, hairline borders.
+
+   Distance is encoded by exactly three colours, and those three
+   colours are the only ones in the legend. Family is never encoded
+   by colour — it is written in words.
+   ============================================================ */
+
+:root{
+  --ink:#05284a;
+  --purple:#4b1482;
+  --teal:#0f6e86;
+  --slate:#5b6b7f;
+  --page:#f4f7fb;
+  --panel:#ffffff;
+  --line:#dbe3ee;
+  --line-soft:#eaeff6;
+  --muted:#5d7085;
+  --muted-2:#8798aa;
+  --canvas:#062f52;
+  --canvas-2:#04203f;
+  --focus:#4b1482;
+  --r:10px;
+  --shadow:0 1px 2px rgba(5,40,74,.06), 0 8px 24px rgba(5,40,74,.06);
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+
+html,body{height:100%}
+body{
+  font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  background:var(--page);
+  color:var(--ink);
+  font-size:15px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  display:flex;
+  flex-direction:column;
+  min-height:100%;
+}
+
+button{font:inherit;color:inherit;cursor:pointer;background:none;border:none}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px;border-radius:4px}
+
+.eyebrow{
+  font-size:10.5px;font-weight:700;letter-spacing:.13em;
+  text-transform:uppercase;color:var(--muted-2);
+}
+
+/* ---------- App chrome ---------- */
+.appbar{
+  display:flex;align-items:center;gap:14px;
+  padding:14px 22px;background:var(--panel);
+  border-bottom:1px solid var(--line);
+  flex-shrink:0;
+}
+.mark{
+  width:30px;height:30px;border-radius:8px;background:var(--ink);
+  display:grid;place-items:center;flex-shrink:0;
+}
+.mark svg{width:15px;height:15px}
+.brand strong{display:block;font-size:13.5px;font-weight:700;letter-spacing:-.01em;line-height:1.25}
+.brand span{display:block;font-size:11px;color:var(--muted-2);letter-spacing:.04em}
+.appbar .spacer{flex:1}
+
+.chip-role[hidden]{display:none}
+.chip-role{
+  display:flex;align-items:center;gap:10px;
+  padding:6px 8px 6px 12px;border:1px solid var(--line);
+  border-radius:999px;background:var(--page);max-width:min(46vw,420px);
+}
+.chip-role .lbl{font-size:10px;color:var(--muted-2);letter-spacing:.1em;text-transform:uppercase;flex-shrink:0}
+.chip-role .val{font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.chip-role button{
+  font-size:12px;font-weight:600;color:var(--purple);
+  padding:4px 10px;border-radius:999px;border:1px solid #e0d5ee;background:#fff;flex-shrink:0;
+}
+.chip-role button:hover{background:#f6f1fc}
+
+.poc-tag{
+  font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--teal);border:1px solid #cfe4ea;background:#f0f8fa;
+  padding:4px 9px;border-radius:5px;
+}
+
+/* ---------- Stage ---------- */
+.stage{flex:1;display:flex;min-height:0;position:relative}
+
+/* ================= FRONT DOOR ================= */
+.frontdoor{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  padding:min(9vh,84px) 24px 40px;overflow-y:auto;
+}
+.fd-inner{width:100%;max-width:620px}
+.fd-inner h1{
+  font-size:clamp(26px,3.4vw,36px);font-weight:700;letter-spacing:-.025em;
+  line-height:1.15;margin:14px 0 10px;
+}
+.fd-inner .lede{font-size:16px;color:var(--muted);max-width:46ch;margin-bottom:26px}
+
+.search-wrap{position:relative}
+.search-field{
+  display:flex;align-items:center;gap:11px;background:var(--panel);
+  border:1px solid var(--line);border-radius:12px;padding:0 14px;
+  box-shadow:var(--shadow);transition:border-color .15s,box-shadow .15s;
+}
+.search-field:focus-within{border-color:var(--purple);box-shadow:0 0 0 3px rgba(75,20,130,.1)}
+.search-field svg{width:17px;height:17px;color:var(--muted-2);flex-shrink:0}
+.search-field input{
+  flex:1;border:none;outline:none;background:none;font:inherit;
+  font-size:16px;padding:15px 0;color:var(--ink);
+}
+.search-field input::placeholder{color:var(--muted-2)}
+.search-field .clear{color:var(--muted-2);font-size:19px;line-height:1;padding:4px 2px}
+
+.results{
+  margin-top:8px;background:var(--panel);border:1px solid var(--line);
+  border-radius:12px;box-shadow:var(--shadow);overflow:hidden;
+  max-height:min(46vh,380px);overflow-y:auto;
+}
+.results:empty{display:none}
+.res-row{
+  display:flex;align-items:baseline;gap:12px;width:100%;text-align:left;
+  padding:11px 15px;border-bottom:1px solid var(--line-soft);
+}
+.res-row:last-child{border-bottom:none}
+.res-row:hover,.res-row[aria-selected="true"]{background:#f7f4fd}
+.res-row[aria-selected="true"]{box-shadow:inset 3px 0 0 var(--purple)}
+.res-row .t{font-size:14px;font-weight:600;flex:1;min-width:0;letter-spacing:-.005em}
+.res-row .t mark{background:#efe4fb;color:var(--purple);border-radius:2px;padding:0 1px}
+.res-row .meta{font-size:11.5px;color:var(--muted-2);white-space:nowrap;flex-shrink:0}
+.res-row .grade{
+  font-size:11px;font-weight:600;color:var(--muted);background:var(--page);
+  border:1px solid var(--line);border-radius:4px;padding:1px 6px;
+  font-variant-numeric:tabular-nums;flex-shrink:0;
+}
+.res-empty{padding:15px;font-size:13.5px;color:var(--muted)}
+
+.fd-hint{margin-top:16px;font-size:12.5px;color:var(--muted-2)}
+.fd-suggest{display:flex;flex-wrap:wrap;gap:7px;margin-top:10px}
+.fd-suggest button{
+  font-size:12.5px;padding:6px 12px;border:1px solid var(--line);
+  border-radius:999px;background:var(--panel);color:var(--ink);
+}
+.fd-suggest button:hover{border-color:var(--purple);color:var(--purple)}
+.fd-privacy{margin-top:30px;font-size:12px;color:var(--muted-2);display:flex;gap:7px;align-items:center}
+.fd-privacy svg{width:13px;height:13px;flex-shrink:0}
+
+/* ================= EXPLORER ================= */
+.explorer{flex:1;display:flex;min-height:0}
+
+/* ---- Walk panel ----
+   Width-driven in every state so the reveal (wide walk + teaser  ->  slim rail
+   + full map) animates as a single smooth width transition. */
+/* ================= SCANNING INTERSTITIAL ================= */
+.scan{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  padding:32px 24px;cursor:pointer;
+}
+.scan{position:relative}
+.scan-card{
+  display:flex;flex-direction:column;align-items:center;text-align:center;
+  max-width:440px;width:100%;animation:scan-in .4s ease both;
+}
+@keyframes scan-in{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.scan-motif{width:132px;height:132px;margin-bottom:22px}
+.scan-motif svg{width:100%;height:100%;overflow:visible}
+.s-ring{fill:none;stroke:var(--line);stroke-width:1;stroke-dasharray:3 5;transform-box:view-box;transform-origin:60px 60px;animation:s-pulse 2.4s ease-in-out infinite}
+.s-ring:nth-of-type(2){animation-delay:.4s}
+@keyframes s-pulse{0%,100%{opacity:.5}50%{opacity:1}}
+.s-sweep{stroke:var(--teal);stroke-width:2;stroke-linecap:round;transform-box:view-box;transform-origin:60px 60px;animation:s-rot 1.7s linear infinite;opacity:.7}
+@keyframes s-rot{to{transform:rotate(360deg)}}
+.s-hub{fill:var(--ink)}
+.s-dot{opacity:0;transform-box:view-box;transform-origin:center;animation:s-pop .5s ease both}
+@keyframes s-pop{0%{opacity:0;transform:scale(.3)}60%{opacity:1;transform:scale(1.25)}100%{opacity:1;transform:scale(1)}}
+.scan .eyebrow{color:var(--muted-2)}
+.scan-role{font-size:22px;font-weight:700;letter-spacing:-.02em;margin:8px 0 24px;color:var(--ink)}
+.scan-lines{list-style:none;display:flex;flex-direction:column;gap:11px;width:100%;max-width:360px;text-align:left}
+.scan-line{
+  display:flex;align-items:center;gap:11px;font-size:13.5px;color:var(--muted);
+  opacity:0;animation:scan-line-in .45s ease forwards;
+}
+@keyframes scan-line-in{from{opacity:0;transform:translateX(-6px)}to{opacity:1;transform:none}}
+.s-tick{
+  width:20px;height:20px;border-radius:50%;background:#e6f2f5;color:var(--teal);
+  display:grid;place-items:center;flex-shrink:0;transform:scale(0);
+  animation:s-tick-in .32s cubic-bezier(.2,.9,.3,1.3) forwards;animation-delay:inherit;
+}
+.s-tick svg{width:11px;height:11px}
+@keyframes s-tick-in{to{transform:scale(1)}}
+.scan-line:last-child{color:var(--ink);font-weight:600}
+.scan-skip{
+  margin-top:26px;font-size:12.5px;font-weight:600;color:var(--muted-2);
+  padding:6px 14px;border:1px solid var(--line);border-radius:999px;
+}
+.scan-skip:hover{border-color:var(--muted-2);color:var(--muted)}
+@media (max-width:860px){ .scan-role{font-size:19px} }
+
+/* ================= EXPLORER ================= */
+.explorer{--teaser:172px}
+.walk{
+  flex:0 0 auto;width:396px;background:var(--panel);
+  border-right:1px solid var(--line);display:flex;flex-direction:column;
+  transition:width .45s cubic-bezier(.22,.61,.36,1);
+}
+.explorer.pre .walk{width:calc(100% - var(--teaser))}   /* pre-reveal: walk holds the stage */
+.walk.slim{width:56px}
+/* Pre-reveal the walk is very wide, so the reading column is centred and capped. */
+.explorer.pre .walk-body,.explorer.pre .walk-foot{max-width:600px;margin-inline:auto;width:100%}
+.explorer.pre .privacy{max-width:600px;margin-inline:auto;width:100%}
+.walk-body{
+  flex:1;display:flex;flex-direction:column;padding:22px 26px 0;
+  min-height:0;overflow-y:auto;
+}
+.walk.slim .walk-body,.walk.slim .walk-foot{display:none}
+
+.rail{display:flex;gap:5px;margin-bottom:20px;flex-shrink:0}
+.rail i{flex:1;height:3px;border-radius:2px;background:var(--line);transition:background .3s}
+.rail i.on{background:var(--purple)}
+
+.step-h{font-size:22px;font-weight:700;line-height:1.24;letter-spacing:-.022em;margin-bottom:12px}
+.step-h.small{font-size:18px}
+.step-p{font-size:14.5px;color:var(--muted);line-height:1.6}
+.step-mid{flex:1;display:flex;flex-direction:column;justify-content:center;padding-bottom:14%}
+
+.hook-from{
+  display:inline-flex;align-items:center;gap:8px;margin-bottom:16px;
+  font-size:11.5px;color:var(--muted-2);
+}
+.hook-from b{color:var(--ink);font-weight:600}
+
+.acts{display:flex;flex-direction:column;gap:7px;margin-top:4px}
+.act{
+  display:flex;gap:10px;align-items:flex-start;padding:10px 12px;
+  border:1px solid var(--line);border-radius:var(--r);background:var(--panel);
+}
+.act .ic{
+  width:19px;height:19px;border-radius:5px;display:grid;place-items:center;
+  flex-shrink:0;margin-top:1px;
+}
+.act .ic svg{width:11px;height:11px}
+.act .ic.have{background:#e6f2f5;color:var(--teal)}
+.act .ic.new{background:#f0e8fa;color:var(--purple)}
+.act p{font-size:13.5px;line-height:1.45}
+.act .sub{font-size:11.5px;color:var(--muted-2);margin-top:2px}
+
+.note{
+  margin-top:14px;font-size:13px;color:var(--teal);font-weight:600;
+}
+.honest{
+  margin-top:16px;padding:12px 14px;background:var(--page);
+  border:1px solid var(--line);border-left:3px solid var(--purple);
+  border-radius:0 var(--r) var(--r) 0;
+}
+.honest .eyebrow{margin-bottom:4px;color:var(--purple)}
+.honest p{font-size:13px;color:var(--muted);line-height:1.55}
+
+.walk-foot{
+  display:flex;gap:9px;padding:16px 26px 12px;border-top:1px solid var(--line-soft);
+  flex-shrink:0;
+}
+.btn{
+  border-radius:9px;padding:11px 16px;font-size:13.5px;font-weight:600;
+  display:inline-flex;align-items:center;justify-content:center;gap:9px;
+  transition:background .15s,border-color .15s;
+}
+.btn svg{width:14px;height:14px;flex-shrink:0}
+.btn.primary{background:var(--purple);color:#fff}
+.btn.primary:hover{background:#3d0f6d}
+.btn.ghost{border:1px solid var(--line);color:var(--ink);background:var(--panel)}
+.btn.ghost:hover{border-color:var(--muted-2)}
+.btn.wide{width:100%;justify-content:flex-start;margin-bottom:8px;padding:13px 15px;text-align:left}
+.btn.wide span{flex:1}
+.btn.reveal{background:var(--teal);color:#fff}
+.btn.reveal:hover{background:#0c5c70}
+.btn.grow{flex:1}
+.privacy{padding:0 26px 14px;font-size:11.5px;color:var(--muted-2);flex-shrink:0}
+
+.walk-back,.scan-back{
+  display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;
+  color:var(--muted);padding:4px 0;align-self:flex-start;
+}
+.walk-back{margin-bottom:16px}
+.walk-back svg,.scan-back svg{width:14px;height:14px}
+.walk-back:hover,.scan-back:hover{color:var(--purple)}
+.scan-back{position:absolute;top:20px;left:22px;color:var(--muted-2)}
+.hook-swap{
+  margin-top:20px;font-size:12.5px;font-weight:600;color:var(--purple);
+  align-self:flex-start;padding:2px 0;border-bottom:1px solid transparent;
+}
+.hook-swap:hover{border-bottom-color:var(--purple)}
+
+/* refinement chips (shared by the walk step 4 and the map popover) */
+.refine-inline{margin-top:16px;padding-top:16px;border-top:1px solid var(--line-soft)}
+.refine-inline .eyebrow{display:block;margin-bottom:13px;color:var(--muted-2)}
+.refine-row{margin-bottom:12px}
+.refine-row:last-child{margin-bottom:0}
+.refine-q{display:block;font-size:11px;font-weight:600;color:var(--muted);margin-bottom:6px}
+.refine-opts{display:flex;flex-wrap:wrap;gap:6px}
+.rchip{
+  font-size:12px;padding:6px 11px;border:1px solid var(--line);border-radius:999px;
+  background:var(--panel);color:var(--muted);transition:background .12s,border-color .12s,color .12s;
+}
+.rchip:hover{border-color:var(--purple);color:var(--purple)}
+.rchip.on{background:var(--purple);border-color:var(--purple);color:#fff}
+
+.slim-tab{
+  display:none;flex-direction:column;align-items:center;gap:14px;
+  padding:18px 0;width:100%;height:100%;
+}
+.walk.slim .slim-tab{display:flex}
+.slim-tab .ic{width:30px;height:30px;border-radius:8px;background:var(--purple);display:grid;place-items:center}
+.slim-tab .ic svg{width:14px;height:14px}
+.slim-tab .vert{
+  writing-mode:vertical-rl;font-size:11px;font-weight:600;letter-spacing:.08em;
+  color:var(--muted);text-transform:uppercase;
+}
+
+/* ---- Map ---- */
+.map{
+  flex:1 1 auto;position:relative;min-width:0;overflow:hidden;
+  background:radial-gradient(120% 95% at 50% 44%, #ffffff 0%, #eef3fa 55%, #e4ecf6 100%);
+}
+.map-grid{display:none}
+.map-vignette{
+  position:absolute;inset:0;pointer-events:none;
+  background:radial-gradient(78% 68% at 50% 46%, transparent 60%, rgba(5,40,74,.06) 100%);
+}
+
+.map-top{
+  position:absolute;top:0;left:0;right:0;display:flex;align-items:flex-start;
+  justify-content:space-between;gap:16px;padding:16px 18px;z-index:6;pointer-events:none;
+}
+.map-top .eyebrow{color:var(--muted-2)}
+.map-here{font-size:14px;font-weight:700;color:var(--ink);letter-spacing:-.01em;margin-top:3px}
+.map-sub{font-size:11.5px;color:var(--muted);margin-top:1px}
+
+.batchcol{position:relative;display:flex;flex-direction:column;align-items:flex-end;gap:6px;pointer-events:none}
+.batchcap{font-size:10.5px;color:var(--muted);letter-spacing:.02em}
+.maprow{display:flex;align-items:center;gap:10px;justify-content:flex-end;pointer-events:auto}
+.refine-btn{
+  display:inline-flex;align-items:center;gap:6px;font-size:11.5px;font-weight:600;
+  color:var(--muted);border:1px solid var(--line);border-radius:999px;
+  padding:5px 11px 5px 9px;background:rgba(255,255,255,.85);pointer-events:auto;box-shadow:var(--shadow);
+}
+.refine-btn:hover,.refine-btn.open{background:#fff;color:var(--ink)}
+.refine-btn.active{border-color:var(--teal);color:var(--teal);background:#effafb}
+.refine-btn svg{width:12px;height:12px}
+.map-hint{
+  position:absolute;inset:0;z-index:14;display:grid;place-items:center;
+  padding:24px;background:rgba(228,236,246,.66);backdrop-filter:blur(2px);
+  animation:mh-in .35s ease both;
+}
+@keyframes mh-in{from{opacity:0}to{opacity:1}}
+.map-hint-card{
+  max-width:360px;background:var(--panel);border:1px solid var(--line);
+  border-radius:14px;box-shadow:var(--shadow);padding:22px 22px 20px;text-align:left;
+}
+.map-hint-card .eyebrow{display:block;margin-bottom:9px;color:var(--muted-2)}
+.map-hint-card p{font-size:14px;line-height:1.6;color:var(--ink);margin-bottom:18px}
+.map-hint-card p b{font-weight:700}
+.map-hint-card .btn{width:100%}
+.refine-pop{
+  position:absolute;top:100%;right:0;margin-top:9px;width:288px;
+  background:var(--panel);border:1px solid var(--line);border-radius:12px;
+  box-shadow:var(--shadow);padding:16px;pointer-events:auto;z-index:12;
+}
+.refine-reset{margin-top:14px;font-size:12px;font-weight:600;color:var(--purple)}
+.refine-reset:hover{text-decoration:underline}
+.batchbar{
+  display:flex;align-items:center;gap:4px;pointer-events:auto;background:rgba(255,255,255,.85);
+  border:1px solid var(--line);border-radius:999px;padding:4px;box-shadow:var(--shadow);
+}
+.batchbar button{
+  width:28px;height:28px;border-radius:999px;display:grid;place-items:center;
+  color:var(--muted);
+}
+.batchbar button:hover:not(:disabled){background:var(--page);color:var(--ink)}
+.batchbar button:disabled{opacity:.35;cursor:default}
+.batchbar button svg{width:13px;height:13px}
+.batchbar .count{
+  font-size:11.5px;color:var(--ink);padding:0 9px;font-weight:500;
+  font-variant-numeric:tabular-nums;white-space:nowrap;
+}
+
+.trail{
+  display:flex;flex-wrap:wrap;align-items:center;gap:5px;margin-top:8px;
+  pointer-events:auto;font-size:11.5px;
+}
+.trail button{color:var(--muted);text-decoration:underline;text-underline-offset:2px}
+.trail button:hover{color:var(--purple)}
+.trail span{color:var(--muted-2)}
+.trail b{color:var(--ink);font-weight:600}
+.lines{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:1}
+.nodes{position:absolute;inset:0;z-index:3}
+
+.hub{
+  position:absolute;transform:translate(-50%,-50%);z-index:5;
+  display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;
+}
+.hub .disc{
+  width:78px;height:78px;border-radius:50%;background:var(--ink);
+  display:grid;place-items:center;
+  box-shadow:0 6px 20px rgba(5,40,74,.28), 0 0 0 8px rgba(5,40,74,.06);
+}
+.hub .disc span{
+  color:#fff;font-size:9px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+  text-align:center;line-height:1.3;padding:0 6px;
+}
+.hub .cap{
+  font-size:13px;font-weight:700;color:var(--ink);text-align:center;max-width:200px;
+  line-height:1.3;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+}
+
+/* Prominent radial rings — distance from centre is the one thing the map encodes. */
+.ring{
+  position:absolute;transform:translate(-50%,-50%);border-radius:50%;
+  border:1.5px dashed rgba(5,40,74,.16);pointer-events:none;
+}
+.ring-label{
+  position:absolute;transform:translate(-50%,-50%);z-index:2;pointer-events:none;
+  font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--muted-2);background:linear-gradient(#eef3fa,#eef3fa);padding:0 6px;
+}
+
+.node{
+  position:absolute;transform:translate(-50%,-50%);z-index:4;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  width:150px;padding:0;
+}
+.node.fresh,.hub-btn.fresh{animation:arrive-soft .62s cubic-bezier(.34,1.12,.52,1) both}
+.node .dot{
+  border-radius:50%;display:grid;place-items:center;position:relative;
+  background:var(--teal);
+  box-shadow:0 3px 10px rgba(5,40,74,.18), 0 0 0 5px rgba(15,110,134,.1);
+  transition:transform .18s,box-shadow .18s;
+}
+.node:hover .dot,.node:focus-visible .dot{transform:scale(1.09);box-shadow:0 4px 14px rgba(5,40,74,.24), 0 0 0 6px rgba(15,110,134,.16)}
+.node.on .dot{box-shadow:0 3px 12px rgba(5,40,74,.22), 0 0 0 4px var(--purple)}
+.node .name{
+  font-size:12px;font-weight:600;color:var(--ink);text-align:center;line-height:1.28;
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+}
+.legend .row{display:flex;align-items:center;gap:7px;margin-bottom:5px}
+.legend .sw{width:11px;height:11px;border-radius:50%;flex-shrink:0}
+.sw.same{background:var(--teal)}
+.sw.snr{background:var(--purple)}
+.branch-dot{position:absolute;top:-5px;right:-5px;width:18px;height:18px;border-radius:50%;background:#fff;color:var(--ink);font-size:13px;font-weight:800;line-height:1;display:grid;place-items:center;border:1.5px solid var(--line);box-shadow:0 1px 3px rgba(5,40,74,.2)}
+.hub-btn{position:absolute;transform:translate(-50%,-50%);z-index:5;background:none;padding:0}
+.hub-btn .hub{position:static;transform:none}
+.hub-btn.on .disc{box-shadow:0 6px 20px rgba(5,40,74,.32), 0 0 0 5px var(--purple)}
+.branch-row{display:flex;flex-direction:column;gap:8px}
+.btn.branch{border:1px solid var(--line);background:var(--panel);color:var(--ink);justify-content:flex-start}
+.btn.branch:hover:not(:disabled){border-color:var(--muted-2)}
+.btn.branch:disabled{opacity:.5;cursor:default}
+.btn.branch .sw{width:12px;min-width:12px;height:12px;border-radius:50%;flex:none;display:inline-block}
+.btn.branch.same:hover:not(:disabled){border-color:var(--teal)}
+.btn.branch.snr:hover:not(:disabled){border-color:var(--purple)}
+.grow-badge{
+  position:absolute;top:-5px;right:-5px;min-width:20px;height:18px;padding:0 4px;
+  border-radius:999px;background:var(--teal);color:#fff;font-size:10px;font-weight:700;
+  display:grid;place-items:center;border:2px solid var(--page);box-shadow:0 1px 3px rgba(5,40,74,.3);
+}
+.node.can-grow .dot{cursor:pointer}
+.node.can-grow .dot::after{content:"";position:absolute;inset:-5px;border-radius:50%;border:1.5px dashed rgba(15,110,134,.45)}
+.node:not(.can-grow) .dot{background:#3c5a75}
+.grp-badge{
+  position:absolute;top:-4px;right:-4px;min-width:18px;height:18px;padding:0 4px;
+  border-radius:999px;background:var(--purple);color:#fff;font-size:10px;font-weight:700;
+  display:grid;place-items:center;border:2px solid var(--page);box-shadow:0 1px 3px rgba(5,40,74,.3);
+}
+.variants{
+  margin-bottom:18px;padding:12px 14px;background:var(--page);
+  border:1px solid var(--line);border-radius:var(--r);
+}
+.variants .eyebrow{display:block;margin-bottom:8px;color:var(--muted-2)}
+.variants ul{list-style:none;display:flex;flex-direction:column;gap:5px}
+.variants li{font-size:12.5px;color:var(--ink);padding-left:14px;position:relative}
+.variants li::before{content:"";position:absolute;left:2px;top:8px;width:4px;height:4px;border-radius:50%;background:var(--teal)}
+.node .fam{
+  font-size:10px;color:var(--muted-2);text-align:center;line-height:1.25;letter-spacing:.02em;
+}
+@keyframes arrive-soft{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.55)}
+  55%{opacity:1}
+  100%{opacity:1;transform:translate(-50%,-50%) scale(1)}
+}
+.fresh-line{animation:line-in .6s ease both}
+@keyframes line-in{from{opacity:0}to{opacity:1}}
+
+.legend{
+  position:absolute;left:18px;bottom:16px;z-index:6;
+  background:rgba(255,255,255,.9);border:1px solid var(--line);
+  border-radius:9px;padding:11px 13px;box-shadow:var(--shadow);max-width:210px;
+}
+.legend .eyebrow{color:var(--muted-2);margin-bottom:6px;display:block}
+.legend p{font-size:11.5px;color:var(--muted);line-height:1.5}
+.legend .scale{display:flex;align-items:center;gap:7px;margin-top:8px}
+.legend .scale i{height:8px;border-radius:4px;background:var(--teal);flex-shrink:0}
+.legend .scale .near{width:9px;opacity:1}
+.legend .scale .far{width:9px;opacity:.4}
+.legend .scale span{font-size:10px;color:var(--muted-2)}
+
+.map-empty{
+  position:absolute;inset:0;display:grid;place-items:center;z-index:6;
+  text-align:center;padding:30px;
+}
+.map-empty p{font-size:13.5px;color:var(--muted);max-width:34ch;line-height:1.6}
+
+/* pre-reveal teaser — a slim promise of the map, not the map itself */
+.teaser{
+  position:absolute;inset:0;z-index:8;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:9px;text-align:center;
+  padding:22px 12px;overflow:hidden;width:100%;height:100%;
+}
+.teaser-ghost{position:absolute;inset:0;opacity:.55;pointer-events:none}
+.teaser-lab{position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;gap:5px}
+.teaser-lab .eyebrow{color:var(--muted-2)}
+.teaser-count{font-size:12.5px;font-weight:700;color:var(--ink)}
+.teaser-hint{
+  font-size:10.5px;color:var(--muted);line-height:1.4;
+  display:inline-flex;align-items:center;gap:5px;margin-top:2px;
+}
+.teaser-hint svg{width:11px;height:11px}
+.teaser:hover .teaser-hint{color:var(--purple)}
+.teaser:hover .teaser-ghost{opacity:.72}
+
+/* ---- Detail panel ---- */
+#floatCard{position:absolute;z-index:20;width:322px;max-width:calc(100% - 28px)}
+.detail{
+  display:flex;flex-direction:column;width:100%;
+  max-height:min(70vh,540px);background:var(--panel);
+  border:1px solid var(--line);border-radius:14px;overflow:hidden;
+  box-shadow:0 10px 34px rgba(5,40,74,.22), 0 2px 6px rgba(5,40,74,.1);
+  animation:cardpop .26s cubic-bezier(.22,.7,.3,1);
+}
+@keyframes cardpop{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
+.detail-h{padding:16px 18px 12px;border-bottom:1px solid var(--line-soft);flex-shrink:0}
+.detail-h .top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.band{
+  display:inline-flex;align-items:center;gap:6px;font-size:10.5px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;padding:4px 9px;border-radius:5px;
+}
+.band i{width:7px;height:7px;border-radius:50%;background:currentColor}
+.detail-h h2{font-size:19px;font-weight:700;letter-spacing:-.02em;line-height:1.25;margin:10px 0 6px}
+.detail-meta{display:flex;flex-wrap:wrap;gap:6px}
+.tag{
+  font-size:11px;color:var(--muted);background:var(--page);
+  border:1px solid var(--line);border-radius:5px;padding:2px 7px;
+}
+.x{width:30px;height:30px;border-radius:8px;border:1px solid var(--line);display:grid;place-items:center;color:var(--muted);flex-shrink:0}
+.x:hover{background:var(--page);color:var(--ink)}
+.x svg{width:13px;height:13px}
+.detail-b{flex:1;overflow-y:auto;padding:18px 22px}
+.detail-b .eyebrow{margin-bottom:9px;display:block}
+.detail-b .eyebrow + .acts{margin-bottom:20px}
+.overlap-line{
+  font-size:13.5px;color:var(--muted);margin-bottom:16px;padding-bottom:14px;
+  border-bottom:1px solid var(--line-soft);
+}
+.overlap-line b{color:var(--ink);font-weight:700}
+.detail-f{padding:14px 22px 18px;border-top:1px solid var(--line-soft);flex-shrink:0}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important;transition-duration:.01ms !important}
+}
+
+/* ---- Responsive ---- */
+@media (max-width:1080px){ .walk{width:340px} .detail{width:340px} }
+@media (max-width:760px){
+  .poc-tag{display:none}
+  .chip-role .lbl{display:none}
+  .appbar{padding:10px 14px;gap:10px}
+  .brand strong{font-size:12.5px}
+  .map-top{flex-direction:column;align-items:stretch;gap:8px;padding:12px 14px}
+  .batchbar{align-self:flex-start}
+  .legend{left:12px;right:12px;bottom:12px;max-width:none}
+  .legend p{font-size:11px}
+  .node{width:104px}
+}
+@media (max-width:860px){
+  .explorer{flex-direction:column}
+  .walk,.explorer.pre .walk,.walk.slim{width:100% !important}
+  .walk{border-right:none;border-bottom:1px solid var(--line);max-height:56vh}
+  /* Pre-reveal on mobile: walk owns the screen, map is a short teaser bar below. */
+  .explorer.pre .walk{max-height:none;flex:1 1 auto}
+  .explorer.pre .walk-body,.explorer.pre .walk-foot,.explorer.pre .privacy{max-width:none}
+  .explorer.pre .map{flex:0 0 78px;min-height:0}
+  .walk.slim{max-height:none;height:52px}
+  .walk.slim .slim-tab{flex-direction:row;padding:0 16px;justify-content:flex-start}
+  .walk.slim .vert{writing-mode:horizontal-tb}
+  .map{min-height:60vh}
+  .teaser{flex-direction:row;gap:14px;padding:0 18px}
+  .teaser-lab{flex-direction:row;align-items:center;gap:10px}
+  .teaser-hint{margin-top:0}
+  #floatCard{left:8px!important;right:8px!important;top:auto!important;bottom:8px!important;width:auto;max-width:none}
+  .detail{max-height:64vh}
+  .chip-role{max-width:40vw}
+}
+
+/* ===== BANK BAR ===== */
+.bankbar{position:absolute;top:14px;left:50%;transform:translateX(-50%);z-index:30;
+  display:flex;align-items:center;gap:14px;background:var(--panel);border:1px solid var(--line);
+  border-radius:999px;padding:8px 8px 8px 16px;box-shadow:var(--shadow);max-width:calc(100% - 40px);flex-wrap:wrap;justify-content:center}
+.bank-lbl{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted-2)}
+.bank-lbl svg{width:13px;height:13px}
+.bankchips{display:flex;gap:6px}
+.bankchip{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:600;border-radius:999px;padding:5px 6px 5px 11px;max-width:190px}
+.bankchip.filled{background:#f4eefb;color:var(--purple);border:1px solid #e2d5f0}
+.bankchip.empty{color:var(--muted-2);border:1px dashed var(--line);padding:5px 11px}
+.bankchip .bc-t{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bc-x{width:16px;height:16px;border-radius:50%;display:grid;place-items:center;color:var(--purple);flex-shrink:0}
+.bc-x:hover{background:#e7d9f5}.bc-x svg{width:9px;height:9px}
+.bank-warn{display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--down);max-width:230px;line-height:1.3}
+.bank-warn svg{width:14px;height:14px;flex-shrink:0}
+.bank-compare{font-size:12.5px;padding:9px 16px}
+.bank-btn{border:1px solid var(--line);background:var(--panel);color:var(--ink);justify-content:flex-start}
+.bank-btn:hover{border-color:var(--purple);color:var(--purple)}
+.bank-btn.on{background:#f4eefb;border-color:#e2d5f0;color:var(--purple)}
+
+/* ===== COMPARE ===== */
+.cmp{flex:1;overflow-y:auto;background:var(--page);padding:26px 26px 60px}
+.cmp-head{display:flex;flex-direction:column;gap:12px;max-width:980px;margin:0 auto 20px}
+.cmp-head .ws-back{align-self:flex-start;font-size:12.5px;font-weight:600;color:var(--muted);display:inline-flex;align-items:center;gap:5px}
+.cmp-head .ws-back svg{width:14px;height:14px}.cmp-head .ws-back:hover{color:var(--purple)}
+.cmp-head h2{font-size:22px;font-weight:700;letter-spacing:-.02em;margin-top:3px}
+.cmp-head .cmp-sub{font-size:13px;color:var(--muted);margin-top:3px}
+.cmp-grid{display:grid;gap:0;max-width:980px;margin:0 auto;align-items:stretch}
+.cmp-corner{border-bottom:1px solid var(--line)}
+.cmp-col-h{padding:10px 12px;font-size:12px;font-weight:700;color:var(--ink);border-bottom:1px solid var(--line);border-left:1px solid var(--line-soft);line-height:1.25;text-align:center}
+.cmp-col-h span{display:block;font-size:10px;font-weight:600;color:var(--muted-2);margin-top:2px}
+.cmp-col-h.you{background:#0d2b4a08}
+.cmp-col-h .ybadge{display:inline-block;font-size:9px;font-weight:800;letter-spacing:.1em;color:#fff;background:var(--ink);border-radius:4px;padding:1px 6px;margin-bottom:4px}
+.cmp-band{max-width:980px;margin:20px auto 0;padding:8px 2px}
+.cmp-band .eyebrow{color:var(--teal)} .cmp-band.gap .eyebrow{color:var(--down)}
+.cmp-band em{font-style:normal;font-weight:600;color:var(--muted-2);text-transform:none;letter-spacing:0}
+.cmp-row{display:contents}
+.cmp-cap{padding:11px 12px;font-size:12.5px;font-weight:600;color:var(--ink);border-bottom:1px solid var(--line-soft);display:flex;align-items:center}
+.cmp-cell{padding:9px 12px;border-bottom:1px solid var(--line-soft);border-left:1px solid var(--line-soft);display:flex;align-items:center;justify-content:center;gap:6px}
+.cmp-cell.you{background:#0d2b4a06}
+.cmp-cell.ok{background:#effaf7}.cmp-cell.gap{background:#fbf3ea}
+.cmp-cell.empty{color:var(--muted-2)}
+.cmp-delta{font-size:10px;font-weight:700;color:var(--down);background:#f5e3cf;border-radius:4px;padding:1px 5px}
+.lvl{width:22px;height:22px;border-radius:6px;display:inline-grid;place-items:center;font-size:11px;font-weight:800;color:#fff;background:var(--teal)}
+.lvl.none{background:transparent;color:var(--muted-2);border:1px dashed var(--line);font-weight:600}
+.lvl1{background:#9bb3c7}.lvl2{background:#5f97b0}.lvl3{background:#0f6e86}.lvl4{background:#0b566a}.lvl5{background:#05284a}
+.cmp-legend{display:flex;flex-wrap:wrap;gap:16px;max-width:980px;margin:16px auto 0;font-size:11.5px;color:var(--muted)}
+.cmp-legend i{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:5px;vertical-align:middle;margin-right:4px;font-size:10px;color:#fff;font-style:normal}
+.cmp-swatch{width:14px!important;height:14px!important;border-radius:4px}
+.cmp-swatch.ok{background:#effaf7;border:1px solid #bfe6da}.cmp-swatch.gap{background:#fbf3ea;border:1px solid #e6d3ba}
+.cmp-actions{max-width:980px;margin:28px auto 0;padding-top:22px;border-top:1px solid var(--line)}
+.build-btn{justify-content:flex-start;gap:10px}.build-btn b{font-weight:700}
+.build-btn svg:last-child{margin-left:auto;width:14px;height:14px;color:var(--muted-2)}
+
+/* ===== BUILD (LLM) ===== */
+.build-gaps{display:flex;flex-wrap:wrap;gap:7px;max-width:820px;margin:0 auto 20px}
+.gchip{font-size:12px;font-weight:600;color:var(--ink);background:#fbf3ea;border:1px solid #e6d3ba;border-radius:999px;padding:5px 11px}
+.gchip em{font-style:normal;color:var(--down);font-weight:700;margin-left:4px}
+.build-body{max-width:820px;margin:0 auto}
+.build-loading{display:flex;flex-direction:column;align-items:center;gap:14px;padding:50px 0;color:var(--muted)}
+.spin{width:30px;height:30px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--purple);animation:spin 0.8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.build-note{font-size:12.5px;color:var(--muted-2);background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:10px 12px;margin-bottom:16px}
+.build-cap{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:12px;box-shadow:var(--shadow)}
+.build-cap h4{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+.build-cap h4::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--purple)}
+.build-cap ul{list-style:none;display:flex;flex-direction:column;gap:8px}
+.build-cap li{font-size:13px;line-height:1.45;color:var(--ink);padding-left:22px;position:relative}
+.build-cap li::before{content:"";position:absolute;left:4px;top:7px;width:6px;height:6px;border-radius:2px;background:var(--teal)}
+.build-foot{display:flex;align-items:center;gap:14px;margin-top:18px;flex-wrap:wrap}
+.build-disclaim{font-size:11.5px;color:var(--muted-2)}
+@media (max-width:720px){ .cmp{padding:18px 14px 50px} .cmp-cap{font-size:11.5px} .lvl{width:20px;height:20px} }
+
+/* ---- in-constellation route drawer ---- */
+.cmp.route .rt-track{position:relative;display:flex;flex-direction:column;margin-top:18px;max-width:640px}
+.cmp.route .rt-track:before{content:"";position:absolute;left:11px;top:16px;bottom:30px;width:2px;background:var(--line)}
+.rt-node{position:relative;padding:0 0 0 34px}
+.rt-dot{position:absolute;left:5px;top:16px;width:14px;height:14px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 4px #effafb;z-index:1}
+.rt-node.start .rt-dot{background:var(--ink);box-shadow:0 0 0 4px var(--page)}
+.rt-node.dest .rt-dot{background:var(--purple);box-shadow:0 0 0 4px #f4eefb}
+.rt-node.dest.short .rt-dot{background:var(--muted);box-shadow:0 0 0 4px var(--page)}
+.rt-conn{padding:10px 0 10px 34px;margin-left:-34px}
+.rt-delta{display:inline-block;position:relative;z-index:1;font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted);background:var(--page);border:1px solid var(--line);border-radius:999px;padding:2px 9px}
+.rt-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:12px 14px;box-shadow:var(--shadow)}
+.rt-node.dest .rt-card{border-color:#e3d4f5}
+.rt-tag{display:block;font-size:11px;letter-spacing:.04em;text-transform:uppercase;font-weight:600;margin-bottom:3px;color:var(--teal)}
+.rt-tag.step{color:var(--slate)} .rt-tag.dest{color:var(--purple)}
+.rt-node.start .rt-tag{color:var(--ink)}
+.rt-card h4{margin:0;font-size:15px;color:var(--ink)}
+.rt-grade{font-size:12.5px;color:var(--muted);margin-top:2px}
+.rt-band{margin:8px 0 0;font-size:13px;line-height:1.5;color:var(--slate)}
+.rt-foot{margin:18px 0 0;font-size:12px;color:var(--muted);max-width:640px;line-height:1.5}
+.route-empty{display:flex;gap:12px;align-items:flex-start;max-width:560px;margin-top:22px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;box-shadow:var(--shadow)}
+.route-empty svg{flex:none;color:var(--purple)}
+.route-empty p{margin:0;font-size:14px;line-height:1.55;color:var(--slate)}
+</style>
+</head>
+<body>
+
+<header class="appbar">
+  <div class="mark" aria-hidden="true">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/>
+    </svg>
+  </div>
+  <div class="brand"><strong>Career Pathways</strong><span>TAFE NSW</span></div>
+  <span class="poc-tag">Proof of concept</span>
+  <div class="spacer"></div>
+  <div class="chip-role" id="roleChip" hidden>
+    <span class="lbl">Your role</span>
+    <span class="val" id="roleChipVal"></span>
+    <button id="changeRole">Change</button>
+  </div>
+</header>
+
+<main class="stage" id="stage"></main>
+
+<script>
+/* ROUTE — in-constellation walk. Reuses the walk's edge-graph scorer to
+   auto-compute the most-doable path between two roles. Self-contained,
+   namespaced; carries its own dataset and bridges to the map by title. */
+const ROUTE=(function(){
+const D=__ROUTE_DATA__;
+const RS=D.r, EG=D.e, IDF=D.idf, VOCAB=D.vocab, ADJ=D.adj;
+const T2I={}; for(let i=0;i<RS.length;i++){const k=RS[i].t.toLowerCase(); if(!(k in T2I)) T2I[k]=i;}
+function findIdx(title){const k=String(title||'').toLowerCase(); return (k in T2I)?T2I[k]:null;}
+function famTierTo(fam,tfam){ if(!fam||!tfam) return 2; if(fam===tfam) return 0; const t=ADJ[fam+'|'+tfam]; return t==null?2:t; }
+function actOverlapAcc(accActs,bi){ const B=RS[bi].act; if(!B.length||!accActs.size) return null; let wi=0,wd=0; for(const x of B){const w=1-(VOCAB[x]?VOCAB[x].share:0); wd+=w; if(accActs.has(x)) wi+=w;} return wd? wi/wd : null; }
+function accFrom(ids){const a={};ids.forEach(i=>RS[i].ac.forEach(([c,l])=>{a[c]=Math.max(a[c]||0,l);}));return a;}
+function accActFrom(ids){const s=new Set();ids.forEach(i=>RS[i].act.forEach(x=>s.add(x)));return s;}
+function readiness(acc,tgt){let num=0,den=0;const t=RS[tgt]; for(const [cap,req] of t.fc){const w=0.35+(IDF[cap]||0.6);den+=w;const have=acc[cap]; if(have==null)continue; if(have>=req)num+=w; else if(req-have===1)num+=w*0.6; else num+=w*0.3;} return den?num/den:0;}
+function altd(a,b){return (RS[b].a-RS[a].a)/10;}
+function nextOptions(state){
+  const cur=state.path[state.path.length-1];
+  const r0=readiness(state.acc,state.target);
+  const opts=[];
+  for(const ed of (EG[String(cur)]||[])){
+    const j=ed.to; if(state.path.includes(j))continue;
+    const rs=readiness(state.acc,j); if(rs<0.55)continue;
+    const acc2={...state.acc}; RS[j].ac.forEach(([c,l])=>{acc2[c]=Math.max(acc2[c]||0,l);});
+    const rt=readiness(acc2,state.target);
+    const aCand=actOverlapAcc(state.accAct,j);
+    const aNow=actOverlapAcc(state.accAct,state.target);
+    const acc2Act=new Set(state.accAct); RS[j].act.forEach(x=>acc2Act.add(x));
+    const aAfter=actOverlapAcc(acc2Act,state.target);
+    const aGain=(aNow!=null&&aAfter!=null)?(aAfter-aNow):null;
+    opts.push({j,rs,rt,gain:rt-r0,dg:ed.dg,aCand,aGain,toward:RS[j].a<=RS[state.target].a});
+  }
+  const tfam=RS[state.target].f, tsub=RS[state.target].s;
+  const compass=o=>{ const ft=famTierTo(RS[o.j].f,tfam); let pull=RS[o.j].f===tfam?1.00:(ft===1?0.35:-0.50); if(tsub&&RS[o.j].s===tsub) pull+=0.60; return pull; };
+  const key=o=>{ const prog=o.gain*10; const actProg=(o.aGain!=null&&o.aGain>0)?o.aGain*5:0; const toGrade=-Math.abs(altd(o.j,state.target))*0.6; let tie; if(o.aCand==null)tie=0; else if(o.aCand<0.02)tie=-1.5; else tie=o.aCand*0.5; return prog+actProg+compass(o)+toGrade+tie; };
+  opts.sort((a,b)=>key(b)-key(a));
+  opts.forEach(o=>{o.toTargetFam=RS[o.j].f===tfam;});
+  return {opts,r0};
+}
+function arrivedWithinRange(state){
+  const cur=state.path[state.path.length-1];
+  const r0=readiness(state.acc,state.target);
+  const direct=(EG[String(cur)]||[]).some(e=>e.to===state.target);
+  return (direct && r0>=0.70) || r0>=0.90;
+}
+function route(startTitle,targetTitle){
+  const s=findIdx(startTitle), t=findIdx(targetTitle);
+  if(s==null) return {status:'nomatch',which:'start'};
+  if(t==null) return {status:'nomatch',which:'target'};
+  const base={startRole:{title:RS[s].t,grade:RS[s].cl||RS[s].c}, targetRole:{title:RS[t].t,grade:RS[t].cl||RS[t].c}};
+  if(s===t) return {status:'same',...base,chain:[]};
+  const state={start:s,target:t,path:[s],acc:accFrom([s]),accAct:accActFrom([s])};
+  const startReadiness=readiness(state.acc,t);
+  const chain=[]; const MAX=6; let status='capped';
+  while(true){
+    if(arrivedWithinRange(state)){ status='arrived'; break; }
+    if(state.path.length-1>=MAX){ status='capped'; break; }
+    const {opts}=nextOptions(state);
+    if(!opts.length || opts[0].gain<=0.001){ status=(state.path.length===1?'noway':'deadend'); break; }
+    const best=opts[0];
+    state.path.push(best.j);
+    RS[best.j].ac.forEach(([c,l])=>{state.acc[c]=Math.max(state.acc[c]||0,l);});
+    RS[best.j].act.forEach(x=>state.accAct.add(x));
+    chain.push({idx:best.j,title:RS[best.j].t,grade:RS[best.j].cl||RS[best.j].c,dg:best.dg,actOverlap:best.aCand,sameField:best.toTargetFam});
+    if(best.j===t){ status='arrived'; break; }
+  }
+  return {status,...base,chain,startReadiness,
+    targetOverlap:actOverlapAcc(state.accAct,t),
+    targetReadiness:readiness(state.acc,t),
+    lastTitle:RS[state.path[state.path.length-1]].t};
+}
+return {route,findIdx};
+})();
+
+</script>
+<script>
+const DATA = __CONSTELLATION_DATA__;
+
+/* ============================================================
+   MODEL
+   ============================================================ */
+const R = DATA.roles, FAM = DATA.families, TIER = DATA.tiers, CL = DATA.clusters, CAPS = DATA.caps;
+/* NSW Capability Framework levels 1..5(+) in plain words. */
+const LEVELS={1:'Foundational',2:'Intermediate',3:'Adept',4:'Advanced',5:'Highly Advanced',6:'Highly Advanced',7:'Highly Advanced'};
+function capMap(role){ const m={}; (role.cp||[]).forEach(([i,l])=>m[i]=l); return m; }
+/* Compare the current role against a target: which capabilities are shared
+   (both hold), and which are gaps (target needs one the current lacks, or at a
+   higher level). Returns levels so the gap depth is explicit. */
+function capCompare(cur,tgt){
+  const a=capMap(cur), b=capMap(tgt);
+  const shared=[], gaps=[];
+  Object.keys(b).forEach(k=>{ k=+k;
+    const need=b[k], have=a[k]||0;
+    if(have>=need && have>0) shared.push({i:k, have, need});
+    else if(have>0 && have<need) gaps.push({i:k, have, need, kind:'lift'});
+    else gaps.push({i:k, have:0, need, kind:'new'});
+  });
+  shared.sort((x,y)=>y.need-x.need); gaps.sort((x,y)=>(y.need-y.have)-(x.need-x.have));
+  return {shared,gaps};
+}
+
+const TITLE_STOP = new Set(['senior','officer','coordinator','manager','support','lead','team',
+  'leader','specialist','administrator','assistant','head','director','and','of','the','a',
+  'identified','aboriginal','role','snr']);
+
+function titleTokens(t){
+  const s = new Set();
+  (t.toLowerCase().match(/[a-z]+/g)||[]).forEach(w=>{ if(!TITLE_STOP.has(w)) s.add(w); });
+  return s;
+}
+/* Two titles describe the same job — not a pathway — when one title's
+   meaningful words are contained in the other's, or when they mostly
+   coincide. "Payroll Officer" vs "Payroll Disbursement Officer" is the
+   same job with a narrower scope, and surfacing it as a discovery is noise. */
+/* Because PD titles are inconsistent, near-identical roles get slightly
+   different names (Performance and Risk Analyst / Risk and Performance Advisor).
+   For grouping we reduce a title to its substantive domain words, treating
+   role-type and seniority words as interchangeable. Same family + same grade +
+   same domain signature  =>  one node, variants listed inside. */
+const GROUP_STOP=new Set(['senior','snr','junior','officer','coordinator','manager','support',
+'lead','team','leader','specialist','administrator','administrative','assistant','head',
+'director','advisor','adviser','analyst','engineer','consultant','technician','associate',
+'principal','trainee','graduate','and','of','the','a','an','to','for','identified',
+'aboriginal','role','staff','services','service']);
+function groupSig(title){
+  const w=(title.toLowerCase().match(/[a-z]+/g)||[]).filter(x=>!GROUP_STOP.has(x));
+  return Array.from(new Set(w)).sort().join(' ');
+}
+function sameJob(a,b){
+  const A=titleTokens(a),B=titleTokens(b);
+  if(!A.size||!B.size) return false;
+  let inter=0; A.forEach(w=>{ if(B.has(w)) inter++; });
+  if(inter===A.size||inter===B.size) return true;
+  return inter/(A.size+B.size-inter)>=0.5;
+}
+R.forEach(r=>{ r._n = Math.sqrt(r.p.reduce((s,c)=>s+CL[c].w,0)); });
+
+function famRel(a,b){ return a===b ? -1 : TIER[a][b]; }
+
+/* A band says one plain thing: how much of THAT job is work you already do.
+   It is a proportion of the target role's activity profile, not an opaque
+   score — so the legend can state the measure and the number can be shown.
+   Thresholds calibrated against the real distribution across all 939 roles. */
+const BANDS = {
+  close  :{key:'close',  label:'Closely related', note:'Half or more of the job',      colour:'#3fa8bf', ink:'#0f6e86', ring:0},
+  related:{key:'related',label:'Related field',   note:'A quarter to a half',          colour:'#9a72d4', ink:'#4b1482', ring:1},
+  stretch:{key:'stretch',label:'A stretch',       note:'Less than a quarter',          colour:'#8fa2b6', ink:'#5b6b7f', ring:2}
+};
+function bandFor(prop){
+  if(prop>=0.40) return BANDS.close;
+  if(prop>=0.25) return BANDS.related;
+  return BANDS.stretch;
+}
+/* A move should be a step, not a leap across the organisation. We reach a
+   little further upward than downward, because that is the direction people
+   are usually asking about. */
+const REACH_UP = 40, REACH_DOWN = 30;
+
+function candidates(srcIdx){
+  const src = R[srcIdx];
+  const sp = new Set(src.p);
+  const strict = [], relaxed = [];
+  for(let i=0;i<R.length;i++){
+    if(i===srcIdx) continue;
+    const c = R[i];
+    if(famRel(src.f,c.f)===2) continue;            // distant families are gated out entirely
+    if(sameJob(src.t,c.t)) continue;               // same job under another name is not a pathway
+    const gd = c.go-src.go;
+    if(gd>REACH_UP||gd<-REACH_DOWN) continue;
+    let w=0,shared=[];
+    for(const cl of c.p) if(sp.has(cl)){ shared.push(cl); w+=CL[cl].w; }
+    const score = (src._n&&c._n) ? w/(src._n*c._n) : 0; // rarity-weighted overlap drives the ranking
+    const rel = famRel(src.f,c.f);
+    /* Same field: a modest overlap is enough — it is genuinely the same kind of
+       work. A DIFFERENT field has to earn its place with substantially more
+       shared work, or it is just generic-admin coincidence (a payroll clerk and
+       an IT tester both "keep records"). This is what stops distant roles
+       surfacing on two throwaway activities. */
+    const strictMatch = rel===-1
+      ? shared.length>=2 && score>=0.18
+      : shared.length>=3 && score>=0.26;
+    /* Those thresholds were calibrated against the reference's 939 roles and
+       240 broad activity clusters. The unified source has 1,171 roles and 698
+       finer clusters, so a second, visibly weaker pool is needed to keep the
+       intended three-way fan and branch controls functional. Distant families
+       remain excluded above; every relaxed candidate must still share work. */
+    const relaxedMatch = shared.length>=1 && (
+      (rel===-1 && score>=0.055) ||
+      (rel===0  && score>=0.075) ||
+      (rel===1  && shared.length>=2 && score>=0.10)
+    );
+    if(!strictMatch && !relaxedMatch) continue;
+    const prop = shared.length/c.p.length;    // plain overlap drives what we tell people
+    const gap = c.p.filter(cl=>!sp.has(cl));
+    shared.sort((a,b)=>CL[b].w-CL[a].w);
+    gap.sort((a,b)=>CL[b].w-CL[a].w);
+    (strictMatch?strict:relaxed).push({i,role:c,score,prop,shared,gap,band:bandFor(prop),rel});
+  }
+  strict.sort((a,b)=>b.score-a.score);
+  relaxed.sort((a,b)=>b.score-a.score);
+  const out = strict.concat(relaxed);
+  /* Collapse near-duplicate roles into groups. out is sorted best-first, so the
+     first role of each signature becomes the representative and the rest are
+     attached as members — one node instead of five near-identical ones. */
+  const byKey=new Map(); const grouped=[];
+  for(const c of out){
+    const sg=groupSig(c.role.t);
+    const key = sg ? (c.role.f+'|'+c.role.go+'|'+sg) : ('solo:'+c.i);
+    const g=byKey.get(key);
+    if(g){ if(g.members.length<12) g.members.push(c.role); }
+    else { c.members=[c.role]; byKey.set(key,c); grouped.push(c); }
+  }
+  return grouped;
+}
+
+function batchSize(){ return window.innerWidth<760 ? 3 : 5; }
+
+/* ---- Soft preferences ----------------------------------------------------
+   These never remove a role from the pool (they are refinements, not gates).
+   They re-weight the ordering, so a stated preference pulls matching roles
+   toward the front and pushes others back — the map still shows everything. */
+const PREF_GROUPS=[
+  {g:'move',  q:'What kind of move are you looking for?',            opts:[['up','Move up'],['level','Similar level'],['any','Open to either']]},
+  {g:'lead',  q:'How do you feel about leading a team?',             opts:[['yes','I\u2019d like to'],['open','I\u2019m open to it'],['no','I\u2019d rather not']]},
+  {g:'field', q:'How close do you want to stay to your current work?', opts:[['stay','Stay in my area'],['related','Something related'],['open','Something different']]},
+];
+/* 'any' (move) and 'open' (lead) are the no-preference answers — selectable,
+   but they apply no weighting. A dimension only steers when set to a real
+   preference; nothing is ever selected until the person chooses. */
+function prefsActive(){
+  return (S.pref.move && S.pref.move!=='any') || (S.pref.lead && S.pref.lead!=='open') || !!S.pref.field;
+}
+function isManagerRole(role){
+  return role.go>=100 || /\b(manager|director|head|principal|lead|chief|coordinator)\b/i.test(role.t);
+}
+function prefScore(c){
+  const src=R[S.srcIdx]; if(!src) return 0;
+  let s=0;
+  const gd=c.role.go-src.go;
+  // What kind of move.  By default (and for up/level) below-grade roles are
+  // nudged back — a demotion isn't the first thing to show. "Open to either"
+  // (move==='any') removes that nudge, surfacing down-moves on equal footing.
+  if(S.pref.move!=='any' && gd < -8) s -= 0.35*Math.min(1,-gd/40);
+  if(S.pref.move==='up')         s += 0.7*Math.max(0,gd)/40;                   // reward stepping up
+  else if(S.pref.move==='level') s += 0.5*(1-Math.min(1,Math.abs(gd)/30));     // reward staying near current grade
+  // Leading a team
+  const mgr=isManagerRole(c.role);
+  if(S.pref.lead==='yes')     s += mgr? 0.5 : -0.4;
+  else if(S.pref.lead==='no') s += mgr? -0.5 : 0.3;
+  // How close to current work
+  if(S.pref.field==='stay')         s += c.rel===-1? 0.5 : (c.rel===0? 0.05 : -0.4);
+  else if(S.pref.field==='related') s += c.rel===-1? -0.1 : (c.rel===0? 0.4 : 0.1);
+  else if(S.pref.field==='open')    s += c.rel===-1? -0.4 : 0.4;
+  return s;
+}
+
+/* Rarity-weighted overlap between two roles' clustered profiles. Same measure
+   the ranking uses, but here it compares a candidate to the HOOK role rather
+   than to the person's current role. */
+function roleSim(a,b){
+  const pa=new Set(a.p); let w=0;
+  for(const cl of b.p) if(pa.has(cl)) w+=CL[cl].w;
+  const na=Math.sqrt(a.p.reduce((s,c)=>s+CL[c].w,0));
+  const nb=Math.sqrt(b.p.reduce((s,c)=>s+CL[c].w,0));
+  return (na&&nb) ? w/(na*nb) : 0;
+}
+
+/* The walk introduces ONE role — the hook. So the first thing the map shows
+   should be roles in the same vein as that hook, not a scatter across the
+   whole organisation. We order the candidate pool by closeness to the hook
+   and let each set step further out. Set one is the reassuring neighbourhood;
+   cycling is the act of choosing to look further afield. */
+function makeBatches(cands, hook, max=25){
+  const BATCH = batchSize();
+  const anchor = hook ? hook.role : (cands[0] && cands[0].role);
+  const active = prefsActive();
+  let pool = cands.slice(0, max).map(c=>({c, s:(anchor?roleSim(anchor,c.role):c.score) + prefScore(c)}));
+  pool.sort((a,b)=> b.s - a.s || b.c.score - a.c.score);
+
+  /* Drop near-identical titles so a set is a range of roles, not the same
+     role three times over. Conservative — only very close title matches go. */
+  const kept=[]; 
+  for(const p of pool){
+    if(kept.some(k=> sameJob(k.c.role.t, p.c.role.t))) continue;
+    kept.push(p);
+  }
+  /* Pin the walked role to the front of set one — but only when the person
+     hasn't steered. Once they express a preference, let it win. */
+  if(hook && !active){
+    const hi=kept.findIndex(p=>p.c.i===hook.i);
+    if(hi>0){ const [h]=kept.splice(hi,1); kept.unshift(h); }
+    else if(hi<0){ kept.unshift({c:hook,s:1}); }
+  }
+
+  const batches=[];
+  for(let i=0;i<kept.length;i+=BATCH) batches.push(kept.slice(i,i+BATCH).map(p=>p.c));
+  return batches;
+}
+
+function gradeDelta(a,b){
+  const d=b-a;
+  if(d>=25) return 'up';
+  if(d<=-25) return 'down';
+  return 'level';
+}
+function honestTake(src,c){
+  const g = gradeDelta(src.go,c.role.go);
+  const sameFam = c.rel===-1;
+  if(c.band.key==='close'){
+    if(g==='up') return `Most of this job is work someone here already does, at a higher grade. A real step up, not a sideways move.`;
+    if(g==='down') return `A lot of common ground, but at a lower grade. One for someone who cares more about the work than the level.`;
+    return sameFam
+      ? `Close to the current role and at a similar level — the safe move rather than the surprising one.`
+      : `Close in the work itself, but in a different part of the organisation. More a change of setting than a change of job.`;
+  }
+  if(c.band.key==='related'){
+    if(g==='up') return `Real common ground, but a step up as well as a step across. The new parts would take some deliberate building.`;
+    return `A genuine change of focus with shared ground underneath. Not starting from scratch, but there would be learning.`;
+  }
+  if(g==='up') return `A stretch, and at a higher grade. The overlap is real but thin — a direction to work towards, not a next step.`;
+  return `A stretch. The link is real but narrow, so it would take deliberate effort. One to explore if the work appeals.`;
+}
+
+function relLabel(c,src){
+  if(c.rel===-1) return 'Same job family';
+  return FAM[c.role.f];
+}
+function titleCase(s){
+  return s.toLowerCase().replace(/\b[a-z]/g,m=>m.toUpperCase()).replace(/\bAnd\b/g,'and').replace(/\bOf\b/g,'of');
+}
+function an(w){
+  w=String(w).trim();
+  const first=(w.split(/\s+/)[0]||'');
+  // two-letter initialisms are read as letters: HR, IT, HR -> "an", but SAP (word) stays "a"
+  if(/^[A-Z]{2}$/.test(first)) return /^[AEFHILMNORSX]/.test(first)?'an':'a';
+  return /^[aeiou]/i.test(w)?'an':'a';
+}
+/* Plain-language overlap, aligned to the same thresholds the bands use, so the
+   words on the map and the words in the walk always agree. */
+function amountWord(prop){
+  if(prop>=0.40) return 'most of';
+  if(prop>=0.25) return 'much of';
+  return 'some of';
+}
+function esc(s){ return String(s).replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m])); }
+
+/* ============================================================
+   STATE  — every view renders from here; nothing reads the DOM back.
+   ============================================================ */
+const S = {
+  view:'front',      // 'front' | 'explore'
+  srcIdx:null,
+  cands:[], batches:[], hook:null,
+  step:1, revealed:false, slim:false,
+  batch:0, selected:null,
+  query:'', results:[], cursor:-1,
+  trail:[],           // roles stepped through, for the breadcrumb
+  away:[], hookIdx:0, // cross-family candidates + which one is the current hook
+  pref:{move:null, lead:null, field:null},  // soft steer; nothing set until chosen
+  refineOpen:false,
+  mapSeen:false,     // one-time orientation over the map
+  g:null,  // spawn graph {nodes, edges}
+  selNode:null,
+  banked:[],        // up to 3 roleIdx the person has saved
+  compare:false,    // showing the comparison screen
+  buildFor:null,    // roleIdx we're showing the 'close the gap' step for
+  pathTo:null       // target roleIdx for the in-map route drawer
+};
+const BANK_MAX=3;
+
+const stage = document.getElementById('stage');
+const roleChip = document.getElementById('roleChip');
+const roleChipVal = document.getElementById('roleChipVal');
+document.getElementById('changeRole').addEventListener('click',()=>{
+  S.view='front'; S.query=''; S.results=[]; S.cursor=-1; render();
+});
+
+const ICONS = {
+  search:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
+  check:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>',
+  plus:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>',
+  map:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 4L3 7v13l6-3 6 3 6-3V4l-6 3-6-3z"/><path d="M9 4v13M15 7v13"/></svg>',
+  chat:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 01-8 8H7l-4 3v-5.5A8 8 0 1121 12z"/></svg>',
+  doc:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></svg>',
+  cap:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4L2 9l10 5 10-5-10-5z"/><path d="M6 11.5V17c0 1.5 3 3 6 3s6-1.5 6-3v-5.5"/></svg>',
+  x:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>',
+  left:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg>',
+  right:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg>',
+  lock:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 118 0v3"/></svg>',
+  dice:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><circle cx="8.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="15.5" r="1.2" fill="currentColor"/><circle cx="15.5" cy="8.5" r="1.2" fill="currentColor"/><circle cx="8.5" cy="15.5" r="1.2" fill="currentColor"/></svg>',
+  sliders:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-6M20 11V3M1 14h6M9 8h6M17 15h6"/></svg>',
+  spark:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v3M12 18v3M3 12h3M18 12h3M6 6l2 2M16 16l2 2M18 6l-2 2M8 16l-2 2"/></svg>',
+  bookmark:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 011 1v17l-7-4-7 4V4a1 1 0 011-1z"/></svg>',
+  bookmarkfill:'<svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 2h12a1 1 0 011 1v18l-7-4-7 4V3a1 1 0 011-1z"/></svg>',
+  warn:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01M10.3 3.9L2 18a1.7 1.7 0 001.5 2.5h17A1.7 1.7 0 0022 18L13.7 3.9a1.7 1.7 0 00-3 0z"/></svg>',
+  compass:'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5 5-2z"/></svg>'
+};
+
+/* ============================================================
+   FRONT DOOR
+   ============================================================ */
+const SUGGEST = ['Payroll Officer','Student Administration Officer','Project Coordinator','Library Technician','Facilities Officer'];
+
+function searchRoles(q){
+  q=q.trim().toLowerCase();
+  if(q.length<2) return [];
+  const terms=q.split(/\s+/);
+  const hits=[];
+  for(let i=0;i<R.length;i++){
+    const t=R[i].t.toLowerCase();
+    let ok=true,pos=0;
+    for(const term of terms){ const k=t.indexOf(term); if(k<0){ok=false;break;} pos+=k; }
+    if(!ok) continue;
+    const starts = t.startsWith(terms[0]) ? 0 : 1;
+    hits.push({i,rank:[starts,pos,t.length]});
+  }
+  hits.sort((a,b)=>a.rank[0]-b.rank[0]||a.rank[1]-b.rank[1]||a.rank[2]-b.rank[2]);
+  return hits.slice(0,40).map(h=>h.i);
+}
+function highlight(title,q){
+  const terms=q.trim().toLowerCase().split(/\s+/).filter(t=>t.length>1);
+  let out=esc(title);
+  terms.forEach(t=>{
+    out=out.replace(new RegExp('('+t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','ig'),'<mark>$1</mark>');
+  });
+  return out;
+}
+
+function renderFront(){
+  roleChip.hidden = S.srcIdx===null;
+  stage.innerHTML = `
+  <div class="frontdoor">
+    <div class="fd-inner">
+      <span class="eyebrow">Start here</span>
+      <h1>What do you do now?</h1>
+      <p class="lede">Find your role and we will show you where else that work is done across TAFE NSW — including places you would not think to look.</p>
+      <div class="search-wrap">
+        <div class="search-field">
+          ${ICONS.search}
+          <input id="q" type="text" autocomplete="off" spellcheck="false"
+                 placeholder="Search ${R.length.toLocaleString()} roles by title" value="${esc(S.query)}"
+                 role="combobox" aria-expanded="${S.results.length>0}" aria-controls="results" aria-autocomplete="list">
+          ${S.query?'<button class="clear" id="clearQ" aria-label="Clear search">&times;</button>':''}
+        </div>
+        <div class="results" id="results" role="listbox" aria-label="Matching roles"></div>
+      </div>
+      <p class="fd-hint">Or try one of these:</p>
+      <div class="fd-suggest">${SUGGEST.map(s=>`<button data-s="${esc(s)}">${esc(s)}</button>`).join('')}</div>
+      <p class="fd-privacy">${ICONS.lock}<span>Nothing you look at here is recorded or shared with your manager.</span></p>
+    </div>
+  </div>`;
+
+  const q=document.getElementById('q');
+  const results=document.getElementById('results');
+
+  function paint(){
+    if(!S.query.trim()||S.query.trim().length<2){ results.innerHTML=''; return; }
+    if(!S.results.length){
+      results.innerHTML=`<div class="res-empty">No role matches “${esc(S.query)}”. Try a shorter word, or part of the title.</div>`;
+      return;
+    }
+    results.innerHTML = S.results.map((idx,n)=>{
+      const r=R[idx];
+      return `<button class="res-row" role="option" data-i="${idx}" aria-selected="${n===S.cursor}">
+        <span class="t">${highlight(r.t,S.query)}</span>
+        <span class="meta">${esc(titleCase(FAM[r.f]))}</span>
+        <span class="grade">${esc(r.ga)}</span>
+      </button>`;
+    }).join('');
+    const sel=results.querySelector('[aria-selected="true"]');
+    if(sel) sel.scrollIntoView({block:'nearest'});
+  }
+  paint();
+
+  q.addEventListener('input',e=>{
+    S.query=e.target.value; S.results=searchRoles(S.query); S.cursor=S.results.length?0:-1;
+    const clr=document.getElementById('clearQ');
+    if(!!S.query !== !!clr){ renderFront(); document.getElementById('q').focus(); return; }
+    paint();
+  });
+  q.addEventListener('keydown',e=>{
+    if(e.key==='ArrowDown'||e.key==='ArrowUp'){
+      e.preventDefault();
+      if(!S.results.length) return;
+      S.cursor=(S.cursor+(e.key==='ArrowDown'?1:-1)+S.results.length)%S.results.length;
+      paint();
+    } else if(e.key==='Enter'){
+      if(S.cursor>=0&&S.results[S.cursor]!==undefined) pickRole(S.results[S.cursor]);
+    } else if(e.key==='Escape'){
+      S.query=''; S.results=[]; renderFront(); document.getElementById('q').focus();
+    }
+  });
+  results.addEventListener('click',e=>{
+    const b=e.target.closest('[data-i]'); if(b) pickRole(+b.dataset.i);
+  });
+  const clr=document.getElementById('clearQ');
+  if(clr) clr.addEventListener('click',()=>{ S.query='';S.results=[];renderFront();document.getElementById('q').focus(); });
+  stage.querySelectorAll('.fd-suggest button').forEach(b=>{
+    b.addEventListener('click',()=>{
+      const name=b.dataset.s;
+      const hit=searchRoles(name)[0];
+      if(hit!==undefined) pickRole(hit);
+    });
+  });
+  q.focus();
+}
+
+/* onwards = the person has already done the walk once. Repeating it is
+   friction, so we keep them on the map and just re-centre it. */
+function pickRole(i,onwards){
+  if(onwards) S.trail.push(S.srcIdx); else S.trail=[];
+  S.srcIdx=i;
+  S.cands=candidates(i);
+  /* Choosing the headline direction. Preference order, unless the person has
+     said they're open to either: not-a-demotion first, then a surprising
+     (different-field) move over a same-field one, then most overlap. So a
+     close move in your own field beats a demotion into another field. */
+  const srcGo = R[i].go;
+  const notDown = c => c.role.go >= srcGo - 8;
+  const cross   = c => c.rel !== -1;
+  const openMove = S.pref.move==='any';
+  const pool = S.cands.slice().sort((a,b)=>{
+    if(!openMove){ const ad=notDown(a)?0:1, bd=notDown(b)?0:1; if(ad!==bd) return ad-bd; }
+    const ac=cross(a)?0:1, bc=cross(b)?0:1; if(ac!==bc) return ac-bc;
+    return (b.prop-a.prop)||(b.score-a.score);
+  });
+  S.away = pool; S.hookIdx = 0;
+  S.hook = pool[0] || null;
+  S.batches=makeBatches(S.cands, S.hook);   // batches anchored on the hook
+  S.batch=0; S.selected=null; S.view='explore';
+  if(onwards){ S.step=4; S.revealed=true; S.slim=true; S.view='explore'; }
+  else { S.step=1; S.revealed=false; S.slim=false; S.view='scanning'; }
+  render();
+}
+
+/* ============================================================
+   EXPLORER
+   ============================================================ */
+function actRow(clusterId,kind,sub){
+  const c=CL[clusterId];
+  return `<div class="act">
+    <span class="ic ${kind}">${kind==='have'?ICONS.check:ICONS.plus}</span>
+    <div><p>${esc(c.plain.charAt(0).toUpperCase()+c.plain.slice(1))}</p>
+    ${sub?`<p class="sub">${esc(sub)}</p>`:''}</div>
+  </div>`;
+}
+
+function refineHTML(){
+  return `<div class="refine">${PREF_GROUPS.map(p=>`
+    <div class="refine-row">
+      <span class="refine-q">${p.q}</span>
+      <div class="refine-opts">${p.opts.map(([v,l])=>
+        `<button class="rchip ${S.pref[p.g]===v?'on':''}" data-pg="${p.g}" data-pv="${v}">${l}</button>`).join('')}</div>
+    </div>`).join('')}</div>`;
+}
+/* Caption names the tuning when set, otherwise the fan-out position. */
+function tuningLabel(){
+  const b=[];
+  if(S.pref.move==='up') b.push('moving up');
+  if(S.pref.move==='level') b.push('a similar level');
+  if(S.pref.lead==='yes') b.push('leading a team');
+  if(S.pref.lead==='no') b.push('not leading');
+  if(S.pref.field==='stay') b.push('your area');
+  if(S.pref.field==='related') b.push('related work');
+  if(S.pref.field==='open') b.push('a change of field');
+  return b.length ? 'Tuned to '+b.join(' · ') : 'Best matches';
+}
+
+function walkHTML(){
+  const src=R[S.srcIdx], h=S.hook;
+  if(!h){
+    return `<div class="walk-body"><div class="step-mid">
+      <h3 class="step-h">We could not find a confident direction from this role yet.</h3>
+      <p class="step-p">That usually means the role's activity profile is thin, or its job family has few close neighbours. Try a nearby role to see how the tool behaves.</p>
+    </div></div>
+    <div class="walk-foot"><button class="btn ghost grow" id="backToSearch">Choose another role</button></div>`;
+  }
+  const shared=h.shared.slice(0,3), gaps=h.gap.slice(0,2);
+  let body='';
+  if(S.step===1){
+    const cross = h.rel!==-1;
+    body=`<div class="step-mid">
+      <span class="hook-from">Starting from <b>${esc(src.t)}</b></span>
+      <h3 class="step-h">Someone in this role already does ${amountWord(h.prop)} the work ${an(h.role.t)} ${esc(h.role.t)} does.</h3>
+      <p class="step-p">${cross
+        ? `And that role sits in ${esc(titleCase(FAM[h.role.f]))} — probably not the first place you'd look.`
+        : `It's a close move within ${esc(titleCase(FAM[h.role.f]))} — a natural next step to weigh up.`}</p>
+      ${S.away&&S.away.length>1?`<button class="hook-swap" id="hookSwap">Not the direction you'd pick? Show another &rarr;</button>`:''}
+    </div>`;
+  } else if(S.step===2){
+    body=`<h3 class="step-h small">The shared work</h3>
+      <p class="step-p" style="margin-bottom:14px">Parts of ${an(h.role.t)} ${esc(h.role.t)}'s job that someone in this role already does.</p>
+      <div class="acts">${shared.map(c=>actRow(c,'have')).join('')}</div>`;
+  } else if(S.step===3){
+    body=`<h3 class="step-h small">And this would be new</h3>
+      <p class="step-p" style="margin-bottom:14px">Not starting from scratch — but these are the gaps to close.</p>
+      <div class="acts">${gaps.map(c=>actRow(c,'new')).join('')}</div>
+      <div class="honest"><span class="eyebrow">Worth knowing</span><p>${esc(honestTake(src,h))}</p></div>`;
+  } else {
+    body=`<div>
+      <h3 class="step-h">That is one direction. There are plenty more.</h3>
+      <p class="step-p" style="margin-bottom:16px">${esc(titleCase(FAM[h.role.f]))} is a strong match — but it is one of many. Next is a map of the other directions: somewhere to explore them at your own pace, no walk-through required. Roles that sit closer share more of the work someone in your role already does.</p>
+    </div>
+    <div style="margin-top:auto;padding-bottom:6px">
+      <button class="btn reveal wide" id="reveal">${ICONS.map}<span>Explore the other directions</span></button>
+      <button class="btn ghost wide bank-btn ${isBanked(h.i)?'on':''}" id="bankHook">${isBanked(h.i)?ICONS.bookmarkfill:ICONS.bookmark}<span>${isBanked(h.i)?'On your shortlist':'Add this role to your shortlist'}</span></button>
+      <button class="btn ghost wide" id="respin">${ICONS.dice}<span>Try a different starting direction</span></button>
+      <button class="btn ghost wide" id="a2">${ICONS.doc}<span>Read the ${esc(h.role.t)} description</span></button>
+    </div>`;
+  }
+  return `<div class="walk-body">
+      ${S.step===1?`<button class="walk-back" id="walkBack">${ICONS.left}<span>Search again</span></button>`:''}
+      ${S.step===4?`<button class="walk-back" id="backTo3">${ICONS.left}<span>Back</span></button>`:''}
+      <div class="rail">${[1,2,3,4].map(n=>`<i class="${n<=S.step?'on':''}"></i>`).join('')}</div>
+      ${body}
+    </div>
+    ${S.step<4?`<div class="walk-foot">
+      ${S.step>1?`<button class="btn ghost" id="back">Back</button>`:''}
+      <button class="btn primary grow" id="next">Continue</button>
+    </div>`:''}
+    <p class="privacy">Private to you. Nothing is shared.</p>`;
+}
+
+/* The sets fan outward from the hook, so the caption names where you are in
+   that fan — reassuring first, more adventurous as you cycle. */
+function batchCaption(){
+  const n=S.batches.length;
+  if(prefsActive()) return S.batch===0 ? tuningLabel() : 'More options like these';
+  if(S.batch===0) return 'In the same vein as your walk';
+  if(S.batch>=n-1 && n>2) return 'The biggest changes of direction';
+  if(S.batch<=Math.floor(n/2)) return 'Branching out a little';
+  return 'Further from where you started';
+}
+function teaserHTML(){
+  const total=S.batches.reduce((n,b)=>n+b.length,0);
+  /* A restrained hint: the hub, two orbit arcs, a scatter of dim dots.
+     Enough to promise a map without spending the reveal early. */
+  const dots=[[50,26],[74,40],[28,44],[66,66],[36,70],[82,58]];
+  return `<button class="teaser" id="teaser" aria-label="Open the landscape">
+    <svg class="teaser-ghost" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+      <circle cx="50" cy="50" r="20" fill="none" stroke="rgba(5,40,74,.18)" stroke-width=".5" stroke-dasharray="2 3"/>
+      <circle cx="50" cy="50" r="33" fill="none" stroke="rgba(5,40,74,.13)" stroke-width=".5" stroke-dasharray="2 3"/>
+      ${dots.map(([x,y],i)=>`<circle cx="${x}" cy="${y}" r="${i===0?3:2.2}" fill="${i===0?'#0f6e86':'rgba(15,110,134,.4)'}"/>`).join('')}
+      <circle cx="50" cy="50" r="6.5" fill="var(--ink)"/>
+    </svg>
+    <div class="teaser-lab">
+      <span class="eyebrow">Your landscape</span>
+      <span class="teaser-count">${total} direction${total===1?'':'s'}</span>
+      <span class="teaser-hint">${ICONS.spark}Open the map</span>
+    </div>
+  </button>`;
+}
+function mapHTML(){
+  const src=R[S.srcIdx];
+  const batch=S.batches[S.batch]||[];
+  const total=S.batches.reduce((n,b)=>n+b.length,0);
+  if(!S.revealed) return teaserHTML();
+  return `
+    <div class="map-top">
+      <div>
+        <span class="eyebrow">Starting from</span>
+        <div class="map-here">${esc(src.t)}</div>
+        <div class="map-sub">${esc(titleCase(FAM[src.f]))} · ${esc(src.g)}</div>
+      ${S.trail.length?`<div class="trail">${
+        S.trail.map((ti,n)=>`<button data-t="${n}">${esc(R[ti].t)}</button><span>&rsaquo;</span>`).join('')
+      }<b>${esc(src.t)}</b></div>`:''}
+      </div>
+      <button class="refine-btn" id="spawnReset">${ICONS.compass}Start over</button>
+    </div>
+    <svg class="lines" id="lines" aria-hidden="true"></svg>
+    <div class="nodes" id="nodes"></div>
+    <div class="map-vignette" aria-hidden="true"></div>
+    <div class="legend">
+      <span class="eyebrow">Colour = grade</span>
+      <div class="row"><i class="sw same"></i><span>Same grade</span></div>
+      <div class="row"><i class="sw snr"></i><span>More senior</span></div>
+      <p style="margin-top:8px">Tap a role to inspect it, then branch it out from the panel.</p>
+    </div>
+    ${(!S.mapSeen)?`<div class="map-hint" id="mapHint">
+      <div class="map-hint-card">
+        <span class="eyebrow">Your web of directions</span>
+        <p><b>Tap any role</b> to inspect it. From its panel you can branch out — three roles at the <b>same grade</b>, or three a step <b>more senior</b>. Everything you open stays on screen.</p>
+        <button class="btn primary" id="mapGotIt">Got it</button>
+      </div>
+    </div>`:''}
+    `;
+}
+
+function branchButtons(node){
+  const sameN=node.used_same?0:availByKind(node,'same').length;
+  const snrN =node.used_senior?0:availByKind(node,'senior').length;
+  return `<div class="branch-row">
+    <button class="btn branch same wide" id="brSame" ${sameN?'':'disabled'}>
+      <span class="sw same"></span><span>${node.used_same?'Same grade added':(sameN?`Branch: ${sameN} at the same grade`:'No same-grade matches')}</span></button>
+    <button class="btn branch snr wide" id="brSnr" ${snrN?'':'disabled'} style="margin-bottom:0">
+      <span class="sw snr"></span><span>${node.used_senior?'More senior added':(snrN?`Branch: ${snrN} more senior`:'No more-senior matches')}</span></button>
+  </div>`;
+}
+function detailHTML(){
+  if(S.selNode==null) return '';
+  const node=gById(S.selNode); if(!node) return '';
+  const src=R[S.srcIdx];
+  // Root: minimal panel, just branch controls
+  if(node.depth===0){
+    return `<aside class="detail" id="detail" role="dialog" aria-label="${esc(node.role.t)}">
+      <div class="detail-h"><div class="top">
+        <span class="band" style="color:var(--ink);background:var(--page)"><i style="background:var(--ink)"></i>Your role</span>
+        <button class="x" id="closeDetail" aria-label="Close">${ICONS.x}</button></div>
+        <h2>${esc(node.role.t)}</h2>
+        <div class="detail-meta"><span class="tag">${esc(titleCase(FAM[node.role.f]))}</span><span class="tag">${esc(node.role.g)}</span></div>
+      </div>
+      <div class="detail-b"><p class="overlap-line">These are the closest directions from your role. <b>Tap any one</b> to inspect it, then branch it out — at the same grade, or a step more senior.</p></div>
+    </aside>`;
+  }
+  const c=node.cand;
+  const shared=c.shared.slice(0,4), gaps=c.gap.slice(0,3);
+  const kindTag = node.kind==='senior'?'More senior':'Same grade';
+  const kindCol = node.kind==='senior'?'var(--purple)':'var(--teal)';
+  const kindBg  = node.kind==='senior'?'#f4eefb':'#effafb';
+  return `<aside class="detail" id="detail" role="dialog" aria-label="${esc(c.role.t)}">
+    <div class="detail-h">
+      <div class="top">
+        <span class="band" style="color:${kindCol};background:${kindBg}"><i style="background:${kindCol}"></i>${kindTag}</span>
+        <button class="x" id="closeDetail" aria-label="Close">${ICONS.x}</button>
+      </div>
+      <h2>${esc(c.role.t)}</h2>
+      <div class="detail-meta">
+        <span class="tag">${esc(titleCase(FAM[c.role.f]))}</span>
+        ${c.role.sf?`<span class="tag">${esc(titleCase(c.role.sf))}</span>`:''}
+        <span class="tag">${esc(c.role.g)}</span>
+      </div>
+    </div>
+    <div class="detail-b">
+      ${c.members&&c.members.length>1?`<div class="variants">
+        <span class="eyebrow">Covers ${c.members.length} similar roles at this grade</span>
+        <ul>${c.members.map(m=>`<li>${esc(m.t)}</li>`).join('')}</ul>
+      </div>`:''}
+      <span class="eyebrow">Shared work</span>
+      <div class="acts">${shared.map(x=>actRow(x,'have')).join('')}</div>
+      <span class="eyebrow">New things to learn</span>
+      <div class="acts">${gaps.map(x=>actRow(x,'new')).join('')}</div>
+      <button class="btn ghost wide" id="d3" style="margin:12px 0 0">${ICONS.cap}<span>Find learning for these gaps</span></button>
+    </div>
+    <div class="detail-f">
+      ${branchButtons(node)}
+      <button class="btn wide bank-btn ${isBanked(node.ri)?'on':''}" id="bankBtn" style="margin-top:8px">${isBanked(node.ri)?ICONS.bookmarkfill:ICONS.bookmark}<span>${isBanked(node.ri)?'Shortlisted':(S.banked.length>=BANK_MAX?'Shortlist full (3)':'Add to shortlist')}</span></button>
+      <button class="btn ghost wide" id="pathBtn" style="margin-top:8px">${ICONS.map}<span>Show the path from your role to here</span></button>
+      <button class="btn primary wide" id="d1" style="margin-bottom:0">${ICONS.chat}<span>Talk to my manager about this</span></button>
+    </div>
+  </aside>`;
+}
+
+/* A short, honest pause between choosing a role and seeing the first
+   suggestion. Each line narrates a real step of the matching — the activity
+   profile, the comparison across every role, the same-job filter, the overlap
+   count — so the pause explains the result rather than just delaying it. */
+let scanTimer=null;
+function renderScan(){
+  const src=R[S.srcIdx];
+  const total=S.batches.reduce((n,b)=>n+b.length,0);
+  const acts=src.p.length;
+  const lines=[
+    `Reading the ${acts} kinds of work a ${esc(src.t)} does`,
+    `Comparing them across ${R.length.toLocaleString()} roles at TAFE NSW`,
+    `Setting aside roles that are really the same job`,
+    total ? `Found ${total} direction${total===1?'':'s'} that share this kind of work`
+          : `Checking where the work overlaps`
+  ];
+  const reduce = matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const step = reduce ? 90 : 560;
+  const dots=[[60,22],[92,44],[84,86],[36,86],[28,44],[60,38]];
+  const cols=['#3fa8bf','#9a72d4','#8fa2b6','#9a72d4','#3fa8bf','#8fa2b6'];
+  roleChip.hidden=false; roleChipVal.textContent=src.t;
+  stage.innerHTML=`<div class="scan" id="scan">
+    <div class="scan-card">
+      <div class="scan-motif" aria-hidden="true">
+        <svg viewBox="0 0 120 120">
+          <circle class="s-ring" cx="60" cy="60" r="30"/>
+          <circle class="s-ring" cx="60" cy="60" r="46"/>
+          <line class="s-sweep" x1="60" y1="60" x2="60" y2="12"/>
+          ${dots.map((d,i)=>`<circle class="s-dot" cx="${d[0]}" cy="${d[1]}" r="4.5" fill="${cols[i]}" style="animation-delay:${300+i*180}ms"/>`).join('')}
+          <circle class="s-hub" cx="60" cy="60" r="8"/>
+        </svg>
+      </div>
+      <button class="scan-back" id="scanBack">${ICONS.left}<span>Search again</span></button>
+      <span class="eyebrow">Finding your options</span>
+      <div class="scan-role">Where could a ${esc(src.t)} go next?</div>
+      <ul class="scan-lines">
+        ${lines.map((l,i)=>`<li class="scan-line" style="animation-delay:${i*step}ms">
+          <span class="s-tick">${ICONS.check}</span><span>${l}</span></li>`).join('')}
+      </ul>
+      <button class="scan-skip" id="scanSkip">Skip &rarr;</button>
+    </div>
+  </div>`;
+  const dur = reduce ? (lines.length*step+150) : (lines.length*step+620);
+  const go=()=>{ if(scanTimer){clearTimeout(scanTimer);scanTimer=null;} if(S.view!=='scanning')return; S.view='explore'; renderExplore(); };
+  scanTimer=setTimeout(go,dur);
+  const sc=document.getElementById('scan');
+  const back=document.getElementById('scanBack');
+  back.addEventListener('click',e=>{ e.stopPropagation(); if(scanTimer){clearTimeout(scanTimer);scanTimer=null;} S.view='front'; S.query=''; S.results=[]; render(); });
+  sc.addEventListener('click',e=>{ if(e.target.closest('.scan-back'))return; go(); });
+}
+
+function renderExplore(){
+  roleChip.hidden=false;
+  roleChipVal.textContent=R[S.srcIdx].t;
+  if(S.buildFor!=null){ return renderBuild(); }
+  if(S.compare){ return renderCompare(); }
+  if(S.pathTo!=null){ return renderRoute(); }
+  stage.innerHTML=`<div class="explorer ${S.revealed?'':'pre'}">
+    <section class="walk ${S.slim?'slim':''}" id="walk" aria-label="Guided walk">
+      <button class="slim-tab" id="restore" aria-label="Reopen the walk">
+        <span class="ic">${ICONS.compass}</span>
+        <span class="vert">Your pathway</span>
+      </button>
+      ${S.slim?'':walkHTML()}
+    </section>
+    <section class="map" id="map" aria-label="Career landscape">${mapHTML()}</section>
+    ${S.banked.length?bankBarHTML():''}
+  </div>`;
+  wireExplore();
+  if(S.revealed){
+    if(animateLayout){ animateLayout=false; setTimeout(layoutMap,470); }  // after a width transition settles
+    else requestAnimationFrame(layoutMap);
+  }
+}
+let animateLayout=false;
+
+function wireExplore(){
+  const on=(id,fn,ev='click')=>{const e=document.getElementById(id); if(e) e.addEventListener(ev,fn);};
+  on('next',()=>{ if(S.step<4){S.step++; renderExplore();} });
+  on('back',()=>{ if(S.step>1){S.step--; renderExplore();} });
+  on('backToSearch',()=>{ S.view='front'; render(); });
+  on('walkBack',()=>{ S.view='front'; S.query=''; S.results=[]; render(); });
+  on('reveal',reveal);
+  on('teaser',reveal);
+  on('compareBtn',()=>{ S.compare=true; S.selNode=null; renderExplore(); });
+  stage.querySelectorAll('[data-unbank]').forEach(b=>b.addEventListener('click',ev=>{ ev.stopPropagation(); toggleBank(+b.dataset.unbank); }));
+  on('respin',cycleHook);
+  on('bankHook',()=>{ if(S.hook) toggleBank(S.hook.i); });
+  on('backTo3',()=>{ S.step=3; renderExplore(); });
+  on('restore',()=>{ S.slim=false; animateLayout=true; renderExplore(); });
+  on('prevB',()=>{ if(S.batch>0){S.batch--; S.selected=null; renderExplore();} });
+  on('nextB',()=>{ if(S.batch<S.batches.length-1){S.batch++; S.selected=null; renderExplore();} });
+  stage.querySelectorAll('.trail button').forEach(b=>b.addEventListener('click',()=>{
+    const n=+b.dataset.t, back=S.trail[n];
+    S.trail=S.trail.slice(0,n); pickRole(back,true); S.trail=S.trail.slice(0,n); renderExplore();
+  }));
+  on('hookSwap',cycleHook);
+  on('mapGotIt',()=>{ S.mapSeen=true; const h=document.getElementById('mapHint'); if(h){h.style.opacity='0'; setTimeout(()=>h.remove(),200);} });
+  on('spawnReset',()=>{ initGraph(); S.selected=null; renderExplore(); });
+  const map=document.getElementById('map');
+  if(map) map.addEventListener('click',e=>{
+    if(e.target.closest('.node')||e.target.closest('.hub-btn')||e.target.closest('.detail')||e.target.closest('.legend')||e.target.closest('.refine-btn')) return;
+    if(S.selNode!=null){ S.selNode=null; renderExplore(); }
+  });
+}
+
+/* Re-weight and re-batch after a steering change, keeping the person in place. */
+function reflow(){
+  S.batches=makeBatches(S.cands, S.hook);
+  S.batch=0; S.selected=null;
+  renderExplore();
+}
+/* Opt out of the suggested hook: step to the next cross-family direction and
+   restart the short walk on it. */
+function cycleHook(){
+  if(!S.away||S.away.length<2) return;
+  const span=Math.min(S.away.length,6);
+  S.hookIdx=(S.hookIdx+1)%span;
+  S.hook=S.away[S.hookIdx];
+  S.batches=makeBatches(S.cands, S.hook);
+  S.step=1; S.selected=null;
+  renderExplore();
+}
+
+function isBanked(ri){ return S.banked.includes(ri); }
+function toggleBank(ri){
+  if(isBanked(ri)) S.banked=S.banked.filter(x=>x!==ri);
+  else if(S.banked.length<BANK_MAX) S.banked.push(ri);
+  renderExplore();
+}
+/* Banking works best when the roles are alike. We allow anything but flag it. */
+function bankSpreadWarn(){
+  const set=[S.srcIdx, ...S.banked];
+  for(let i=0;i<set.length;i++) for(let j=i+1;j<set.length;j++){
+    const a=R[set[i]], b=R[set[j]];
+    const famClose = a.f===b.f || (TIER[a.f] && TIER[a.f][b.f]!==2);
+    const gradeClose = Math.abs(a.go-b.go)<=30;
+    if(!(famClose&&gradeClose)) return true;
+  }
+  return false;
+}
+function bankBarHTML(){
+  const slots=[];
+  for(let k=0;k<BANK_MAX;k++){
+    const ri=S.banked[k];
+    slots.push(ri!=null
+      ? `<span class="bankchip filled"><span class="bc-t">${esc(R[ri].t)}</span><button class="bc-x" data-unbank="${ri}" aria-label="Remove">${ICONS.x}</button></span>`
+      : `<span class="bankchip empty">Bank a role</span>`);
+  }
+  return `<div class="bankbar">
+    <span class="bank-lbl">${ICONS.bookmark}Shortlist</span>
+    <div class="bankchips">${slots.join('')}</div>
+    ${bankSpreadWarn()?`<span class="bank-warn">${ICONS.warn}These roles differ a fair bit — expect more gaps than overlap</span>`:''}
+    <button class="btn primary bank-compare" id="compareBtn">Compare ${S.banked.length} against your role &rarr;</button>
+  </div>`;
+}
+
+function reveal(){
+  if(S.revealed) return;
+  S.revealed=true; S.slim=true;
+  initGraph();
+  renderExplore();
+}
+
+/* ============================================================
+   SPAWN GRAPH  (Discovr-style: accumulating web, 3 spawns per node)
+   ============================================================ */
+function gById(id){ return S.g.nodes.find(n=>n.id===id); }
+const _candCache={};
+function candsFor(ri){ return _candCache[ri] || (_candCache[ri]=candidates(ri)); }
+/* A role is simply in or out (candidates() already applies the threshold).
+   The only distinction we draw is grade: same grade, or more senior. */
+function gradeKind(srcGo,go){ return Math.abs(go-srcGo)<=5 ? 'same' : (go>srcGo ? 'senior' : 'junior'); }
+function availByKind(node,kind){
+  const srcGo=R[node.ri].go, taken=new Set(S.g.nodes.map(n=>n.ri));
+  return candsFor(node.ri).filter(c=>!taken.has(c.i) && gradeKind(srcGo,c.role.go)===kind).slice(0,3);
+}
+function canBranch(node){
+  return (!node.used_same && availByKind(node,'same').length>0) ||
+         (!node.used_senior && availByKind(node,'senior').length>0);
+}
+function initGraph(){
+  const root={id:0, ri:S.srcIdx, role:R[S.srcIdx], cand:null, kind:'root', x:0, y:0, depth:0, parent:null};
+  S.g={nodes:[root], edges:[], nextId:1}; S._screen=null;
+  // seed the map: root's three best same-or-senior matches, coloured by grade
+  const srcGo=R[S.srcIdx].go;
+  const seed=candsFor(S.srcIdx).filter(c=>gradeKind(srcGo,c.role.go)!=='junior').slice(0,3);
+  addChildren(root, seed.map(c=>({c, kind:gradeKind(srcGo,c.role.go)})));
+}
+function addChildren(node, items){
+  items.forEach(({c,kind})=>{
+    const child={id:S.g.nextId++, ri:c.i, role:c.role, cand:c, kind,
+      x:node.x, y:node.y, depth:node.depth+1, parent:node.id};
+    S.g.nodes.push(child); S.g.edges.push({from:node.id,to:child.id});
+  });
+}
+/* Branch a node in one grade direction — up to three of that kind. */
+function spawnKind(node,kind){
+  if(node['used_'+kind]) return;
+  node['used_'+kind]=true;
+  const kids=availByKind(node,kind);
+  addChildren(node, kids.map(c=>({c,kind})));
+}
+function onNodeTap(id){          // tap = inspect only (spawning is via the two buttons)
+  S.mapSeen=true; S.selNode=id; renderExplore();
+}
+function layoutMap(){                    // (spawn layout — keeps the name renderExplore calls)
+  const map=document.getElementById('map'), nodesEl=document.getElementById('nodes'), linesEl=document.getElementById('lines');
+  if(!map||!nodesEl||!S.g) return;
+  const W=map.clientWidth, H=map.clientHeight, narrow=W<760;
+  const topInset=narrow?150:104, pad=narrow?70:110, botPad=narrow?120:80;
+  const N=S.g.nodes;
+  // Deterministic radial-tree layout: each subtree gets an angular slice
+  // proportional to its leaf count, so branches fan outward and never drift.
+  const kidsOf=id=>S.g.edges.filter(e=>e.from===id).map(e=>e.to);
+  const leaves=id=>{const c=kidsOf(id); return c.length?c.reduce((s,x)=>s+leaves(x),0):1;};
+  const RING=narrow?150:200;
+  (function assign(id,a0,a1,depth){
+    const n=gById(id), ang=(a0+a1)/2, rad=depth*RING;
+    n.x=Math.cos(ang)*rad; n.y=Math.sin(ang)*rad;
+    const ch=kidsOf(id); if(!ch.length) return;
+    // Equal slice per child gives even, Discovr-style fans; a small gap keeps
+    // sibling labels from touching. Deeper rings have more arc length, so even
+    // narrow angles separate cleanly.
+    const span=(a1-a0)/ch.length, gap=span*0.10;
+    let a=a0;
+    for(const c of ch){ assign(c, a+gap, a+span-gap, depth+1); a+=span; }
+  })(N.find(n=>n.depth===0).id, -Math.PI/2, -Math.PI/2+Math.PI*2, 0);
+  // fit to viewport
+  let minX=1e9,minY=1e9,maxX=-1e9,maxY=-1e9;
+  for(const n of N){ minX=Math.min(minX,n.x);maxX=Math.max(maxX,n.x);minY=Math.min(minY,n.y);maxY=Math.max(maxY,n.y); }
+  const bw=(maxX-minX)||1, bh=(maxY-minY)||1;
+  const availW=W-pad*2, availH=H-topInset-botPad;   // card floats, so no reserved width
+  const scale=Math.min(availW/bw, availH/bh, 1);
+  const cx=(minX+maxX)/2, cy=(minY+maxY)/2;
+  const ox=W/2, oy=topInset+(H-topInset-botPad)/2;
+  const sx=n=>ox+(n.x-cx)*scale, sy=n=>oy+(n.y-cy)*scale;
+  const nodeW=Math.max(96,Math.min(150,150*scale));
+
+  // Which nodes are new since the last layout? (positions kept in state, not DOM,
+  // so this survives the full re-render.) New ones fade in; the rest glide (FLIP).
+  const prev=S._screen||{};
+  const freshIds=new Set(N.filter(n=>!(n.id in prev)).map(n=>n.id));
+  let fi=0; const order={}; N.forEach(n=>{ if(freshIds.has(n.id)) order[n.id]=fi++; });
+
+  // edges (new ones fade in on the same stagger as their node)
+  linesEl.innerHTML=S.g.edges.map(e=>{const a=gById(e.from),b=gById(e.to);
+    const sel=S.selNode===b.id||S.selNode===a.id;
+    const col=b.kind==='senior'?'#4b1482':'#0f6e86';
+    const fresh=freshIds.has(b.id);
+    return `<line class="${fresh?'fresh-line':''}" ${fresh?`style="animation-delay:${(order[b.id]||0)*0.09}s"`:''} x1="${sx(a)}" y1="${sy(a)}" x2="${sx(b)}" y2="${sy(b)}" stroke="${sel?col:'#8aa0b6'}" stroke-width="${sel?2:1.2}" stroke-opacity="${sel?.65:.28}"/>`;}).join('');
+
+  // nodes
+  nodesEl.innerHTML=N.map(n=>{
+    const fresh=freshIds.has(n.id);
+    const dly=fresh?`animation-delay:${(order[n.id]||0)*0.09}s;`:'';
+    if(n.depth===0){
+      const rootSel=S.selNode===0;
+      return `<button class="hub-btn ${rootSel?'on':''} ${fresh?'fresh':''}" data-nid="0" style="left:${sx(n)}px;top:${sy(n)}px;${dly}"><span class="hub"><span class="disc"><span>This<br>role</span></span><span class="cap">${esc(n.role.t)}</span></span></button>`;
+    }
+    const c=n.cand, on=S.selNode===n.id, size=narrow?38:44, more=canBranch(n);
+    const col=n.kind==='senior'?'var(--purple)':'var(--teal)';
+    const ring=n.kind==='senior'?'rgba(75,20,130,.14)':'rgba(15,110,134,.12)';
+    return `<button class="node ${on?'on':''} ${fresh?'fresh':''}" style="left:${sx(n)}px;top:${sy(n)}px;width:${nodeW}px;${dly}" data-nid="${n.id}" aria-label="${esc(n.role.t)}">
+      <span class="dot" style="width:${size}px;height:${size}px;background:${col};box-shadow:0 3px 10px rgba(5,40,74,.18), 0 0 0 5px ${ring}">${more?`<span class="branch-dot">+</span>`:''}${(c.members&&c.members.length>1)?`<span class="grp-badge">+${c.members.length-1}</span>`:''}</span>
+      <span class="name">${esc(n.role.t)}</span>
+      <span class="fam">${esc(titleCase(FAM[n.role.f]))}</span>
+    </button>`;
+  }).join('');
+
+  // FLIP: existing nodes glide from their previous position to the new one
+  nodesEl.querySelectorAll('[data-nid]').forEach(el=>{
+    const id=+el.dataset.nid;
+    if(prev[id]){
+      const nl=parseFloat(el.style.left), nt=parseFloat(el.style.top);
+      const dx=prev[id].l-nl, dy=prev[id].t-nt;
+      if(Math.abs(dx)>0.5||Math.abs(dy)>0.5){
+        el.style.transition='none';
+        el.style.transform=`translate(calc(-50% + ${dx}px), calc(-50% + ${dy}px))`;
+        requestAnimationFrame(()=>{ el.style.transition='transform .6s cubic-bezier(.22,.61,.36,1)'; el.style.transform='translate(-50%,-50%)'; });
+      }
+    }
+  });
+  nodesEl.querySelectorAll('.node,.hub-btn').forEach(el=>el.addEventListener('click',()=>onNodeTap(+el.dataset.nid)));
+
+  // remember positions for the next layout's FLIP
+  S._screen={}; N.forEach(n=>{ S._screen[n.id]={l:sx(n),t:sy(n)}; });
+
+  // floating detail card, placed beside the tapped node and clamped on-screen
+  let fc=document.getElementById('floatCard');
+  if(!fc){ fc=document.createElement('div'); fc.id='floatCard'; map.appendChild(fc); }
+  if(S.selNode!=null){
+    const n=gById(S.selNode);
+    fc.innerHTML=detailHTML(); fc.style.display='block';
+    const cw=fc.offsetWidth, ch=fc.offsetHeight, gap=nodeW*0.42+26, padc=14;
+    const roomR=W-(sx(n)+gap)-padc, roomL=(sx(n)-gap)-padc;
+    let left=(roomR>=cw || roomR>=roomL) ? sx(n)+gap : sx(n)-gap-cw;
+    left=Math.max(padc,Math.min(W-cw-padc,left));
+    let top=sy(n)-ch/2; top=Math.max(topInset-24,Math.min(H-ch-padc,top));
+    fc.style.left=left+'px'; fc.style.top=top+'px';
+    wireCard();
+  } else { fc.style.display='none'; fc.innerHTML=''; }
+}
+function wireCard(){
+  const on=(id,fn)=>{const e=document.getElementById(id); if(e) e.addEventListener('click',fn);};
+  on('closeDetail',()=>{ S.selNode=null; renderExplore(); });
+  on('bankBtn',()=>{ const n=gById(S.selNode); if(n){ const ri=n.ri; S.selNode=null; toggleBank(ri); } });
+  on('brSame',()=>{ const n=gById(S.selNode); if(n){ spawnKind(n,'same'); S.selNode=null; renderExplore(); } });
+  on('brSnr',()=>{ const n=gById(S.selNode); if(n){ spawnKind(n,'senior'); S.selNode=null; renderExplore(); } });
+  on('pathBtn',()=>{ const n=gById(S.selNode); if(n){ S.pathTo=n.ri; S.selNode=null; renderExplore(); } });
+}
+
+
+/* ============================================================
+   COMPARE  — banked roles vs the current role, on capabilities
+   ============================================================ */
+function levelDot(l){ return l>0?`<span class="lvl lvl${Math.min(l,5)}" title="${LEVELS[l]||('Level '+l)}">${l}</span>`:`<span class="lvl none">–</span>`; }
+function renderCompare(){
+  roleChip.hidden=false; roleChipVal.textContent=R[S.srcIdx].t;
+  const cur=R[S.srcIdx], curCaps=capMap(cur);
+  const tgts=S.banked.map(ri=>R[ri]);
+  // union of capabilities the banked roles call for; hardest gaps first
+  const need={}; tgts.forEach(t=>(t.cp||[]).forEach(([i,l])=>need[i]=Math.max(need[i]||0,l)));
+  const rows=Object.keys(need).map(i=>+i).sort((a,b)=>((need[b]-(curCaps[b]||0))-(need[a]-(curCaps[a]||0)))||need[b]-need[a]);
+  const meetsAll=i=>tgts.every(t=>{const tc=capMap(t); return !tc[i] || (curCaps[i]||0)>=tc[i];});
+  const shared=rows.filter(meetsAll), gaps=rows.filter(i=>!meetsAll(i));
+  const colW=`minmax(90px,1fr)`;
+  const headCols=tgts.map(t=>`<div class="cmp-col-h">${esc(t.t)}<span>${esc(t.ga)}</span></div>`).join('');
+  function matrix(list){
+    return list.map(i=>{
+      const cells=tgts.map(t=>{const tc=capMap(t); const nd=tc[i]||0; if(!nd) return `<div class="cmp-cell empty">–</div>`;
+        const have=curCaps[i]||0, ok=have>=nd;
+        return `<div class="cmp-cell ${ok?'ok':'gap'}">${levelDot(nd)}${ok?'':`<span class="cmp-delta">${have?`+${nd-have}`:'new'}</span>`}</div>`;}).join('');
+      return `<div class="cmp-row"><div class="cmp-cap">${esc(CAPS[i])}</div><div class="cmp-cell you">${levelDot(curCaps[i]||0)}</div>${cells}</div>`;
+    }).join('');
+  }
+  stage.innerHTML=`<div class="cmp">
+    <div class="cmp-head">
+      <button class="ws-back" id="cmpBack">${ICONS.left}<span>Back to the map</span></button>
+      <div><span class="eyebrow">Your shortlist, measured against</span><h2>${esc(cur.t)}</h2>
+        <div class="cmp-sub">${esc(titleCase(FAM[cur.f]))} · ${esc(cur.g)} · comparing ${tgts.length} role${tgts.length===1?'':'s'} on focus capabilities</div></div>
+    </div>
+    <div class="cmp-grid" style="grid-template-columns:minmax(180px,1.4fr) ${colW} ${tgts.map(()=>colW).join(' ')}">
+      <div class="cmp-corner"></div>
+      <div class="cmp-col-h you"><span class="ybadge">You</span>${esc(cur.t)}<span>${esc(cur.ga)}</span></div>
+      ${headCols}
+    </div>
+    ${shared.length?`<div class="cmp-band"><span class="eyebrow">Strengths you already bring <em>(you meet what these roles need)</em></span></div>
+    <div class="cmp-grid" style="grid-template-columns:minmax(180px,1.4fr) ${colW} ${tgts.map(()=>colW).join(' ')}">${matrix(shared)}</div>`:''}
+    ${gaps.length?`<div class="cmp-band gap"><span class="eyebrow">Gaps to close <em>(build these to be competitive)</em></span></div>
+    <div class="cmp-grid" style="grid-template-columns:minmax(180px,1.4fr) ${colW} ${tgts.map(()=>colW).join(' ')}">${matrix(gaps)}</div>`:''}
+    <div class="cmp-legend"><span><i class="lvl none">–</i> not held</span><span><i class="lvl lvl3">n</i> level (1 Foundational → 5 Highly Advanced)</span><span><i class="cmp-swatch ok"></i> you meet it</span><span><i class="cmp-swatch gap"></i> gap to build</span></div>
+    <div class="cmp-actions">
+      <span class="eyebrow" style="display:block;margin-bottom:10px">Close the gaps — see what you could do in your current role</span>
+      ${tgts.map((t,k)=>`<button class="btn ghost wide build-btn" data-build="${S.banked[k]}">${ICONS.cap}<span>How to build toward <b>${esc(t.t)}</b></span>${ICONS.right}</button>`).join('')}
+    </div>
+  </div>`;
+  document.getElementById('cmpBack').addEventListener('click',()=>{ S.compare=false; renderExplore(); });
+  stage.querySelectorAll('[data-build]').forEach(b=>b.addEventListener('click',()=>{ S.buildFor=+b.dataset.build; S.compare=false; renderExplore(); }));
+}
+
+/* ============================================================
+   BUILD  — LLM: activities in the CURRENT role to close each gap
+   ============================================================ */
+function gapsFor(tgtIdx){
+  const {gaps}=capCompare(R[S.srcIdx], R[tgtIdx]); return gaps;
+}
+async function fetchBuild(cur,tgt,gaps){
+  // The reference attempted a direct browser-to-model call. The integrated
+  // application deliberately keeps that boundary server-side; until a
+  // governed provider is configured, preserve the reference fallback flow.
+  await new Promise(resolve=>setTimeout(resolve,450));
+  throw new Error('Live generation is not configured');
+}
+function mockBuild(cur,tgt,gaps){    // graceful fallback so the demo always shows something
+  const verbs=['Volunteer to help with','Ask to shadow a colleague on','Offer to take minutes / support','Put your hand up for a small project involving','Join a working group on'];
+  return gaps.slice(0,5).map((g,k)=>({capability:CAPS[g.i], activities:[
+    `${verbs[k%verbs.length]} work that draws on ${CAPS[g.i].toLowerCase()} in your ${cur.t} role`,
+    `Ask your manager for a task that stretches your ${CAPS[g.i].toLowerCase()} from ${g.have?LEVELS[g.have].toLowerCase():'a standing start'} toward ${LEVELS[g.need].toLowerCase()}`,
+    `Find someone already doing ${tgt.t} work and sit in on how they apply ${CAPS[g.i].toLowerCase()}`
+  ]}));
+}
+function renderBuild(){
+  const cur=R[S.srcIdx], tgt=R[S.buildFor], gaps=gapsFor(S.buildFor);
+  stage.innerHTML=`<div class="cmp build">
+    <div class="cmp-head">
+      <button class="ws-back" id="bdBack">${ICONS.left}<span>Back to comparison</span></button>
+      <div><span class="eyebrow">Closing the gap toward</span><h2>${esc(tgt.t)}</h2>
+        <div class="cmp-sub">Things a <b>${esc(cur.t)}</b> could do — without changing roles — to build the ${gaps.length} missing capabilit${gaps.length===1?'y':'ies'}</div></div>
+    </div>
+    <div class="build-gaps">${gaps.map(g=>`<span class="gchip">${esc(CAPS[g.i])} <em>${g.have?LEVELS[g.have]:'none'} &rarr; ${LEVELS[g.need]}</em></span>`).join('')}</div>
+    <div id="buildBody" class="build-body">
+      <div class="build-loading"><span class="spin"></span><p>Working out what you could do in your current role…</p></div>
+    </div>
+  </div>`;
+  document.getElementById('bdBack').addEventListener('click',()=>{ S.buildFor=null; S.compare=true; renderExplore(); });
+  const body=document.getElementById('buildBody');
+  const paint=(items,note)=>{
+    body.innerHTML=(note?`<p class="build-note">${note}</p>`:'')+items.map(it=>`<div class="build-cap">
+      <h4>${esc(it.capability)}</h4>
+      <ul>${(it.activities||[]).map(a=>`<li>${esc(a)}</li>`).join('')}</ul></div>`).join('')
+      +`<div class="build-foot"><button class="btn primary" id="bdDone">Save my plan</button><span class="build-disclaim">Suggestions are a starting point, generated to illustrate the idea.</span></div>`;
+    const d=document.getElementById('bdDone'); if(d) d.addEventListener('click',()=>{ S.buildFor=null; S.compare=true; renderExplore(); });
+  };
+  fetchBuild(cur,tgt,gaps).then(items=>paint(items,null))
+    .catch(()=>paint(mockBuild(cur,tgt,gaps),'Showing example suggestions (live generation unavailable here).'));
+}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+
+function rtWorkBand(ov){ if(ov==null) return null; if(ov<0.02) return 'bridge'; return amountWord(ov); }
+function renderRoute(){
+  roleChip.hidden=false; roleChipVal.textContent=R[S.srcIdx].t;
+  const startT=R[S.srcIdx].t, targetT=R[S.pathTo].t;
+  const res=ROUTE.route(startT,targetT);
+  const back=`<button class="ws-back" id="rtBack">${ICONS.left}<span>Back to the map</span></button>`;
+  const wire=()=>{ const b=document.getElementById('rtBack'); if(b) b.addEventListener('click',()=>{ S.pathTo=null; renderExplore(); }); };
+  if(res.status==='nomatch'){
+    const miss = res.which==='target'? targetT : startT;
+    stage.innerHTML=`<div class="cmp route"><div class="cmp-head">${back}
+      <div><span class="eyebrow">The most doable path to</span><h2>${esc(targetT)}</h2></div></div>
+      <div class="route-empty">${ICONS.warn}<p>There's no route to map for <b>${esc(targetT)}</b> yet — <b>${esc(miss)}</b> isn't in the pathway graph. That's the small set of roles the two datasets don't yet share; a single shared role list would close it.</p></div></div>`;
+    wire(); return;
+  }
+  if(res.status==='same'){
+    stage.innerHTML=`<div class="cmp route"><div class="cmp-head">${back}
+      <div><span class="eyebrow">Path to</span><h2>${esc(res.targetRole.title)}</h2></div></div>
+      <div class="route-empty">${ICONS.spark}<p>That's your current role — you're already here.</p></div></div>`;
+    wire(); return;
+  }
+  const startCard=`<div class="rt-node start">
+    <span class="rt-dot"></span>
+    <div class="rt-card"><span class="rt-tag">Your role</span><h4>${esc(res.startRole.title)}</h4><div class="rt-grade">${esc(res.startRole.grade)}</div></div></div>`;
+  const stepCards=res.chain.map((c,k)=>{
+    const band=rtWorkBand(c.actOverlap);
+    let bandTxt='';
+    if(band==='bridge') bandTxt=`A bridging step — it shares little of this role's day-to-day work, but it opens the way forward.`;
+    else if(band) bandTxt=`Someone stepping here already does ${band} the work this role does.`;
+    const delta=c.dg>0?'a step more senior':(c.dg<0?'a step down':'same grade');
+    return `<div class="rt-conn"><span class="rt-delta">${esc(delta)}${c.sameField?' · same field':''}</span></div>
+    <div class="rt-node step">
+      <span class="rt-dot"></span>
+      <div class="rt-card"><span class="rt-tag step">Step ${k+1}</span><h4>${esc(c.title)}</h4><div class="rt-grade">${esc(c.grade)}</div>
+        ${bandTxt?`<p class="rt-band">${esc(bandTxt)}</p>`:''}</div></div>`;
+  }).join('');
+  const reached=(res.status==='arrived');
+  const tb=rtWorkBand(res.targetOverlap);
+  let destNote;
+  if(reached){
+    if(res.chain.length===0){
+      destNote = (tb && tb!=='bridge')
+        ? `It's a direct move — someone in your role already does ${tb} the work ${esc(res.targetRole.title)} does.`
+        : `It's a direct move — you'd already meet most of what ${esc(res.targetRole.title)} assesses, a single realistic step away.`;
+    } else {
+      destNote = (tb && tb!=='bridge')
+        ? `Within range — after these steps someone would already do ${tb} the work ${esc(res.targetRole.title)} does, a single realistic move away.`
+        : `Within range — you'd meet most of what ${esc(res.targetRole.title)} assesses, a single realistic move away.`;
+    }
+  } else if(res.status==='capped'){
+    destNote = `A sensible path as far as it runs. From the last step, ${esc(res.targetRole.title)} is a larger leap than one clean move — worth a conversation rather than a single hop.`;
+  } else if(res.status==='deadend'){
+    destNote = `A doable path reaches ${esc(res.lastTitle)}. From there, ${esc(res.targetRole.title)} needs a different kind of move than these steps offer.`;
+  } else {
+    destNote = `No single step from your role heads toward ${esc(res.targetRole.title)} — it's a bigger jump than one pathway bridges. It's likely reachable through a role in between.`;
+  }
+  const destCard=`<div class="rt-conn"><span class="rt-delta">${reached?'within range':'as far as it goes'}</span></div>
+    <div class="rt-node dest ${reached?'reached':'short'}">
+      <span class="rt-dot"></span>
+      <div class="rt-card"><span class="rt-tag dest">${reached?'Destination':'Target'}</span><h4>${esc(res.targetRole.title)}</h4><div class="rt-grade">${esc(res.targetRole.grade)}</div>
+        <p class="rt-band">${destNote}</p></div></div>`;
+  const sub = res.chain.length
+    ? `${res.chain.length} step${res.chain.length>1?'s':''} — the move the walk recommends at each stage, most doable first.`
+    : (reached?`A direct move from your role.`:`No single step bridges this yet.`);
+  stage.innerHTML=`<div class="cmp route">
+    <div class="cmp-head">${back}
+      <div><span class="eyebrow">The most doable path to</span><h2>${esc(res.targetRole.title)}</h2>
+        <div class="cmp-sub">${sub}</div></div></div>
+    <div class="rt-track">${startCard}${stepCards}${destCard}</div>
+    <p class="rt-foot">A route, not a rule — it recomputes the direct path from your role and ignores the way you wandered here. Shortest isn't always best; this favours the most doable move at each step.</p>
+  </div>`;
+  wire();
+}
+
+function render(){
+  if(S.view==='front') return renderFront();
+  if(S.view==='scanning') return renderScan();
+  return renderExplore();
+}
+
+let rt;
+let lastBatchSize=batchSize();
+window.addEventListener('resize',()=>{
+  if(S.view!=='explore') return;
+  clearTimeout(rt);
+  rt=setTimeout(()=>{
+    if(batchSize()!==lastBatchSize){          // crossing the breakpoint re-cuts the sets
+      lastBatchSize=batchSize();
+      S.batches=makeBatches(S.cands, S.hook); S.batch=0; S.selected=null;
+      renderExplore(); return;
+    }
+    if(S.revealed) layoutMap();
+  },140);
+});
+document.addEventListener('keydown',e=>{
+  if(e.key!=='Escape') return;
+  if(S.selected){ S.selected=null; renderExplore(); }
+});
+render();
+</script>
+</body>
+</html>

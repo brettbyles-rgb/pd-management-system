@@ -30,6 +30,7 @@ from .extractor import extract_document
 from .intelligence_prepare import prepare_pd_intelligence
 from .job_family_import import import_job_family_workbook
 from .career_explorer_ui import render_career_explorer
+from .career_explorer_reference_data import build_reference_payloads
 from .mapping_suggestions import (
     _mapping_hierarchy,
     _to_jsonable,
@@ -833,7 +834,8 @@ def make_handler(database_path: Path, model_name: str):
                     return
                 if path == "/career-explorer":
                     with connect_database(database_path) as connection:
-                        self._html(render_career_explorer(career_explorer_payload(connection)))
+                        route_payload, constellation_payload = build_reference_payloads(connection)
+                        self._html(render_career_explorer(route_payload, constellation_payload))
                     return
                 if path == "/api/career-explorer/neighbours":
                     role_id = params.get("role_id", [""])[0].strip()
