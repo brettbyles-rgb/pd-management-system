@@ -51,7 +51,7 @@ Validation is written to `data/qa/unified_database_validation.json`.
 Both applications and the supporting administration commands use one central default declared in `pd_extractor.config`:
 
 ```powershell
-python -m pd_extractor.intelligence_app
+python -m pd_extractor.web_app
 python -m pd_extractor.validation_app
 ```
 
