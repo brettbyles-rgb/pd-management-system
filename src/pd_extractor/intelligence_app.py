@@ -17,6 +17,7 @@ from .classifications import (
     seed_classification_references,
     update_classification_references,
 )
+from .config import default_database_path
 from .database import (
     assign_job_family_mappings,
     connect_database,
@@ -454,6 +455,111 @@ def career_explorer_payload(connection: sqlite3.Connection) -> dict:
     }
 
 
+def career_explorer_neighbours(
+    connection: sqlite3.Connection,
+    role_id: str,
+    *,
+    cursor: int = 0,
+    anchored_role_ids: tuple[str, ...] = (),
+) -> dict:
+    """Return one replaceable three-role Constellation fan for a stable role ID.
+
+    The published Constellation graph becomes authoritative automatically when it
+    exists. Until then, the endpoint exposes the retained provisional graph and
+    labels that fallback explicitly in the response.
+    """
+    role_id = str(role_id or "").strip()
+    if not role_id or connection.execute(
+        "SELECT 1 FROM position_descriptions WHERE role_id = ?", (role_id,)
+    ).fetchone() is None:
+        raise KeyError("Role not found")
+
+    published = connection.execute(
+        """SELECT algorithm_version
+           FROM constellation_algorithm_versions
+           WHERE status = 'published'
+           ORDER BY created_at_utc DESC, algorithm_version DESC
+           LIMIT 1"""
+    ).fetchone()
+    if published:
+        algorithm_version = str(published["algorithm_version"])
+        rows = connection.execute(
+            """SELECT candidate_role_id AS role_id, rank_default AS neighbour_rank,
+                      score, grade_delta,
+                      act_plain_contribution + act_rare_contribution AS activity_contribution,
+                      occupational_contribution,
+                      adjacency_contribution,
+                      grade_contribution AS classification_contribution,
+                      source_release
+               FROM constellation_candidate_scores
+               WHERE algorithm_version = ? AND source_role_id = ?
+                 AND rank_default IS NOT NULL
+               ORDER BY rank_default, candidate_role_id""",
+            (algorithm_version, role_id),
+        ).fetchall()
+        graph_source = "constellation_candidate_scores"
+        provisional = False
+    else:
+        rows = connection.execute(
+            """SELECT neighbour_role_id AS role_id,
+                      CAST(neighbour_rank AS INTEGER) AS neighbour_rank,
+                      CAST(score AS REAL) AS score,
+                      CAST(grade_step_dg AS INTEGER) AS grade_delta,
+                      CAST(activity_contribution AS REAL) AS activity_contribution,
+                      CAST(subfamily_contribution AS REAL) AS occupational_contribution,
+                      0.0 AS adjacency_contribution,
+                      CAST(classification_contribution AS REAL) AS classification_contribution,
+                      source_release, algorithm_version
+               FROM role_neighbours
+               WHERE role_id = ?
+               ORDER BY CAST(neighbour_rank AS INTEGER), neighbour_role_id""",
+            (role_id,),
+        ).fetchall()
+        graph_source = "role_neighbours"
+        algorithm_version = str(rows[0]["algorithm_version"]) if rows else "provisional-1.0.0"
+        provisional = True
+
+    anchored = {str(value) for value in anchored_role_ids if value}
+    available = [row for row in rows if str(row["role_id"]) not in anchored]
+    total = len(available)
+    start = max(0, int(cursor))
+    if total and start >= total:
+        start = 0
+    page = available[start : start + 3]
+    end = start + len(page)
+    next_cursor = 0 if end >= total else end
+
+    items = []
+    for row in page:
+        items.append({
+            "role_id": str(row["role_id"]),
+            "rank": int(row["neighbour_rank"]),
+            "score": float(row["score"] or 0),
+            "grade_delta": int(row["grade_delta"] or 0),
+            "components": {
+                "activity": float(row["activity_contribution"] or 0),
+                "occupation": float(row["occupational_contribution"] or 0),
+                "adjacency": float(row["adjacency_contribution"] or 0),
+                "grade": float(row["classification_contribution"] or 0),
+            },
+        })
+
+    return {
+        "source_role_id": role_id,
+        "items": items,
+        "cursor": start,
+        "next_cursor": next_cursor,
+        "total": total,
+        "counter": f"{start + 1}\u2013{end} of {total}" if page else "0 of 0",
+        "algorithm": {
+            "version": algorithm_version,
+            "source_release": str(rows[0]["source_release"]) if rows else "",
+            "graph_source": graph_source,
+            "provisional": provisional,
+        },
+    }
+
+
 HTML = r"""<!doctype html><html lang=en><head><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
 <title>PD Role Intelligence</title>
@@ -728,6 +834,32 @@ def make_handler(database_path: Path, model_name: str):
                 if path == "/career-explorer":
                     with connect_database(database_path) as connection:
                         self._html(render_career_explorer(career_explorer_payload(connection)))
+                    return
+                if path == "/api/career-explorer/neighbours":
+                    role_id = params.get("role_id", [""])[0].strip()
+                    try:
+                        cursor = int(params.get("cursor", ["0"])[0])
+                    except ValueError:
+                        self._json({"error": "cursor must be an integer"}, 400)
+                        return
+                    anchored = tuple(
+                        item.strip()
+                        for value in params.get("anchored", [])
+                        for item in value.split(",")
+                        if item.strip()
+                    )
+                    with connect_database(database_path) as connection:
+                        try:
+                            payload = career_explorer_neighbours(
+                                connection,
+                                role_id,
+                                cursor=cursor,
+                                anchored_role_ids=anchored,
+                            )
+                        except KeyError:
+                            self._json({"error": "Role not found"}, 404)
+                            return
+                    self._json(payload)
                     return
                 if path == "/mapping-assistant":
                     requested_pd = params.get("pd", [""])[0]
@@ -1014,4 +1146,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-from pd_extractor.config import default_database_path

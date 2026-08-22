@@ -15,3 +15,27 @@
 | Legacy capability/graph `pd_id` | 0–1,098 array position | `role_id_crosswalk` | Unique title+classification matches only; ambiguous rows reported |
 | Legacy activity rarity `pd_id` | database ID | `role_id_crosswalk` | Requires database ID and title agreement |
 | Combined JSON flattened family fields | first mapping only | generated application JSON | Rebuilt from ranked mappings; flattened primary fields remain compatibility views |
+
+## Constellation integration contract
+
+The Career Pathways screen reads the searchable role catalogue from the unified
+database and obtains each three-role fan from
+`GET /api/career-explorer/neighbours`. The browser does not carry its own copy
+of the scoring model or source dataset.
+
+| Algorithm field | Unified source | Current treatment |
+|---|---|---|
+| Stable role identity | `position_descriptions.role_id` | UUID used by the UI, graph and API |
+| Role activities | `position_description_activities.activity_id` | Projected into `constellation_role_features`; three roles are presently missing assignments |
+| Activity rarity | `activity_statistics.role_share` / `activity_rarity` | Scorer loads the maintained corpus rarity; no browser calculation |
+| Family, sub-family, specialisation | active `pd_job_family_mappings` joined to `job_family_entries` | Deepest populated framework IDs become the occupational feature; incomplete primary mappings remain a publication blocker |
+| Framework hierarchy | active `job_family_entries.code`, `.level`, `.parent_code` | Used for the cumulative occupational ladder and guarded against hierarchy cycles |
+| Grade rung | `position_descriptions.classification_grade_band` joined to `constellation_grade_rungs.classification_label` | Provisional shared-rung map; unmapped classification labels remain a publication blocker |
+| Family adjacency | `constellation_family_adjacency` | Intended 32 x 32 maintained matrix; currently empty and therefore a publication blocker |
+| Candidate scores | `constellation_candidate_scores` | Becomes authoritative only for an algorithm version whose status is `published` |
+| Current UI fallback | `role_neighbours` | Retained `provisional-1.0.0` graph, explicitly labelled provisional by the API and screen |
+| Capabilities | `role_capability_profiles` | Excluded from Constellation scoring; reserved for the future directed-walk readiness gate |
+
+The supplied standalone HTML remains a visual and interaction reference only.
+Its embedded role copies, walk graph and direct Anthropic API call are not part
+of the integrated application.

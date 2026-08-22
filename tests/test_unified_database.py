@@ -3,7 +3,10 @@ from __future__ import annotations
 import sqlite3
 from pathlib import Path
 
-from pd_extractor.intelligence_app import career_explorer_payload
+from pd_extractor.intelligence_app import (
+    career_explorer_neighbours,
+    career_explorer_payload,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -85,5 +88,39 @@ def test_existing_career_explorer_payload_is_unique_and_uses_stable_ids() -> Non
         assert len({row["id"] for row in payload["roles"]}) == 1171
         assert len({row["role_id"] for row in payload["roles"]}) == 1171
         assert sum(bool(row["purpose"]) for row in payload["roles"]) == 1166
+    finally:
+        connection.close()
+
+
+def test_career_explorer_neighbour_fan_pages_and_excludes_anchors() -> None:
+    connection = sqlite3.connect(UNIFIED)
+    connection.row_factory = sqlite3.Row
+    try:
+        source_role_id = connection.execute(
+            "SELECT role_id FROM role_neighbours ORDER BY role_id LIMIT 1"
+        ).fetchone()[0]
+        first = career_explorer_neighbours(connection, source_role_id)
+        assert len(first["items"]) == 3
+        assert first["counter"] == f"1\u20133 of {first['total']}"
+        assert first["algorithm"]["provisional"] is True
+        assert first["algorithm"]["graph_source"] == "role_neighbours"
+
+        second = career_explorer_neighbours(
+            connection,
+            source_role_id,
+            cursor=first["next_cursor"],
+        )
+        assert {row["role_id"] for row in first["items"]}.isdisjoint(
+            row["role_id"] for row in second["items"]
+        )
+
+        anchored_role_id = first["items"][0]["role_id"]
+        after_anchor = career_explorer_neighbours(
+            connection,
+            source_role_id,
+            anchored_role_ids=(anchored_role_id,),
+        )
+        assert after_anchor["total"] == first["total"] - 1
+        assert anchored_role_id not in {row["role_id"] for row in after_anchor["items"]}
     finally:
         connection.close()

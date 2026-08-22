@@ -1,4 +1,6 @@
 from pathlib import Path
+import subprocess
+import sys
 
 
 PACKAGE_DIR = Path(__file__).parents[1] / "src" / "pd_extractor"
@@ -35,3 +37,14 @@ def test_separate_workflows_share_navigation_destinations():
         assert "mapping-assistant" in html
         assert "Classification Admin" in html
         assert "#workbook" in html
+
+
+def test_intelligence_app_module_can_reach_its_command_line_parser():
+    result = subprocess.run(
+        [sys.executable, "-m", "pd_extractor.intelligence_app", "--help"],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, result.stderr
+    assert "Run the local PD role intelligence app" in result.stdout
