@@ -2,6 +2,12 @@
 
 Local prototype for extracting structured data from TAFE NSW Word position descriptions.
 
+## Product map
+
+See [the current-state product map](docs/product-map-current-state.md) for the
+screens, audiences, user journeys, product boundaries and known gaps across PD
+administration, workforce intelligence and the Career Pathways Explorer.
+
 ## Run
 
 ```powershell
