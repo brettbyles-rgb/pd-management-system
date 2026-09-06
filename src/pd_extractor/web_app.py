@@ -72,6 +72,14 @@ SECURITY_HEADERS = {
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
 }
+EXPLORER_DEMO_PATHS = {
+    "/",
+    "/career-explorer",
+    "/api/career-explorer/neighbours",
+    "/api/version",
+    "/health/live",
+    "/health/ready",
+}
 
 
 class JsonFormatter(logging.Formatter):
@@ -112,8 +120,30 @@ def _initialise(settings: WebSettings) -> None:
         seed_classification_references(connection)
 
 
+def _validate_settings(settings: WebSettings) -> None:
+    if settings.deployment_profile not in {"full", "explorer-demo"}:
+        raise ValueError(
+            "PD_MANAGEMENT_DEPLOYMENT_PROFILE must be 'full' or 'explorer-demo'"
+        )
+
+
+def _database_is_ready(settings: WebSettings) -> bool:
+    with connect_database(settings.database_path) as connection:
+        connection.execute("SELECT 1").fetchone()
+        if settings.require_data:
+            count = connection.execute("SELECT COUNT(*) FROM position_descriptions").fetchone()[0]
+            pathway_table = connection.execute(
+                "SELECT 1 FROM sqlite_master WHERE type IN ('table', 'view') AND name = ?",
+                ("role_neighbours",),
+            ).fetchone()
+            if count < 1 or pathway_table is None:
+                return False
+    return True
+
+
 def create_app(settings: WebSettings | None = None) -> FastAPI:
     settings = settings or web_settings()
+    _validate_settings(settings)
 
     @asynccontextmanager
     async def lifespan(_: FastAPI):
@@ -136,11 +166,20 @@ def create_app(settings: WebSettings | None = None) -> FastAPI:
     async def operational_controls(request: Request, call_next):
         request_id = request.headers.get("X-Request-ID", str(uuid.uuid4()))[:128]
         started = time.perf_counter()
-        try:
-            response = await call_next(request)
-        except Exception:
-            LOGGER.exception("request_failed", extra={"request_id": request_id, "path": request.url.path})
-            response = _json({"error": "Internal server error", "request_id": request_id}, 500)
+        if (
+            settings.deployment_profile == "explorer-demo"
+            and (
+                request.method != "GET"
+                or request.url.path not in EXPLORER_DEMO_PATHS
+            )
+        ):
+            response = _json({"error": "Not found"}, 404)
+        else:
+            try:
+                response = await call_next(request)
+            except Exception:
+                LOGGER.exception("request_failed", extra={"request_id": request_id, "path": request.url.path})
+                response = _json({"error": "Internal server error", "request_id": request_id}, 500)
         response.headers["X-Request-ID"] = request_id
         for name, value in SECURITY_HEADERS.items():
             response.headers[name] = value
@@ -165,14 +204,16 @@ def create_app(settings: WebSettings | None = None) -> FastAPI:
     @app.get("/health/ready")
     def health_ready():
         try:
-            with connect_database(settings.database_path) as connection:
-                connection.execute("SELECT 1").fetchone()
-            return {"status": "ready"}
+            if _database_is_ready(settings):
+                return {"status": "ready"}
+            return _json({"status": "not_ready"}, 503)
         except Exception:
             return _json({"status": "not_ready"}, 503)
 
     @app.get("/")
     def home():
+        if settings.deployment_profile == "explorer-demo":
+            return RedirectResponse("/career-explorer", status_code=302)
         return HTMLResponse(HTML_V2)
 
     @app.get("/career-explorer")
@@ -370,8 +411,23 @@ def main() -> int:
     parser.add_argument("--port", type=int, default=defaults.port)
     parser.add_argument("--environment", default=defaults.environment)
     parser.add_argument("--log-level", default=defaults.log_level)
+    parser.add_argument(
+        "--deployment-profile",
+        choices=("full", "explorer-demo"),
+        default=defaults.deployment_profile,
+    )
+    parser.add_argument("--require-data", action="store_true", default=defaults.require_data)
     args = parser.parse_args()
-    settings = WebSettings(args.database.resolve(), args.model, args.host, args.port, args.environment, args.log_level)
+    settings = WebSettings(
+        args.database.resolve(),
+        args.model,
+        args.host,
+        args.port,
+        args.environment,
+        args.log_level,
+        args.deployment_profile,
+        args.require_data,
+    )
     configure_logging(settings.log_level)
     uvicorn.run(create_app(settings), host=settings.host, port=settings.port, log_level=settings.log_level.lower(), access_log=False)
     return 0

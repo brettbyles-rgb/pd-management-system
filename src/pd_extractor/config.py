@@ -20,6 +20,15 @@ class WebSettings:
     port: int = 8766
     environment: str = "development"
     log_level: str = "INFO"
+    deployment_profile: str = "full"
+    require_data: bool = False
+
+
+def _environment_flag(name: str, default: bool = False) -> bool:
+    value = os.environ.get(name)
+    if value is None:
+        return default
+    return value.strip().lower() in {"1", "true", "yes", "on"}
 
 
 def web_settings() -> WebSettings:
@@ -28,10 +37,15 @@ def web_settings() -> WebSettings:
     return WebSettings(
         database_path=default_database_path(),
         model_name=os.environ.get("PD_MANAGEMENT_MODEL", DEFAULT_MODEL_NAME),
-        host=os.environ.get("PD_MANAGEMENT_HOST", "127.0.0.1"),
-        port=int(os.environ.get("PD_MANAGEMENT_PORT", "8766")),
+        host=os.environ.get(
+            "PD_MANAGEMENT_HOST",
+            "0.0.0.0" if os.environ.get("RAILWAY_ENVIRONMENT") else "127.0.0.1",
+        ),
+        port=int(os.environ.get("PD_MANAGEMENT_PORT") or os.environ.get("PORT") or "8766"),
         environment=os.environ.get("PD_MANAGEMENT_ENVIRONMENT", "development"),
         log_level=os.environ.get("PD_MANAGEMENT_LOG_LEVEL", "INFO").upper(),
+        deployment_profile=os.environ.get("PD_MANAGEMENT_DEPLOYMENT_PROFILE", "full").lower(),
+        require_data=_environment_flag("PD_MANAGEMENT_REQUIRE_DATA"),
     )
 
 

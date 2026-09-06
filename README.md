@@ -8,6 +8,9 @@ See [the current-state product map](docs/product-map-current-state.md) for the
 screens, audiences, user journeys, product boundaries and known gaps across PD
 administration, workforce intelligence and the Career Pathways Explorer.
 
+See [the cloud migration plan](docs/cloud-migration-plan.md) for the staged
+GitHub, Railway and Supabase transition and its deployment safeguards.
+
 ## Run
 
 ```powershell

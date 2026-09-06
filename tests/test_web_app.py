@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from fastapi.testclient import TestClient
 
-from pd_extractor.config import WebSettings
+from pd_extractor.config import WebSettings, web_settings
 from pd_extractor.embeddings import DEFAULT_MODEL_NAME
 from pd_extractor.intelligence_app import ADMIN_HTML, HTML_V2
 from pd_extractor.web_app import SECURITY_HEADERS, create_app
@@ -63,3 +63,67 @@ def test_invalid_career_cursor_retains_existing_api_contract(tmp_path):
 
     assert response.status_code == 400
     assert response.json() == {"error": "cursor must be an integer"}
+
+
+def test_railway_runtime_settings_use_injected_host_and_port(monkeypatch):
+    monkeypatch.setenv("RAILWAY_ENVIRONMENT", "staging")
+    monkeypatch.setenv("PORT", "4321")
+    monkeypatch.setenv("PD_MANAGEMENT_DEPLOYMENT_PROFILE", "explorer-demo")
+    monkeypatch.setenv("PD_MANAGEMENT_REQUIRE_DATA", "true")
+
+    settings = web_settings()
+
+    assert settings.host == "0.0.0.0"
+    assert settings.port == 4321
+    assert settings.deployment_profile == "explorer-demo"
+    assert settings.require_data is True
+
+
+def test_explorer_demo_profile_hides_administration_and_writes(tmp_path):
+    settings = WebSettings(
+        database_path=tmp_path / "application.sqlite3",
+        model_name=DEFAULT_MODEL_NAME,
+        environment="test",
+        deployment_profile="explorer-demo",
+    )
+    with TestClient(create_app(settings)) as client:
+        home = client.get("/", follow_redirects=False)
+        admin = client.get("/admin/classifications")
+        write = client.put("/api/classifications", json={"rows": []})
+        live = client.get("/health/live")
+
+    assert home.status_code == 302
+    assert home.headers["location"] == "/career-explorer"
+    assert admin.status_code == 404
+    assert write.status_code == 404
+    assert live.status_code == 200
+
+
+def test_require_data_fails_readiness_for_empty_database(tmp_path):
+    settings = WebSettings(
+        database_path=tmp_path / "application.sqlite3",
+        model_name=DEFAULT_MODEL_NAME,
+        environment="test",
+        deployment_profile="explorer-demo",
+        require_data=True,
+    )
+    with TestClient(create_app(settings)) as client:
+        response = client.get("/health/ready")
+
+    assert response.status_code == 503
+    assert response.json() == {"status": "not_ready"}
+
+
+def test_unknown_deployment_profile_is_rejected(tmp_path):
+    settings = WebSettings(
+        database_path=tmp_path / "application.sqlite3",
+        model_name=DEFAULT_MODEL_NAME,
+        deployment_profile="public-everything",
+    )
+
+    try:
+        create_app(settings)
+    except ValueError as exc:
+        assert "PD_MANAGEMENT_DEPLOYMENT_PROFILE" in str(exc)
+    else:
+        raise AssertionError("unsafe unknown deployment profile was accepted")
