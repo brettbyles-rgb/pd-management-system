@@ -7,6 +7,7 @@ from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 DATABASE_ENVIRONMENT_VARIABLE = "PD_MANAGEMENT_DATABASE"
+DATABASE_URL_ENVIRONMENT_VARIABLE = "PD_MANAGEMENT_DATABASE_URL"
 UNIFIED_DATABASE = PROJECT_ROOT / "data" / "generated" / "pd_management_unified.sqlite3"
 
 
@@ -22,6 +23,7 @@ class WebSettings:
     log_level: str = "INFO"
     deployment_profile: str = "full"
     require_data: bool = False
+    database_url: str | None = None
 
 
 def _environment_flag(name: str, default: bool = False) -> bool:
@@ -46,6 +48,7 @@ def web_settings() -> WebSettings:
         log_level=os.environ.get("PD_MANAGEMENT_LOG_LEVEL", "INFO").upper(),
         deployment_profile=os.environ.get("PD_MANAGEMENT_DEPLOYMENT_PROFILE", "full").lower(),
         require_data=_environment_flag("PD_MANAGEMENT_REQUIRE_DATA"),
+        database_url=os.environ.get(DATABASE_URL_ENVIRONMENT_VARIABLE) or None,
     )
 
 

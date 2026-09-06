@@ -48,13 +48,32 @@ Railway supplies `PORT`. No public domain should be enabled while readiness fail
 - Explicit public demo surface.
 - Environment-driven runtime settings.
 
-### 2. PostgreSQL compatibility — next
+### 2. PostgreSQL compatibility — in progress
 
-- Add a PostgreSQL driver and a database access boundary.
-- Introduce versioned schema migrations.
-- Replace SQLite-only pragmas, schema inspection, placeholders and connection assumptions.
+- PostgreSQL driver and a shared connection boundary are now available for the
+  read-only Explorer deployment profile.
+- Versioned PostgreSQL migrations and an explicit migration runner have been added.
+- The Explorer path no longer depends on SQLite-only placeholders or schema inspection.
 - Preserve SQLite-backed tests during the transition.
 - Add PostgreSQL integration tests against a disposable schema.
+
+The PostgreSQL path is intentionally refused when the `full` deployment profile is
+selected. Validation, mapping, imports and administration remain SQLite-only until
+their writes, file storage, audit and authorisation controls are migrated.
+
+### Controlled migration commands
+
+Keep the connection URL in the current process environment; never put it in a
+command, source file or chat message. After setting `PD_MANAGEMENT_DATABASE_URL`:
+
+```powershell
+python scripts/apply_postgres_migrations.py
+python scripts/copy_explorer_to_postgres.py --source data/generated/pd_management_unified.sqlite3
+python scripts/copy_explorer_to_postgres.py --source data/generated/pd_management_unified.sqlite3 --apply
+```
+
+The first copy command is inspection-only. The apply command refuses to overwrite
+non-empty target tables and reconciles every copied table count before committing.
 
 ### 3. Controlled data copy
 
@@ -90,7 +109,7 @@ Railway supplies `PORT`. No public domain should be enabled while readiness fail
 
 ## Current hard blockers to a full cloud deployment
 
-1. The application data layer imports and depends directly on Python's `sqlite3` API.
+1. Write workflows still import and depend directly on Python's `sqlite3` API.
 2. Source documents, workbook imports and classification backups are written to local paths.
 3. Validation still runs through a separate legacy HTTP server.
 4. The full application has no authentication or route-level permissions.

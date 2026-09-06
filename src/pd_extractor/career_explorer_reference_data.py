@@ -74,7 +74,7 @@ def _family_model(connection: sqlite3.Connection) -> tuple[list[str], list[list[
         for j, right in enumerate(reference_families)
     }
     live_families = [
-        str(row[0])
+        str(row["name"])
         for row in connection.execute(
             """SELECT name FROM job_family_nodes
                WHERE LOWER(level) = 'job family'
@@ -188,7 +188,7 @@ def build_reference_payloads(connection: sqlite3.Connection) -> tuple[dict[str, 
             cluster_roles[cluster_id].add(role_id)
 
     capability_names = [
-        str(row[0])
+        str(row["capability_name"])
         for row in connection.execute(
             """SELECT capability_name FROM capabilities
                WHERE capability_name IS NOT NULL AND capability_name <> ''

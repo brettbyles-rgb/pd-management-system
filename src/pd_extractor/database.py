@@ -5,7 +5,7 @@ import html
 import json
 import sqlite3
 from pathlib import Path
-from typing import Any, Iterable
+from typing import Any, Iterable, Protocol, runtime_checkable
 
 
 CANONICAL_FRAMEWORKS = [
@@ -298,7 +298,96 @@ JOIN position_descriptions pd ON pd.id = assigned.position_description_id;
 """
 
 
-def connect_database(path: Path) -> sqlite3.Connection:
+@runtime_checkable
+class DatabaseConnection(Protocol):
+    """Small DB-API surface shared by SQLite and the read-only PostgreSQL slice."""
+
+    backend: str
+
+    def execute(self, sql: str, parameters: object = ...) -> Any: ...
+    def executemany(self, sql: str, parameters: object) -> Any: ...
+    def commit(self) -> None: ...
+    def rollback(self) -> None: ...
+    def close(self) -> None: ...
+
+
+def _postgres_parameters(sql: str) -> str:
+    """Translate SQLite qmark parameters without changing quoted question marks."""
+    output: list[str] = []
+    quote: str | None = None
+    index = 0
+    while index < len(sql):
+        character = sql[index]
+        if quote:
+            output.append(character)
+            if character == quote:
+                if index + 1 < len(sql) and sql[index + 1] == quote:
+                    output.append(sql[index + 1])
+                    index += 1
+                else:
+                    quote = None
+        elif character in {"'", '"'}:
+            quote = character
+            output.append(character)
+        elif character == "?":
+            output.append("%s")
+        else:
+            output.append(character)
+        index += 1
+    return "".join(output)
+
+
+class PostgresConnection:
+    """Compatibility wrapper for the SQL used by the read-only Explorer routes."""
+
+    backend = "postgresql"
+
+    def __init__(self, connection: Any):
+        self._connection = connection
+
+    def execute(self, sql: str, parameters: object = ()) -> Any:
+        return self._connection.execute(_postgres_parameters(sql), parameters)
+
+    def executemany(self, sql: str, parameters: object) -> Any:
+        return self._connection.executemany(_postgres_parameters(sql), parameters)
+
+    def commit(self) -> None:
+        self._connection.commit()
+
+    def rollback(self) -> None:
+        self._connection.rollback()
+
+    def close(self) -> None:
+        self._connection.close()
+
+    def __enter__(self) -> "PostgresConnection":
+        self._connection.__enter__()
+        return self
+
+    def __exit__(self, exc_type: object, exc: object, traceback: object) -> object:
+        return self._connection.__exit__(exc_type, exc, traceback)
+
+
+def connect_database(
+    path: Path,
+    database_url: str | None = None,
+) -> sqlite3.Connection | PostgresConnection:
+    if database_url:
+        if not database_url.lower().startswith(("postgresql://", "postgres://")):
+            raise ValueError("PD_MANAGEMENT_DATABASE_URL must be a PostgreSQL connection URL")
+        try:
+            import psycopg
+            from psycopg.rows import dict_row
+        except ImportError as exc:  # pragma: no cover - exercised only in a misbuilt runtime
+            raise RuntimeError("PostgreSQL support requires psycopg") from exc
+        connection = psycopg.connect(
+            database_url,
+            sslmode="require",
+            row_factory=dict_row,
+            connect_timeout=10,
+        )
+        return PostgresConnection(connection)
+
     path.parent.mkdir(parents=True, exist_ok=True)
     connection = sqlite3.connect(path, timeout=5.0)
     connection.row_factory = sqlite3.Row
@@ -306,6 +395,23 @@ def connect_database(path: Path) -> sqlite3.Connection:
     connection.execute("PRAGMA busy_timeout = 5000")
     connection.execute("PRAGMA journal_mode = WAL")
     return connection
+
+
+def database_backend(connection: object) -> str:
+    return getattr(connection, "backend", "sqlite")
+
+
+def database_object_exists(
+    connection: sqlite3.Connection | PostgresConnection,
+    name: str,
+) -> bool:
+    if database_backend(connection) == "postgresql":
+        row = connection.execute("SELECT to_regclass(?) AS object_name", (name,)).fetchone()
+        return bool(row and row["object_name"])
+    return connection.execute(
+        "SELECT 1 FROM sqlite_master WHERE type IN ('table', 'view') AND name = ?",
+        (name,),
+    ).fetchone() is not None
 
 
 def initialise_database(connection: sqlite3.Connection) -> None:

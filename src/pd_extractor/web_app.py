@@ -22,6 +22,7 @@ from .config import WebSettings, web_settings
 from .database import (
     assign_job_family_mappings,
     connect_database,
+    database_object_exists,
     import_document,
     initialise_database,
     job_family_mappings_for_pd,
@@ -115,9 +116,16 @@ def _json(value: object, status: int = 200) -> JSONResponse:
 
 
 def _initialise(settings: WebSettings) -> None:
-    with connect_database(settings.database_path) as connection:
+    if settings.database_url:
+        # Cloud schemas are changed only by the explicit migration command.
+        return
+    with _connect(settings) as connection:
         initialise_database(connection)
         seed_classification_references(connection)
+
+
+def _connect(settings: WebSettings):
+    return connect_database(settings.database_path, settings.database_url)
 
 
 def _validate_settings(settings: WebSettings) -> None:
@@ -125,18 +133,24 @@ def _validate_settings(settings: WebSettings) -> None:
         raise ValueError(
             "PD_MANAGEMENT_DEPLOYMENT_PROFILE must be 'full' or 'explorer-demo'"
         )
+    if settings.database_url:
+        if not settings.database_url.lower().startswith(("postgresql://", "postgres://")):
+            raise ValueError("PD_MANAGEMENT_DATABASE_URL must be a PostgreSQL connection URL")
+        if settings.deployment_profile != "explorer-demo":
+            raise ValueError(
+                "PostgreSQL is currently restricted to the read-only explorer-demo profile"
+            )
 
 
 def _database_is_ready(settings: WebSettings) -> bool:
-    with connect_database(settings.database_path) as connection:
+    with _connect(settings) as connection:
         connection.execute("SELECT 1").fetchone()
         if settings.require_data:
-            count = connection.execute("SELECT COUNT(*) FROM position_descriptions").fetchone()[0]
-            pathway_table = connection.execute(
-                "SELECT 1 FROM sqlite_master WHERE type IN ('table', 'view') AND name = ?",
-                ("role_neighbours",),
+            row = connection.execute(
+                "SELECT COUNT(*) AS role_count FROM position_descriptions"
             ).fetchone()
-            if count < 1 or pathway_table is None:
+            count = int(row["role_count"])
+            if count < 1 or not database_object_exists(connection, "role_neighbours"):
                 return False
     return True
 
@@ -218,7 +232,7 @@ def create_app(settings: WebSettings | None = None) -> FastAPI:
 
     @app.get("/career-explorer")
     def career_explorer():
-        with connect_database(settings.database_path) as connection:
+        with _connect(settings) as connection:
             route_payload, constellation_payload = build_reference_payloads(connection)
         return HTMLResponse(render_career_explorer(route_payload, constellation_payload))
 
@@ -230,7 +244,7 @@ def create_app(settings: WebSettings | None = None) -> FastAPI:
         except ValueError:
             return _json({"error": "cursor must be an integer"}, 400)
         anchored = tuple(item.strip() for value in request.query_params.getlist("anchored") for item in value.split(",") if item.strip())
-        with connect_database(settings.database_path) as connection:
+        with _connect(settings) as connection:
             try:
                 payload = career_explorer_neighbours(connection, role_id, cursor=cursor, anchored_role_ids=anchored)
             except KeyError:
@@ -240,7 +254,7 @@ def create_app(settings: WebSettings | None = None) -> FastAPI:
     @app.get("/mapping-assistant")
     def mapping_assistant(request: Request):
         requested_pd = request.query_params.get("pd", "")
-        with connect_database(settings.database_path) as connection:
+        with _connect(settings) as connection:
             pd_id = resolve_pd_identifier(connection, requested_pd)
             if pd_id is None:
                 return RedirectResponse("/#mapping", status_code=302)
@@ -264,13 +278,13 @@ def create_app(settings: WebSettings | None = None) -> FastAPI:
 
     @app.get("/api/classifications")
     def classifications():
-        with connect_database(settings.database_path) as connection:
+        with _connect(settings) as connection:
             return {"rows": classification_rows(connection)}
 
     @app.get("/api/classifications/export")
     def classifications_export(request: Request):
         export_format = request.query_params.get("format", "csv").lower()
-        with connect_database(settings.database_path) as connection:
+        with _connect(settings) as connection:
             rows = classification_rows(connection)
         stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
         if export_format == "json":
@@ -283,22 +297,22 @@ def create_app(settings: WebSettings | None = None) -> FastAPI:
 
     @app.get("/api/validation-queue")
     def get_validation_queue():
-        with connect_database(settings.database_path) as connection:
+        with _connect(settings) as connection:
             return {"rows": validation_queue(connection)}
 
     @app.get("/api/job-family-import-status")
     def get_job_family_import_status():
-        with connect_database(settings.database_path) as connection:
+        with _connect(settings) as connection:
             return job_family_import_status(connection)
 
     @app.get("/api/pds")
     def get_pds(request: Request):
-        with connect_database(settings.database_path) as connection:
+        with _connect(settings) as connection:
             return search_pds(connection, request.query_params.get("q", ""))
 
     @app.get("/api/pds/{pd_id}/intelligence")
     def pd_intelligence(pd_id: int):
-        with connect_database(settings.database_path) as connection:
+        with _connect(settings) as connection:
             detail = pd_detail(connection, pd_id)
             if detail is None:
                 return _json({"error": "Not found"}, 404)
@@ -314,7 +328,7 @@ def create_app(settings: WebSettings | None = None) -> FastAPI:
         query = request.query_params.get("query", "").strip()
         if not query:
             return _json({"error": "Missing query"}, 400)
-        with connect_database(settings.database_path) as connection:
+        with _connect(settings) as connection:
             model = _embedder(settings.model_name)
             roles = search_roles(connection, query, model, model_name=settings.model_name, limit=50)
             suggestions = suggest_mappings_for_query(connection, query, model, model_name=settings.model_name)
@@ -334,7 +348,7 @@ def create_app(settings: WebSettings | None = None) -> FastAPI:
         document_path = _uploaded_pd_path(settings.database_path, filename)
         document_path.write_bytes(base64.b64decode(encoded))
         extracted = extract_document(document_path)
-        with connect_database(settings.database_path) as connection:
+        with _connect(settings) as connection:
             initialise_database(connection)
             pd_id = import_document(connection, extracted)
             seed_classification_references(connection)
@@ -352,7 +366,7 @@ def create_app(settings: WebSettings | None = None) -> FastAPI:
             return _json({"error": "No file content supplied"}, 400)
         workbook_path = _uploaded_job_family_path(settings.database_path, filename)
         workbook_path.write_bytes(base64.b64decode(encoded))
-        with connect_database(settings.database_path) as connection:
+        with _connect(settings) as connection:
             initialise_database(connection)
             summary = import_job_family_workbook(connection, workbook_path)
             count = upsert_embeddings(connection, framework_embedding_sources(connection), _embedder(settings.model_name), model_name=settings.model_name)
@@ -361,7 +375,7 @@ def create_app(settings: WebSettings | None = None) -> FastAPI:
 
     @app.post("/api/pds/{pd_id}/prepare-intelligence")
     def prepare_intelligence(pd_id: int):
-        with connect_database(settings.database_path) as connection:
+        with _connect(settings) as connection:
             initialise_database(connection)
             if pd_detail(connection, pd_id) is None:
                 return _json({"error": "Not found"}, 404)
@@ -376,7 +390,7 @@ def create_app(settings: WebSettings | None = None) -> FastAPI:
             return _json({"error": "mapping_codes must be a list"}, 400)
         rationale = str(payload.get("rationale") or "").strip() if isinstance(payload, dict) else ""
         notes = f"Assigned in Mapping Assistant. Rationale: {rationale}" if rationale else "Assigned in Mapping Assistant"
-        with connect_database(settings.database_path) as connection:
+        with _connect(settings) as connection:
             initialise_database(connection)
             try:
                 mappings = assign_job_family_mappings(connection, pd_id, codes, validation_notes=notes)
@@ -390,7 +404,7 @@ def create_app(settings: WebSettings | None = None) -> FastAPI:
     async def put_classifications(request: Request):
         payload = await request.json()
         rows = payload.get("rows", []) if isinstance(payload, dict) else []
-        with connect_database(settings.database_path) as connection:
+        with _connect(settings) as connection:
             before = classification_rows(connection)
             _classification_backup_path(settings.database_path).write_text(json.dumps(before, ensure_ascii=False, indent=2), encoding="utf-8")
             updated = update_classification_references(connection, rows)
@@ -427,6 +441,7 @@ def main() -> int:
         args.log_level,
         args.deployment_profile,
         args.require_data,
+        defaults.database_url,
     )
     configure_logging(settings.log_level)
     uvicorn.run(create_app(settings), host=settings.host, port=settings.port, log_level=settings.log_level.lower(), access_log=False)
