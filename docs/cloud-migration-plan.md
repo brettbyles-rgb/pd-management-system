@@ -63,16 +63,16 @@ their writes, file storage, audit and authorisation controls are migrated.
 
 ### Controlled migration commands
 
-Keep the connection URL in the current process environment; never put it in a
-command, source file or chat message. After setting `PD_MANAGEMENT_DATABASE_URL`:
+Never put the database password in a command, source file or chat message. The
+following form asks for it at a hidden prompt and keeps it out of shell history:
 
 ```powershell
-python scripts/apply_postgres_migrations.py
+python scripts/apply_postgres_migrations.py --host <pooler-host> --user <pooler-user> --prompt-password
 python scripts/copy_explorer_to_postgres.py --source data/generated/pd_management_unified.sqlite3
-python scripts/copy_explorer_to_postgres.py --source data/generated/pd_management_unified.sqlite3 --apply
+python scripts/copy_explorer_to_postgres.py --source data/generated/pd_management_unified.sqlite3 --apply --host <pooler-host> --user <pooler-user> --prompt-password
 ```
 
-The first copy command is inspection-only. The apply command refuses to overwrite
+The middle command is local inspection-only and needs no credentials. The apply command refuses to overwrite
 non-empty target tables and reconciles every copied table count before committing.
 
 ### 3. Controlled data copy

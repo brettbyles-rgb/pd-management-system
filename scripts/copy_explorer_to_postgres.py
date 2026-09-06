@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 import argparse
-import os
 import sqlite3
 from pathlib import Path
+
+from postgres_connection import add_connection_arguments, connection_arguments
 
 
 TABLES = (
@@ -27,15 +28,6 @@ TABLES = (
 )
 
 
-def _database_url(environment_variable: str) -> str:
-    value = os.environ.get(environment_variable, "").strip()
-    if not value:
-        raise SystemExit(f"Set {environment_variable} in the current process before copying")
-    if not value.lower().startswith(("postgresql://", "postgres://")):
-        raise SystemExit(f"{environment_variable} is not a PostgreSQL URL")
-    return value
-
-
 def _source_counts(source: sqlite3.Connection) -> dict[str, int]:
     return {
         table: int(source.execute(f'SELECT COUNT(*) FROM "{table}"').fetchone()[0])
@@ -49,7 +41,7 @@ def main() -> int:
     )
     parser.add_argument("--source", type=Path, required=True)
     parser.add_argument("--apply", action="store_true", help="Perform the copy; otherwise only inspect")
-    parser.add_argument("--database-url-env", default="PD_MANAGEMENT_DATABASE_URL")
+    add_connection_arguments(parser)
     args = parser.parse_args()
 
     source_path = args.source.resolve()
@@ -65,11 +57,11 @@ def main() -> int:
         print("inspection only; use --apply after reviewing these counts")
         return 0
 
-    database_url = _database_url(args.database_url_env)
+    positional, keywords = connection_arguments(args)
     import psycopg
     from psycopg import sql
 
-    with psycopg.connect(database_url, sslmode="require", connect_timeout=10) as target:
+    with psycopg.connect(*positional, **keywords) as target:
         for table in TABLES:
             existing = target.execute(
                 sql.SQL("SELECT COUNT(*) FROM {}").format(sql.Identifier(table))

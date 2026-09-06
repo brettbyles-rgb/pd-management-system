@@ -17,6 +17,7 @@ COPY data/reference ./data/reference
 COPY migrations ./migrations
 COPY scripts/apply_postgres_migrations.py ./scripts/apply_postgres_migrations.py
 COPY scripts/copy_explorer_to_postgres.py ./scripts/copy_explorer_to_postgres.py
+COPY scripts/postgres_connection.py ./scripts/postgres_connection.py
 RUN mkdir -p /app/data/generated /app/runtime \
     && chown -R app:app /app
 
