@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 
 
@@ -23,9 +23,9 @@ class WebSettings:
     log_level: str = "INFO"
     deployment_profile: str = "full"
     require_data: bool = False
-    database_url: str | None = None
+    database_url: str | None = field(default=None, repr=False)
     admin_username: str | None = None
-    admin_password: str | None = None
+    admin_password: str | None = field(default=None, repr=False)
 
 
 def _environment_flag(name: str, default: bool = False) -> bool:

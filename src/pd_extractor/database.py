@@ -371,6 +371,8 @@ class PostgresConnection:
 def connect_database(
     path: Path,
     database_url: str | None = None,
+    *,
+    read_only: bool = False,
 ) -> sqlite3.Connection | PostgresConnection:
     if database_url:
         if not database_url.lower().startswith(("postgresql://", "postgres://")):
@@ -380,11 +382,13 @@ def connect_database(
             from psycopg.rows import dict_row
         except ImportError as exc:  # pragma: no cover - exercised only in a misbuilt runtime
             raise RuntimeError("PostgreSQL support requires psycopg") from exc
+        options = {"options": "-c default_transaction_read_only=on"} if read_only else {}
         connection = psycopg.connect(
             database_url,
             sslmode="require",
             row_factory=dict_row,
             connect_timeout=10,
+            **options,
         )
         return PostgresConnection(connection)
 

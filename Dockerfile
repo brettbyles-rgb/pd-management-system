@@ -8,9 +8,9 @@ WORKDIR /app
 
 RUN groupadd --system app && useradd --system --gid app --create-home app
 
-COPY pyproject.toml requirements.txt ./
+COPY pyproject.toml requirements-cloud.txt ./
 RUN python -m pip install --no-cache-dir --upgrade pip \
-    && python -m pip install --no-cache-dir -r requirements.txt
+    && python -m pip install --no-cache-dir -r requirements-cloud.txt
 
 COPY src ./src
 COPY data/reference ./data/reference

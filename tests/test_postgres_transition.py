@@ -93,3 +93,24 @@ def test_explorer_queries_do_not_mix_text_and_numeric_coalesce_types():
 
     assert "COALESCE(s.share,'0')" in source
     assert "COALESCE(s.share,0)" not in source
+
+
+def test_hosted_read_profiles_force_postgres_transactions_read_only():
+    database_source = (ROOT / "src" / "pd_extractor" / "database.py").read_text(
+        encoding="utf-8"
+    )
+    web_source = (ROOT / "src" / "pd_extractor" / "web_app.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "default_transaction_read_only=on" in database_source
+    assert 'read_only=settings.deployment_profile in {"explorer-demo", "admin-poc-readonly"}' in web_source
+
+
+def test_cloud_image_uses_reduced_runtime_dependencies():
+    dockerfile = (ROOT / "Dockerfile").read_text(encoding="utf-8")
+    cloud_requirements = (ROOT / "requirements-cloud.txt").read_text(encoding="utf-8")
+
+    assert "requirements-cloud.txt" in dockerfile
+    assert "sentence-transformers" not in cloud_requirements
+    assert "pytest" not in cloud_requirements

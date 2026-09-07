@@ -73,6 +73,8 @@ SECURITY_HEADERS = {
         "base-uri 'self'; form-action 'self'"
     ),
     "Referrer-Policy": "no-referrer",
+    "Permissions-Policy": "camera=(), geolocation=(), microphone=()",
+    "Strict-Transport-Security": "max-age=31536000",
     "X-Content-Type-Options": "nosniff",
     "X-Frame-Options": "DENY",
 }
@@ -89,6 +91,11 @@ POC_PUBLIC_PATHS = {
     "/api/career-explorer/neighbours",
     "/health/live",
     "/health/ready",
+}
+POC_DISABLED_PATHS = {
+    # The hosted PoC intentionally omits the local ML runtime. Stored similarity
+    # data remains readable, but free-text searches requiring a live model do not.
+    "/api/search",
 }
 
 
@@ -123,9 +130,10 @@ def configure_logging(level: str) -> None:
 def _safe_exception_summary(error: Exception) -> str:
     """Return useful diagnostics without emitting configured database credentials."""
     detail = str(error)
-    password = os.environ.get("PGPASSWORD", "")
-    if password:
-        detail = detail.replace(password, "[redacted]")
+    for variable in ("PGPASSWORD", "PD_MANAGEMENT_ADMIN_PASSWORD"):
+        secret = os.environ.get(variable, "")
+        if secret:
+            detail = detail.replace(secret, "[redacted]")
     detail = re.sub(
         r"(?i)(postgres(?:ql)?://[^:/\s]+:)[^@\s]+(@)",
         r"\1[redacted]\2",
@@ -173,7 +181,11 @@ def _initialise(settings: WebSettings) -> None:
 
 
 def _connect(settings: WebSettings):
-    return connect_database(settings.database_path, settings.database_url)
+    return connect_database(
+        settings.database_path,
+        settings.database_url,
+        read_only=settings.deployment_profile in {"explorer-demo", "admin-poc-readonly"},
+    )
 
 
 def _validate_settings(settings: WebSettings) -> None:
@@ -251,6 +263,10 @@ def create_app(settings: WebSettings | None = None) -> FastAPI:
                 response = _basic_challenge()
             elif request.method != "GET":
                 response = _json({"error": "Hosted administration is read-only"}, 405)
+            elif request.url.path in POC_DISABLED_PATHS:
+                response = _json(
+                    {"error": "Semantic search is disabled in the hosted PoC"}, 503
+                )
             else:
                 try:
                     response = await call_next(request)
@@ -278,8 +294,14 @@ def create_app(settings: WebSettings | None = None) -> FastAPI:
         response.headers["X-Request-ID"] = request_id
         for name, value in SECURITY_HEADERS.items():
             response.headers[name] = value
-        if request.url.path == "/" or request.url.path.endswith("explorer") or response.headers.get("content-type", "").startswith("application/json"):
+        protected_poc_response = (
+            settings.deployment_profile == "admin-poc-readonly"
+            and request.url.path not in POC_PUBLIC_PATHS
+        )
+        if request.url.path == "/" or request.url.path.endswith("explorer") or response.headers.get("content-type", "").startswith("application/json") or protected_poc_response:
             response.headers["Cache-Control"] = "no-store"
+        if protected_poc_response:
+            response.headers["Vary"] = "Authorization"
         LOGGER.info(
             "request_completed",
             extra={

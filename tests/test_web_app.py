@@ -127,6 +127,9 @@ def test_admin_poc_readonly_challenges_admin_and_blocks_writes(tmp_path):
         unauthenticated = client.get("/")
         wrong = client.get("/", auth=("reviewer", "wrong"))
         authenticated = client.get("/", auth=("reviewer", "not-a-real-secret"))
+        semantic_search = client.get(
+            "/api/search?query=payroll", auth=("reviewer", "not-a-real-secret")
+        )
         write = client.put(
             "/api/classifications",
             auth=("reviewer", "not-a-real-secret"),
@@ -139,6 +142,12 @@ def test_admin_poc_readonly_challenges_admin_and_blocks_writes(tmp_path):
     assert wrong.status_code == 401
     assert authenticated.status_code == 200
     assert authenticated.text == HTML_V2
+    assert authenticated.headers["cache-control"] == "no-store"
+    assert authenticated.headers["vary"] == "Authorization"
+    assert semantic_search.status_code == 503
+    assert semantic_search.json() == {
+        "error": "Semantic search is disabled in the hosted PoC"
+    }
     assert write.status_code == 405
     assert write.json() == {"error": "Hosted administration is read-only"}
     assert public_health.status_code == 200

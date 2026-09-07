@@ -12,6 +12,15 @@ def test_exception_summary_redacts_environment_password(monkeypatch):
     assert "[redacted]" in summary
 
 
+def test_exception_summary_redacts_admin_password(monkeypatch):
+    monkeypatch.setenv("PD_MANAGEMENT_ADMIN_PASSWORD", "another-fake-secret")
+
+    summary = _safe_exception_summary(RuntimeError("received another-fake-secret"))
+
+    assert "another-fake-secret" not in summary
+    assert "[redacted]" in summary
+
+
 def test_exception_summary_redacts_postgres_url_password():
     summary = _safe_exception_summary(
         RuntimeError("postgresql://application:not-a-real-secret@example.invalid/db failed")
