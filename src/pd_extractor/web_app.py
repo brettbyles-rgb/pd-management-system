@@ -4,6 +4,8 @@ import argparse
 import base64
 import json
 import logging
+import os
+import re
 import sys
 import time
 import uuid
@@ -111,6 +113,20 @@ def configure_logging(level: str) -> None:
     LOGGER.propagate = False
 
 
+def _safe_exception_summary(error: Exception) -> str:
+    """Return useful diagnostics without emitting configured database credentials."""
+    detail = str(error)
+    password = os.environ.get("PGPASSWORD", "")
+    if password:
+        detail = detail.replace(password, "[redacted]")
+    detail = re.sub(
+        r"(?i)(postgres(?:ql)?://[^:/\s]+:)[^@\s]+(@)",
+        r"\1[redacted]\2",
+        detail,
+    )
+    return " ".join(detail.split())[:1000] or "no error message"
+
+
 def _json(value: object, status: int = 200) -> JSONResponse:
     return JSONResponse(value, status_code=status)
 
@@ -191,8 +207,13 @@ def create_app(settings: WebSettings | None = None) -> FastAPI:
         else:
             try:
                 response = await call_next(request)
-            except Exception:
-                LOGGER.exception("request_failed", extra={"request_id": request_id, "path": request.url.path})
+            except Exception as error:
+                LOGGER.exception(
+                    "request_failed: %s: %s",
+                    type(error).__name__,
+                    _safe_exception_summary(error),
+                    extra={"request_id": request_id, "path": request.url.path},
+                )
                 response = _json({"error": "Internal server error", "request_id": request_id}, 500)
         response.headers["X-Request-ID"] = request_id
         for name, value in SECURITY_HEADERS.items():
