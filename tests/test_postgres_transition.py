@@ -52,6 +52,30 @@ def test_postgres_migrations_exclude_sqlite_only_syntax():
     assert "INSERT OR IGNORE" not in sql
 
 
+def test_admin_read_model_migration_is_present_and_protected():
+    migration = (
+        ROOT / "migrations" / "postgresql" / "0002_admin_read_model.sql"
+    ).read_text(encoding="utf-8")
+
+    for table in (
+        "role_description_fields",
+        "pd_sections",
+        "pd_list_items",
+        "key_relationships",
+        "capability_indicators",
+        "extraction_issues",
+        "validation_records",
+        "validation_events",
+        "pd_assigned_job_family_mappings",
+        "pd_mapping_texts",
+        "embeddings",
+    ):
+        assert f"CREATE TABLE {table}" in migration
+        assert f"ALTER TABLE {table} ENABLE ROW LEVEL SECURITY" in migration
+    assert "DEFAULT CURRENT_TIMESTAMP," not in migration
+    assert "DEFAULT CURRENT_TIMESTAMP\n" not in migration
+
+
 def test_postgres_copy_uses_cursor_for_bulk_inserts():
     script = (ROOT / "scripts" / "copy_explorer_to_postgres.py").read_text(
         encoding="utf-8"
