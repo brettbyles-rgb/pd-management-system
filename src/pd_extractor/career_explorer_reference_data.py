@@ -145,7 +145,7 @@ def build_reference_payloads(connection: sqlite3.Connection) -> tuple[dict[str, 
 
     activity_rows = connection.execute(
         """SELECT a.activity_id, a.canonical_match_label, a.canonical_plain_label,
-                  a.cluster_id, COALESCE(s.share,0) AS share
+                  a.cluster_id, COALESCE(s.share,'0') AS share
            FROM activities a
            LEFT JOIN activity_statistics s ON s.activity_id = a.activity_id
            ORDER BY a.activity_id"""

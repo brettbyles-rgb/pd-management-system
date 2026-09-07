@@ -60,3 +60,12 @@ def test_postgres_copy_uses_cursor_for_bulk_inserts():
     assert "with target.cursor() as writer:" in script
     assert "writer.executemany(" in script
     assert "target.executemany(" not in script
+
+
+def test_explorer_queries_do_not_mix_text_and_numeric_coalesce_types():
+    source = (
+        ROOT / "src" / "pd_extractor" / "career_explorer_reference_data.py"
+    ).read_text(encoding="utf-8")
+
+    assert "COALESCE(s.share,'0')" in source
+    assert "COALESCE(s.share,0)" not in source
