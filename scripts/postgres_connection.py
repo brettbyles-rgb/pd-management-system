@@ -29,6 +29,10 @@ def connection_arguments(
         password = getpass.getpass("Database password (input hidden): ")
         if not password:
             raise SystemExit("Database password was empty")
+        confirmation = getpass.getpass("Paste the same password again (input hidden): ")
+        if password != confirmation:
+            raise SystemExit("The two password entries did not match; connection not attempted")
+        print(f"Password input confirmed ({len(password)} characters); connecting securely...")
         return (), {
             **common,
             "host": args.host,

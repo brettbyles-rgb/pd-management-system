@@ -60,3 +60,18 @@ def test_connection_error_never_contains_password(monkeypatch):
         assert "unsafe diagnostic" not in str(exc)
     else:
         raise AssertionError("Connection failure was not reported")
+
+
+def test_mismatched_hidden_entries_stop_before_connection(monkeypatch):
+    entries = iter(("first-value", "different-value"))
+    monkeypatch.setattr("postgres_connection.getpass.getpass", lambda _: next(entries))
+    driver = FakePsycopg()
+
+    try:
+        open_postgres_connection(driver, _args())
+    except SystemExit as exc:
+        assert "did not match" in str(exc)
+    else:
+        raise AssertionError("Mismatched password entries were accepted")
+
+    assert driver.keywords is None
