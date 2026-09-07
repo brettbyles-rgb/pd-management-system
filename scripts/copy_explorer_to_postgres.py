@@ -70,20 +70,24 @@ def main() -> int:
                     f"Target table {table} is not empty; copy stopped without replacing data"
                 )
 
-        for table in TABLES:
-            columns = [
-                str(row[1])
-                for row in source.execute(f'PRAGMA table_info("{table}")').fetchall()
-            ]
-            statement = sql.SQL("INSERT INTO {} ({}) VALUES ({})").format(
-                sql.Identifier(table),
-                sql.SQL(", ").join(map(sql.Identifier, columns)),
-                sql.SQL(", ").join(sql.Placeholder() for _ in columns),
-            )
-            cursor = source.execute(f'SELECT * FROM "{table}"')
-            while batch := cursor.fetchmany(1000):
-                target.executemany(statement, [tuple(row[column] for column in columns) for row in batch])
-            print(f"copied: {table} ({counts[table]})")
+        with target.cursor() as writer:
+            for table in TABLES:
+                columns = [
+                    str(row[1])
+                    for row in source.execute(f'PRAGMA table_info("{table}")').fetchall()
+                ]
+                statement = sql.SQL("INSERT INTO {} ({}) VALUES ({})").format(
+                    sql.Identifier(table),
+                    sql.SQL(", ").join(map(sql.Identifier, columns)),
+                    sql.SQL(", ").join(sql.Placeholder() for _ in columns),
+                )
+                cursor = source.execute(f'SELECT * FROM "{table}"')
+                while batch := cursor.fetchmany(1000):
+                    writer.executemany(
+                        statement,
+                        [tuple(row[column] for column in columns) for row in batch],
+                    )
+                print(f"copied: {table} ({counts[table]})")
 
         for table, expected in counts.items():
             actual = target.execute(

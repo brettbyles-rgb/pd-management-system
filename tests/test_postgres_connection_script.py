@@ -35,6 +35,7 @@ def _args() -> argparse.Namespace:
         user="application",
         database_name="postgres",
         prompt_password=True,
+        visible_password=False,
     )
 
 
@@ -45,6 +46,32 @@ def test_prompted_password_uses_temporary_libpq_environment(monkeypatch):
     open_postgres_connection(driver, _args())
 
     assert driver.password_seen == "not-a-real-secret"
+    assert "password" not in driver.keywords
+    assert "PGPASSWORD" not in os.environ
+
+
+def test_prompted_password_trims_surrounding_whitespace(monkeypatch):
+    monkeypatch.setattr(
+        "postgres_connection.getpass.getpass",
+        lambda _: "  not-a-real-secret  ",
+    )
+    driver = FakePsycopg()
+
+    open_postgres_connection(driver, _args())
+
+    assert driver.password_seen == "not-a-real-secret"
+
+
+def test_visible_password_is_echoed_input_and_trims_whitespace(monkeypatch):
+    args = _args()
+    args.prompt_password = False
+    args.visible_password = True
+    monkeypatch.setattr("builtins.input", lambda _: "  visible-not-a-real-secret  ")
+    driver = FakePsycopg()
+
+    open_postgres_connection(driver, args)
+
+    assert driver.password_seen == "visible-not-a-real-secret"
     assert "password" not in driver.keywords
     assert "PGPASSWORD" not in os.environ
 

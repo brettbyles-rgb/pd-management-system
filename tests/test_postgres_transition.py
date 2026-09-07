@@ -50,3 +50,13 @@ def test_postgres_migrations_exclude_sqlite_only_syntax():
     assert "SQLITE_MASTER" not in sql
     assert "INSERT OR REPLACE" not in sql
     assert "INSERT OR IGNORE" not in sql
+
+
+def test_postgres_copy_uses_cursor_for_bulk_inserts():
+    script = (ROOT / "scripts" / "copy_explorer_to_postgres.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "with target.cursor() as writer:" in script
+    assert "writer.executemany(" in script
+    assert "target.executemany(" not in script
