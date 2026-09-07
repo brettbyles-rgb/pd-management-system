@@ -6,6 +6,7 @@ import json
 import logging
 import os
 import re
+import secrets
 import sys
 import time
 import uuid
@@ -83,6 +84,12 @@ EXPLORER_DEMO_PATHS = {
     "/health/live",
     "/health/ready",
 }
+POC_PUBLIC_PATHS = {
+    "/career-explorer",
+    "/api/career-explorer/neighbours",
+    "/health/live",
+    "/health/ready",
+}
 
 
 class JsonFormatter(logging.Formatter):
@@ -131,6 +138,31 @@ def _json(value: object, status: int = 200) -> JSONResponse:
     return JSONResponse(value, status_code=status)
 
 
+def _valid_basic_credentials(request: Request, settings: WebSettings) -> bool:
+    authorization = request.headers.get("Authorization", "")
+    if not authorization.startswith("Basic "):
+        return False
+    try:
+        decoded = base64.b64decode(authorization[6:], validate=True).decode("utf-8")
+        username, password = decoded.split(":", 1)
+    except (ValueError, UnicodeDecodeError):
+        return False
+    return bool(
+        settings.admin_username
+        and settings.admin_password
+        and secrets.compare_digest(username, settings.admin_username)
+        and secrets.compare_digest(password, settings.admin_password)
+    )
+
+
+def _basic_challenge() -> JSONResponse:
+    return JSONResponse(
+        {"error": "Authentication required"},
+        status_code=401,
+        headers={"WWW-Authenticate": 'Basic realm="PD Management PoC", charset="UTF-8"'},
+    )
+
+
 def _initialise(settings: WebSettings) -> None:
     if settings.database_url:
         # Cloud schemas are changed only by the explicit migration command.
@@ -145,17 +177,25 @@ def _connect(settings: WebSettings):
 
 
 def _validate_settings(settings: WebSettings) -> None:
-    if settings.deployment_profile not in {"full", "explorer-demo"}:
+    if settings.deployment_profile not in {"full", "explorer-demo", "admin-poc-readonly"}:
         raise ValueError(
-            "PD_MANAGEMENT_DEPLOYMENT_PROFILE must be 'full' or 'explorer-demo'"
+            "PD_MANAGEMENT_DEPLOYMENT_PROFILE must be 'full', 'explorer-demo' "
+            "or 'admin-poc-readonly'"
         )
     if settings.database_url:
         if not settings.database_url.lower().startswith(("postgresql://", "postgres://")):
             raise ValueError("PD_MANAGEMENT_DATABASE_URL must be a PostgreSQL connection URL")
-        if settings.deployment_profile != "explorer-demo":
+        if settings.deployment_profile not in {"explorer-demo", "admin-poc-readonly"}:
             raise ValueError(
-                "PostgreSQL is currently restricted to the read-only explorer-demo profile"
+                "PostgreSQL is currently restricted to read-only deployment profiles"
             )
+    if settings.deployment_profile == "admin-poc-readonly" and not (
+        settings.admin_username and settings.admin_password
+    ):
+        raise ValueError(
+            "admin-poc-readonly requires PD_MANAGEMENT_ADMIN_USERNAME and "
+            "PD_MANAGEMENT_ADMIN_PASSWORD"
+        )
 
 
 def _database_is_ready(settings: WebSettings) -> bool:
@@ -204,6 +244,26 @@ def create_app(settings: WebSettings | None = None) -> FastAPI:
             )
         ):
             response = _json({"error": "Not found"}, 404)
+        elif settings.deployment_profile == "admin-poc-readonly" and (
+            request.url.path not in POC_PUBLIC_PATHS
+        ):
+            if not _valid_basic_credentials(request, settings):
+                response = _basic_challenge()
+            elif request.method != "GET":
+                response = _json({"error": "Hosted administration is read-only"}, 405)
+            else:
+                try:
+                    response = await call_next(request)
+                except Exception as error:
+                    LOGGER.exception(
+                        "request_failed: %s: %s",
+                        type(error).__name__,
+                        _safe_exception_summary(error),
+                        extra={"request_id": request_id, "path": request.url.path},
+                    )
+                    response = _json(
+                        {"error": "Internal server error", "request_id": request_id}, 500
+                    )
         else:
             try:
                 response = await call_next(request)
@@ -448,7 +508,7 @@ def main() -> int:
     parser.add_argument("--log-level", default=defaults.log_level)
     parser.add_argument(
         "--deployment-profile",
-        choices=("full", "explorer-demo"),
+        choices=("full", "explorer-demo", "admin-poc-readonly"),
         default=defaults.deployment_profile,
     )
     parser.add_argument("--require-data", action="store_true", default=defaults.require_data)
@@ -463,6 +523,8 @@ def main() -> int:
         args.deployment_profile,
         args.require_data,
         defaults.database_url,
+        defaults.admin_username,
+        defaults.admin_password,
     )
     configure_logging(settings.log_level)
     uvicorn.run(create_app(settings), host=settings.host, port=settings.port, log_level=settings.log_level.lower(), access_log=False)

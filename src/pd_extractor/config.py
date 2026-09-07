@@ -24,6 +24,8 @@ class WebSettings:
     deployment_profile: str = "full"
     require_data: bool = False
     database_url: str | None = None
+    admin_username: str | None = None
+    admin_password: str | None = None
 
 
 def _environment_flag(name: str, default: bool = False) -> bool:
@@ -49,6 +51,8 @@ def web_settings() -> WebSettings:
         deployment_profile=os.environ.get("PD_MANAGEMENT_DEPLOYMENT_PROFILE", "full").lower(),
         require_data=_environment_flag("PD_MANAGEMENT_REQUIRE_DATA"),
         database_url=os.environ.get(DATABASE_URL_ENVIRONMENT_VARIABLE) or None,
+        admin_username=os.environ.get("PD_MANAGEMENT_ADMIN_USERNAME") or None,
+        admin_password=os.environ.get("PD_MANAGEMENT_ADMIN_PASSWORD") or None,
     )
 
 

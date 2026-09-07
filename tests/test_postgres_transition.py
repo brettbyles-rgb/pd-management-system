@@ -29,7 +29,7 @@ def test_qmark_translation_ignores_quoted_question_marks():
     )
 
 
-def test_postgres_is_guarded_to_read_only_explorer_profile(tmp_path):
+def test_postgres_rejects_write_enabled_full_profile(tmp_path):
     settings = WebSettings(
         database_path=tmp_path / "unused.sqlite3",
         model_name=DEFAULT_MODEL_NAME,
@@ -37,7 +37,7 @@ def test_postgres_is_guarded_to_read_only_explorer_profile(tmp_path):
         database_url="postgresql://application:secret@example.invalid/postgres",
     )
 
-    with pytest.raises(ValueError, match="read-only explorer-demo"):
+    with pytest.raises(ValueError, match="read-only deployment profiles"):
         create_app(settings)
 
 
