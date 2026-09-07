@@ -4,7 +4,7 @@ import argparse
 import hashlib
 from pathlib import Path
 
-from postgres_connection import add_connection_arguments, connection_arguments
+from postgres_connection import add_connection_arguments, open_postgres_connection
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -15,7 +15,6 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Apply versioned PostgreSQL schema migrations")
     add_connection_arguments(parser)
     args = parser.parse_args()
-    positional, keywords = connection_arguments(args)
 
     import psycopg
 
@@ -23,7 +22,7 @@ def main() -> int:
     if not files:
         raise SystemExit("No PostgreSQL migrations found")
 
-    with psycopg.connect(*positional, **keywords) as connection:
+    with open_postgres_connection(psycopg, args) as connection:
         connection.execute(
             """CREATE TABLE IF NOT EXISTS schema_migrations (
                    version TEXT PRIMARY KEY,

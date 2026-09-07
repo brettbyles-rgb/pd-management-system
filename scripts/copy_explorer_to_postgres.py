@@ -4,7 +4,7 @@ import argparse
 import sqlite3
 from pathlib import Path
 
-from postgres_connection import add_connection_arguments, connection_arguments
+from postgres_connection import add_connection_arguments, open_postgres_connection
 
 
 TABLES = (
@@ -57,11 +57,10 @@ def main() -> int:
         print("inspection only; use --apply after reviewing these counts")
         return 0
 
-    positional, keywords = connection_arguments(args)
     import psycopg
     from psycopg import sql
 
-    with psycopg.connect(*positional, **keywords) as target:
+    with open_postgres_connection(psycopg, args) as target:
         for table in TABLES:
             existing = target.execute(
                 sql.SQL("SELECT COUNT(*) FROM {}").format(sql.Identifier(table))
