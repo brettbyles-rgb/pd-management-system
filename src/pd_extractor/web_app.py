@@ -16,7 +16,7 @@ from pathlib import Path
 
 import uvicorn
 from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse, JSONResponse, RedirectResponse, Response
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse, Response
 
 from .career_explorer_reference_data import build_reference_payloads
 from .career_explorer_ui import render_career_explorer
@@ -51,6 +51,8 @@ from .intelligence_app import (
     resolve_pd_identifier,
     search_pds,
     validation_queue,
+    render_application_shell,
+    render_classification_admin,
 )
 from .intelligence_prepare import prepare_pd_intelligence
 from .job_family_import import import_job_family_workbook
@@ -62,6 +64,14 @@ from .mapping_suggestions import (
     suggest_mappings_for_query,
 )
 from .similarity import find_similar_roles, search_roles
+from .validation_app import (
+    confirm_validation,
+    get_validated_export,
+    get_validation_record,
+    list_validation_records,
+    render_validation_app,
+    save_validation_draft,
+)
 
 
 LOGGER = logging.getLogger("pd_management.web")
@@ -331,7 +341,11 @@ def create_app(settings: WebSettings | None = None) -> FastAPI:
     def home():
         if settings.deployment_profile == "explorer-demo":
             return RedirectResponse("/career-explorer", status_code=302)
-        return HTMLResponse(HTML_V2)
+        return HTMLResponse(
+            render_application_shell(
+                read_only=settings.deployment_profile == "admin-poc-readonly"
+            )
+        )
 
     @app.get("/career-explorer")
     def career_explorer():
@@ -369,11 +383,122 @@ def create_app(settings: WebSettings | None = None) -> FastAPI:
             payload = build_mapping_assistant_payload(
                 connection, detail, job_family_mappings_for_pd(connection, pd_id), _similar_json(connection, similar), scores
             )
-        return HTMLResponse(render_mapping_assistant(payload))
+        return HTMLResponse(
+            render_mapping_assistant(
+                payload,
+                read_only=settings.deployment_profile == "admin-poc-readonly",
+            )
+        )
 
     @app.get("/admin/classifications")
     def classification_admin():
-        return HTMLResponse(ADMIN_HTML)
+        return HTMLResponse(
+            render_classification_admin(
+                read_only=settings.deployment_profile == "admin-poc-readonly"
+            )
+        )
+
+    @app.get("/validation")
+    def validation_workspace():
+        return HTMLResponse(
+            render_validation_app(
+                read_only=settings.deployment_profile == "admin-poc-readonly"
+            )
+        )
+
+    @app.get("/api/validation/pds")
+    def validation_records():
+        with _connect(settings) as connection:
+            return list_validation_records(connection)
+
+    @app.get("/api/validation/pds/{pd_id}")
+    def validation_record(pd_id: int):
+        with _connect(settings) as connection:
+            record = get_validation_record(connection, pd_id)
+        return record if record is not None else _json({"error": "Not found"}, 404)
+
+    @app.get("/api/validation/pds/{pd_id}/export")
+    def validation_export(pd_id: int, request: Request):
+        with _connect(settings) as connection:
+            export = get_validated_export(connection, pd_id)
+        if export is None:
+            return _json({"error": "This PD has not been validated"}, 409)
+        filename = Path(
+            export.get("pd_record", {}).get("source_filename", f"pd-{pd_id}")
+        ).stem
+        disposition = "inline" if request.query_params.get("view") == "1" else "attachment"
+        return JSONResponse(
+            export,
+            headers={
+                "Content-Disposition": (
+                    f'{disposition}; filename="{filename}-validated.json"'
+                )
+            },
+        )
+
+    @app.get("/validation/source/{filename:path}")
+    def validation_source(filename: str):
+        safe_name = Path(filename).name
+        candidates = (
+            settings.database_path.parent / "uploaded-pds" / safe_name,
+            Path.cwd() / "samples" / safe_name,
+            Path(__file__).resolve().parents[2] / "samples" / safe_name,
+        )
+        source = next((candidate for candidate in candidates if candidate.is_file()), None)
+        if source is None:
+            return _json({"error": "Source document not available"}, 404)
+        return FileResponse(source, filename=source.name, content_disposition_type="inline")
+
+    @app.put("/api/validation/pds/{pd_id}/draft")
+    async def validation_save_draft(pd_id: int, request: Request):
+        payload = await request.json()
+        try:
+            with _connect(settings) as connection:
+                save_validation_draft(
+                    connection,
+                    pd_id,
+                    payload["draft"],
+                    payload.get("section_statuses", {}),
+                    payload.get("edited_paths", []),
+                )
+        except (KeyError, TypeError, ValueError) as error:
+            return _json({"error": str(error)}, 400)
+        return {"ok": True}
+
+    @app.post("/api/validation/pds/{pd_id}/confirm")
+    async def validation_confirm(pd_id: int, request: Request):
+        payload = await request.json()
+        try:
+            with _connect(settings) as connection:
+                errors = confirm_validation(
+                    connection,
+                    pd_id,
+                    payload["draft"],
+                    payload.get("section_statuses", {}),
+                    payload.get("edited_paths", []),
+                )
+        except (KeyError, TypeError, ValueError) as error:
+            return _json({"error": str(error)}, 400)
+        return _json({"ok": not errors, "errors": errors}, 200 if not errors else 400)
+
+    @app.post("/api/validation/pds/{pd_id}/prepare-intelligence")
+    def validation_prepare_intelligence(pd_id: int):
+        with _connect(settings) as connection:
+            record = get_validation_record(connection, pd_id)
+            if record is None:
+                return _json({"error": "Not found"}, 404)
+            if record["validation_status"] != "Validated":
+                return _json(
+                    {"error": "Validate the PD before preparing it for Mapping Assistant"},
+                    409,
+                )
+            summary = prepare_pd_intelligence(
+                connection,
+                pd_id,
+                _embedder(settings.model_name),
+                model_name=settings.model_name,
+            )
+        return {"ok": True, "summary": summary}
 
     @app.get("/api/version")
     def version():
@@ -456,7 +581,7 @@ def create_app(settings: WebSettings | None = None) -> FastAPI:
             pd_id = import_document(connection, extracted)
             seed_classification_references(connection)
         record = extracted.get("pd_record", {})
-        return {"ok": True, "position_description_id": pd_id, "role_title": record.get("role_title", ""), "source_filename": record.get("source_filename", document_path.name), "extraction_status": record.get("extraction_status", ""), "validation_url": f"http://127.0.0.1:8765/?pd={pd_id}"}
+        return {"ok": True, "position_description_id": pd_id, "role_title": record.get("role_title", ""), "source_filename": record.get("source_filename", document_path.name), "extraction_status": record.get("extraction_status", ""), "validation_url": f"/validation?pd={pd_id}"}
 
     @app.post("/api/import-job-family-workbook")
     async def import_job_family(request: Request):

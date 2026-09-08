@@ -225,6 +225,53 @@ loadList();
 </script></body></html>'''
 
 
+def render_validation_app(*, read_only: bool = False) -> str:
+    """Render the legacy editor inside the joined application and route namespace."""
+    html = HTML
+    navigation = (
+        '<nav class="system-nav"><a class="system-brand" href="/">PD Manager</a>'
+        '<div class="system-links"><a href="/career-explorer">Career Explorer</a>'
+        '<a href="/#upload">Upload</a><a class="active" href="/validation">Validation Queue</a>'
+        '<a href="/#library">Role Library</a><a href="/#semantic">Semantic Search</a>'
+        '<a href="/mapping-assistant">Mapping Assistant</a>'
+        '<a href="/admin/classifications">Classification Admin</a>'
+        '<a href="/#workbook">Mapping Workbook Import</a></div></nav>'
+    )
+    nav_start = html.index('<nav class="system-nav">')
+    nav_end = html.index('</nav>', nav_start) + len('</nav>')
+    html = html[:nav_start] + navigation + html[nav_end:]
+    html = html.replace("'/api/pds", "'/api/validation/pds")
+    html = html.replace('href="/api/pds/', 'href="/api/validation/pds/')
+    html = html.replace('href="/source/', 'href="/validation/source/')
+    if not read_only:
+        return html
+
+    html = html.replace(
+        '</style>',
+        '.readonly-banner{background:#fff4d8;border-bottom:1px solid #e6c878;color:#684b00;'
+        'padding:10px 24px;text-align:center;font-weight:800}.hosted-readonly #app input,'
+        '.hosted-readonly #app textarea,.hosted-readonly #app select{background:#f3f4f6;color:#667085}'
+        '</style>',
+        1,
+    )
+    html = html.replace(
+        '<body>',
+        '<body class="hosted-readonly"><div class="readonly-banner">Hosted read-only proof of concept — '
+        'review and export are available; editing and validation are disabled.</div>',
+        1,
+    )
+    readonly_script = r'''
+const applyHostedReadOnly=()=>{
+  document.querySelectorAll('#app input,#app textarea,#app select,#app button').forEach(el=>{
+    el.disabled=true;el.title='Editing is disabled in the hosted read-only proof of concept';
+  });
+};
+new MutationObserver(applyHostedReadOnly).observe(document.documentElement,{childList:true,subtree:true});
+document.addEventListener('DOMContentLoaded',applyHostedReadOnly);
+'''
+    return html.replace('loadList();\n</script>', readonly_script + 'loadList();\n</script>', 1)
+
+
 def make_handler(database_path: Path, samples_dir: Path):
     class Handler(BaseHTTPRequestHandler):
         def _json(self, value: object, status: int = 200) -> None:

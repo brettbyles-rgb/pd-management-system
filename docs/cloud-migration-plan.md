@@ -9,7 +9,7 @@
 | Platform | Initial role | Boundary |
 | --- | --- | --- |
 | GitHub | Private source control and deployment source | No databases, uploaded PDs, backups, logs or secrets |
-| Railway | Stateless application runtime for a controlled test/demo | Use the `explorer-demo` profile until authentication and authorisation exist |
+| Railway | Stateless application runtime for a controlled test/demo | Use the `admin-poc-readonly` profile for the joined protected demonstration |
 | Supabase | Sydney-region PostgreSQL target | Database migration is required; the current SQLite file cannot simply be attached |
 | Local workstation | Known-good application and data rollback | Remains authoritative during migration verification |
 
@@ -17,8 +17,9 @@
 
 - Railway's injected `PORT` is recognised automatically.
 - Railway defaults to listening on `0.0.0.0`; local execution remains loopback-only.
-- `PD_MANAGEMENT_DEPLOYMENT_PROFILE=explorer-demo` exposes only the Explorer and operational health/version endpoints.
-- Non-GET requests and administration routes return `404` in the demo profile.
+- `PD_MANAGEMENT_DEPLOYMENT_PROFILE=admin-poc-readonly` exposes the public Explorer plus a Basic-auth-protected, read-only administration workspace.
+- Non-GET requests are rejected and write controls are visibly disabled in the hosted profile.
+- Railway connects to PostgreSQL as the dedicated `pd_management_reader` role rather than the database owner.
 - `PD_MANAGEMENT_REQUIRE_DATA=true` prevents readiness from passing when the database is empty or lacks pathway data.
 - The container runs as a non-root user.
 - The Docker build excludes databases, documents, generated output, backups, logs, local environments and `.env` files.
@@ -32,7 +33,7 @@ Do not configure these until a safe database target is available:
 
 ```text
 PD_MANAGEMENT_ENVIRONMENT=staging
-PD_MANAGEMENT_DEPLOYMENT_PROFILE=explorer-demo
+PD_MANAGEMENT_DEPLOYMENT_PROFILE=admin-poc-readonly
 PD_MANAGEMENT_REQUIRE_DATA=true
 PD_MANAGEMENT_LOG_LEVEL=INFO
 ```
@@ -57,9 +58,9 @@ Railway supplies `PORT`. No public domain should be enabled while readiness fail
 - Preserve SQLite-backed tests during the transition.
 - Add PostgreSQL integration tests against a disposable schema.
 
-The PostgreSQL path is intentionally refused when the `full` deployment profile is
-selected. Validation, mapping, imports and administration remain SQLite-only until
-their writes, file storage, audit and authorisation controls are migrated.
+The joined PostgreSQL path is available in the `admin-poc-readonly` profile. Validation,
+mapping and administration data can be viewed there, while their writes, file storage,
+audit and role-based authorisation remain deliberately disabled.
 
 ### Controlled migration commands
 
@@ -87,7 +88,7 @@ non-empty target tables and reconciles every copied table count before committin
 ### 4. Read-only cloud verification
 
 - Connect Railway to Supabase using a protected Railway secret.
-- Keep the Explorer-only profile enabled.
+- Keep the joined read-only profile enabled.
 - Verify readiness, performance, logs and failure behaviour.
 - Keep the local application and database unchanged as rollback.
 
@@ -109,11 +110,11 @@ non-empty target tables and reconciles every copied table count before committin
 
 ## Current hard blockers to a full cloud deployment
 
-1. Write workflows still import and depend directly on Python's `sqlite3` API.
+1. Write workflows still require their PostgreSQL persistence, audit and conflict-handling paths to be designed and tested.
 2. Source documents, workbook imports and classification backups are written to local paths.
-3. Validation still runs through a separate legacy HTTP server.
-4. The full application has no authentication or route-level permissions.
-5. The Supabase project connection, region, roles, TLS and backup settings have not yet been verified from the application.
+3. Enterprise identity and role-based authorisation are not implemented; the hosted PoC currently uses one shared Basic credential.
+4. Supabase backup/recovery remains limited by the selected plan and has not been restore-tested.
+5. The joined administration workspace is read-only in Railway by design.
 6. Railway's current Asia-Pacific application region is outside Australia, so its acceptability for any TAFE production workload must not be assumed.
 
 ## Cutover rule

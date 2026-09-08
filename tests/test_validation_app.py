@@ -10,6 +10,7 @@ from pd_extractor.validation_app import (
     get_validated_export,
     get_validation_record,
     list_validation_records,
+    render_validation_app,
     save_validation_draft,
     validation_errors,
 )
@@ -93,3 +94,15 @@ def test_capability_editor_supports_controlled_add_and_delete():
     assert "framework:''" in HTML
     assert "capability_name:''" in HTML
     assert "level:''" in HTML
+
+
+def test_joined_validation_editor_uses_main_service_routes_and_read_only_mode():
+    joined = render_validation_app()
+    hosted = render_validation_app(read_only=True)
+
+    assert 'href="/validation"' in joined
+    assert "/api/validation/pds" in joined
+    assert "/validation/source/" in joined
+    assert "127.0.0.1:8766" not in joined
+    assert "Hosted read-only proof of concept" in hosted
+    assert "applyHostedReadOnly" in hosted

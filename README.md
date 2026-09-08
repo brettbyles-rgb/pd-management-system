@@ -45,6 +45,10 @@ underlying tables normalized.
 
 ## Run the validation application
 
+The complete validation editor is integrated into the joined application at
+`http://127.0.0.1:8766/validation`. The standalone command below is retained as a
+local compatibility entry point:
+
 ```powershell
 python -m pd_extractor.validation_app
 ```

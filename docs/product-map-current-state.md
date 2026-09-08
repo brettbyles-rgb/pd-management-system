@@ -1,7 +1,7 @@
 # PD Management System — current-state product map
 
 **Status:** Connected local and hosted proof of concept
-**Date:** 8 September 2026
+**Date:** 9 September 2026
 **Purpose:** Establish what the product currently contains, who each part appears to serve, how users move through it, and which apparent features are not yet complete.
 
 This is a product map, not a technical architecture or future-state design. It describes the experience currently available from the joined application and identifies decisions that should be made before the next substantial development phase.
@@ -33,7 +33,7 @@ The final arrow is important: validated and prepared PD information becomes evid
 
 ## 2. Likely user groups
 
-The application does not yet authenticate users or enforce roles. The following audiences are therefore **inferred from the functions**, not implemented access groups.
+The hosted proof of concept uses a single HTTP Basic sign-in for administration routes and a SELECT-only database account. It does not yet implement named users or role-based permissions. The following audiences are therefore **inferred from the functions**, not implemented access groups.
 
 | User group | Primary need | Current product area |
 | --- | --- | --- |
@@ -53,11 +53,11 @@ The main application at `/` acts as both a home page and a container for several
 | Screen or view | Entry point | What the user can do | Persists changes? | Current status |
 | --- | --- | --- | --- | --- |
 | Product home | `/` | Choose Explorer, Upload, Validation, Role Library, Semantic Search, Mapping, Classification Admin or Workbook Import | No | Joined shell; protected in the hosted PoC |
-| Upload Position Description | `/#upload` | Upload a Word `.docx`, extract its content and add the PD to the validation queue | Yes | Working locally |
-| Validation Queue | `/#validation` plus the legacy local editor on port `8765` | View the shared queue in the joined shell; use the legacy local editor for detailed correction and validation | Detailed editor only | Queue integrated; detailed editing remains local and separate |
+| Upload Position Description | `/#upload` | Upload a Word `.docx`, extract its content and add the PD to the validation queue | Yes | Working locally; visibly disabled in the hosted read-only PoC |
+| Validation workspace | `/validation` | Find a PD; inspect extracted and draft data; correct sections; record review status; validate; export trusted JSON; prepare intelligence | Yes | Complete editor integrated into the joined application; read-only in the hosted PoC |
 | PD Library | `/#library` | Find a PD by number/title and inspect role details, related roles and current mapping context | No | Working locally |
-| Classification Admin | `/admin/classifications` | Maintain display label, abbreviation, cohort, seniority order, agreement/source, active status and notes; export CSV/JSON | Yes | Working locally; unrestricted |
-| Mapping Workbook Import | `/#workbook` | Replace the active job-family framework and mapping reference batch from `.xlsx` | Yes, high impact | Working locally; unrestricted |
+| Classification Admin | `/admin/classifications` | Maintain display label, abbreviation, cohort, seniority order, agreement/source, active status and notes; export CSV/JSON | Yes | Working locally; visibly read-only in the hosted PoC |
+| Mapping Workbook Import | `/#workbook` | Replace the active job-family framework and mapping reference batch from `.xlsx` | Yes, high impact | Working locally; visibly disabled in the hosted read-only PoC |
 
 ### B. Workforce intelligence and mapping
 
@@ -65,8 +65,8 @@ The main application at `/` acts as both a home page and a container for several
 | --- | --- | --- | --- | --- |
 | Semantic Search | `/#semantic` | Describe work in natural language; receive semantically related roles and suggested job families | No | Connected in the shell and working locally; intentionally disabled in the hosted PoC until a safe cloud embedding runtime is selected |
 | Mapping Assistant selector | `/#mapping` | Find an unmapped or uncertain PD and open the detailed mapping workflow | No | Working locally |
-| Detailed Mapping Assistant | `/mapping-assistant?pd=...` | Review ranked families, sub-families and specialisations; inspect similar-role evidence; shortlist; select primary/additional mappings; record rationale; assign | Yes | Working locally with live data |
-| Prepare intelligence | Validation Queue or mapping error recovery | Generate the mapping text/embedding needed for similarity and mapping assistance | Yes | Working, but still a user-triggered technical preparation step |
+| Detailed Mapping Assistant | `/mapping-assistant?pd=...` | Review ranked families, sub-families and specialisations; inspect similar-role evidence; shortlist; select primary/additional mappings; record rationale; assign | Yes | Working locally with live data; evidence remains viewable but assignment is disabled in the hosted PoC |
+| Prepare intelligence | Validation workspace or mapping error recovery | Generate the mapping text/embedding needed for similarity and mapping assistance | Yes | Working locally, but still a user-triggered technical preparation step; disabled in the hosted PoC |
 
 The Mapper is decision support. It recommends and supplies evidence, but the user makes and records the mapping decision.
 
@@ -91,7 +91,7 @@ The Explorer remains a deliberately self-contained employee experience so its re
 flowchart TD
     Home["Home /"]
     Upload["Upload /#upload"]
-    Validation["Validation Queue :8765"]
+    Validation["Validation workspace /validation"]
     Library["PD Library /#library"]
     Semantic["Semantic Search /#semantic"]
     MapSelect["Mapping selector /#mapping"]
@@ -118,7 +118,7 @@ flowchart TD
 - Upload, Validation, Search, Mapping, Classification Admin and Workbook Import are presented as one administration-oriented product.
 - Semantic Search is a primary route in the joined shell; the hosted model runtime is still pending.
 - The detailed Mapper has its own screen and returns to the main application through shared links.
-- The Validation Queue looks related but is hosted separately and uses absolute local links.
+- The complete Validation editor is part of the joined FastAPI application and uses the same database and protected navigation as the other administration screens.
 - The Explorer keeps its own interaction model and exact visual treatment, while the joined shell provides a clear entry to it.
 - Administrative and employee-facing experiences are not yet separated by audience or permissions.
 
@@ -196,14 +196,14 @@ All three product areas draw from the same unified role data. Their use of it di
 
 ### Provisional, incomplete or local-only
 
-- No sign-in, user identity, permissions or role separation.
+- The hosted administration area has one shared HTTP Basic credential, but no named user identity, application roles or enterprise SSO.
 - No employee-specific starting role from an HR identity/profile system.
 - No saved Explorer shortlist, career plan or history.
 - No connection to learning, vacancies, talent profiles or manager workflows.
 - Explorer job-family tier relationships still include provisional reference configuration.
-- Validation remains a separate legacy server/application shell.
+- The standalone port `8765` validator remains available only as a local compatibility entry point; the joined product no longer depends on it.
 - Some generated intelligence requires manual preparation or rebuild commands.
-- High-impact administration functions are available without workflow approval or access controls.
+- High-impact administration functions have no approval workflow; hosted mutations are blocked and visibly disabled, while the full local profile remains intentionally writable.
 - The administration, search and mapping screens now share a shell; the Explorer intentionally retains its distinct refined experience.
 - Local SQLite and file storage are appropriate to the proof of concept, not the target 10,000-user operating model.
 

@@ -24,7 +24,6 @@ def test_main_shell_keeps_workflows_separate_and_routes_mapping_to_new_ui():
         assert label in INTELLIGENCE_APP_SOURCE
 
     assert "<section id=upload class=view>" in INTELLIGENCE_APP_SOURCE
-    assert "<section id=validation class=view>" in INTELLIGENCE_APP_SOURCE
     assert "<section id=mapping class=view>" in INTELLIGENCE_APP_SOURCE
     assert "<section id=workbook class=view>" in INTELLIGENCE_APP_SOURCE
     assert "window.location.href='/mapping-assistant?pd=${r.id}'" in INTELLIGENCE_APP_SOURCE
@@ -44,9 +43,9 @@ def test_separate_workflows_share_navigation_destinations():
 
 def test_joined_shell_links_explorer_and_replaces_local_validation_navigation():
     assert 'href="/career-explorer"' in INTELLIGENCE_APP_SOURCE
-    assert "showView('validation')" in INTELLIGENCE_APP_SOURCE
+    assert 'href="/validation"' in INTELLIGENCE_APP_SOURCE
     assert "<section id=semantic class=view>" in INTELLIGENCE_APP_SOURCE
-    assert "<button data-view=validation" in INTELLIGENCE_APP_SOURCE
+    assert "127.0.0.1:8765" not in INTELLIGENCE_APP_SOURCE[INTELLIGENCE_APP_SOURCE.index("HTML_V2 ="):INTELLIGENCE_APP_SOURCE.index("ADMIN_HTML =")]
 
 
 def test_intelligence_app_module_can_reach_its_command_line_parser():

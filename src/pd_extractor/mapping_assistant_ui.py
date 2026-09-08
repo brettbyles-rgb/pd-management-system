@@ -322,7 +322,7 @@ def build_mapping_assistant_payload(
     }
 
 
-def render_mapping_assistant(payload: dict[str, Any]) -> str:
+def render_mapping_assistant(payload: dict[str, Any], *, read_only: bool = False) -> str:
     template = TEMPLATE_PATH.read_text(encoding="utf-8")
     payload_json = json.dumps(payload, ensure_ascii=False).replace("</", "<\\/")
     data_hook = f"<script>window.__MAPPING_DATA__={payload_json};</script>\n<script>\n/* ============ Data"
@@ -369,4 +369,28 @@ const state={"""
       break;}"""
     if old_assign not in template:
         raise ValueError("Could not locate the reference assignment action")
-    return template.replace(old_assign, new_assign, 1)
+    template = template.replace(old_assign, new_assign, 1)
+    if not read_only:
+        return template
+
+    template = template.replace(
+        "</style>",
+        ".readonly-banner{background:#fff4d8;border-bottom:1px solid #e6c878;color:#684b00;"
+        "padding:10px 24px;text-align:center;font-weight:800}"
+        "</style>",
+        1,
+    )
+    template = template.replace(
+        "<body>",
+        '<body><div class="readonly-banner">Hosted read-only proof of concept — '
+        "mapping evidence is available, but assignments are disabled.</div>",
+        1,
+    )
+    template = template.replace(
+        "function updateAssignBar(){\n  const btn=$('#assignBtn');const s=$('#assignSumm');if(!btn||!s)return;",
+        "function updateAssignBar(){\n  const btn=$('#assignBtn');const s=$('#assignSumm');if(!btn||!s)return;"
+        "btn.disabled=true;btn.textContent='Assignment disabled';"
+        "s.textContent='Hosted read-only proof of concept';return;",
+        1,
+    )
+    return template

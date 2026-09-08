@@ -1,11 +1,18 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from fastapi.testclient import TestClient
 
+from pd_extractor import extract_document
 from pd_extractor.config import WebSettings, web_settings
+from pd_extractor.database import connect_database, import_document, initialise_database
 from pd_extractor.embeddings import DEFAULT_MODEL_NAME
 from pd_extractor.intelligence_app import ADMIN_HTML, HTML_V2
 from pd_extractor.web_app import SECURITY_HEADERS, create_app
+
+
+FIXTURES = Path(__file__).parent / "fixtures"
 
 
 def client_for(tmp_path):
@@ -36,11 +43,61 @@ def test_existing_html_is_served_without_rewriting(tmp_path):
     with client_for(tmp_path) as client:
         home = client.get("/")
         admin = client.get("/admin/classifications")
+        validation = client.get("/validation")
+        validation_records = client.get("/api/validation/pds")
 
     assert home.status_code == 200
     assert home.text == HTML_V2
     assert admin.status_code == 200
     assert admin.text == ADMIN_HTML
+    assert validation.status_code == 200
+    assert "PD Validation" in validation.text
+    assert "/api/validation/pds" in validation.text
+    assert validation_records.status_code == 200
+    assert validation_records.json() == []
+
+
+def test_joined_validation_routes_support_the_complete_local_workflow(tmp_path):
+    database_path = tmp_path / "application.sqlite3"
+    connection = connect_database(database_path)
+    try:
+        initialise_database(connection)
+        pd_id = import_document(
+            connection,
+            extract_document(
+                FIXTURES / "10108-01 Alternate Dispute Resolution Specialist - TW9.docx"
+            ),
+        )
+    finally:
+        connection.close()
+
+    settings = WebSettings(
+        database_path=database_path,
+        model_name=DEFAULT_MODEL_NAME,
+        environment="test",
+    )
+    with TestClient(create_app(settings)) as client:
+        records = client.get("/api/validation/pds")
+        detail = client.get(f"/api/validation/pds/{pd_id}")
+        draft = detail.json()["draft"]
+        draft["pd_record"]["role_title"] = "Reviewed role title"
+        save = client.put(
+            f"/api/validation/pds/{pd_id}/draft",
+            json={"draft": draft, "section_statuses": {}, "edited_paths": ["role_details"]},
+        )
+        confirm = client.post(
+            f"/api/validation/pds/{pd_id}/confirm",
+            json={"draft": draft, "section_statuses": {}, "edited_paths": ["role_details"]},
+        )
+        export = client.get(f"/api/validation/pds/{pd_id}/export")
+
+    assert records.status_code == 200
+    assert records.json()[0]["id"] == pd_id
+    assert detail.status_code == 200
+    assert save.json() == {"ok": True}
+    assert confirm.json() == {"ok": True, "errors": []}
+    assert export.status_code == 200
+    assert export.json()["pd_record"]["role_title"] == "Reviewed role title"
 
 
 def test_version_and_core_data_routes(tmp_path):
@@ -127,6 +184,15 @@ def test_admin_poc_readonly_challenges_admin_and_blocks_writes(tmp_path):
         unauthenticated = client.get("/")
         wrong = client.get("/", auth=("reviewer", "wrong"))
         authenticated = client.get("/", auth=("reviewer", "not-a-real-secret"))
+        admin = client.get(
+            "/admin/classifications", auth=("reviewer", "not-a-real-secret")
+        )
+        validation = client.get(
+            "/validation", auth=("reviewer", "not-a-real-secret")
+        )
+        validation_records = client.get(
+            "/api/validation/pds", auth=("reviewer", "not-a-real-secret")
+        )
         semantic_search = client.get(
             "/api/search?query=payroll", auth=("reviewer", "not-a-real-secret")
         )
@@ -135,13 +201,25 @@ def test_admin_poc_readonly_challenges_admin_and_blocks_writes(tmp_path):
             auth=("reviewer", "not-a-real-secret"),
             json={"rows": []},
         )
+        validation_write = client.put(
+            "/api/validation/pds/1/draft",
+            auth=("reviewer", "not-a-real-secret"),
+            json={"draft": {}},
+        )
         public_health = client.get("/health/live")
 
     assert unauthenticated.status_code == 401
     assert unauthenticated.headers["www-authenticate"].startswith("Basic ")
     assert wrong.status_code == 401
     assert authenticated.status_code == 200
-    assert authenticated.text == HTML_V2
+    assert "Hosted read-only proof of concept" in authenticated.text
+    assert "Upload disabled" in authenticated.text
+    assert admin.status_code == 200
+    assert "Save disabled" in admin.text
+    assert validation.status_code == 200
+    assert "editing and validation are disabled" in validation.text
+    assert validation_records.status_code == 200
+    assert validation_records.json() == []
     assert authenticated.headers["cache-control"] == "no-store"
     assert authenticated.headers["vary"] == "Authorization"
     assert semantic_search.status_code == 503
@@ -150,6 +228,8 @@ def test_admin_poc_readonly_challenges_admin_and_blocks_writes(tmp_path):
     }
     assert write.status_code == 405
     assert write.json() == {"error": "Hosted administration is read-only"}
+    assert validation_write.status_code == 405
+    assert validation_write.json() == {"error": "Hosted administration is read-only"}
     assert public_health.status_code == 200
 
 

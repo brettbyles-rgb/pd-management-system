@@ -132,3 +132,19 @@ def test_mapping_assistant_template_preserves_reference_and_wires_live_assignmen
     assert 'href="/mapping-assistant"' in html
     assert 'href="/admin/classifications"' in html
     assert 'href="/#workbook"' in html
+
+
+def test_hosted_mapping_assistant_makes_read_only_state_explicit():
+    html = render_mapping_assistant(
+        {
+            "PD": {"databaseId": 7, "id": "10001-01"},
+            "FAMILIES": [],
+            "ROSTER": {},
+            "PDDETAIL": {},
+        },
+        read_only=True,
+    )
+
+    assert "Hosted read-only proof of concept" in html
+    assert "Assignment disabled" in html
+    assert 'href="/validation"' in html
