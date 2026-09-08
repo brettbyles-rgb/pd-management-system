@@ -19,6 +19,7 @@ write operation was found.
   credential comparison.
 - The hosted administration profile blocks non-GET requests.
 - Hosted PostgreSQL sessions default every transaction to read-only.
+- Reference-data workbook updates are never performed by Railway. They require an explicit local maintenance command and a separately supplied privileged Supabase credential; preview remains read-only and apply is transactional.
 - Supabase tables have row-level security enabled and no anonymous policies.
 - API documentation and the OpenAPI document are disabled.
 - Responses use anti-framing, content-sniffing, referrer, permissions, CSP, HSTS,

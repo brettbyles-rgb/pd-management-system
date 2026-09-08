@@ -177,6 +177,19 @@ CREATE TABLE IF NOT EXISTS pd_job_family_mappings (
     framework_code_valid INTEGER NOT NULL DEFAULT 0
 );
 
+CREATE TABLE IF NOT EXISTS job_family_adjacency_entries (
+    import_batch_id INTEGER NOT NULL REFERENCES job_family_import_batches(id) ON DELETE CASCADE,
+    source_family_code TEXT NOT NULL,
+    target_family_code TEXT NOT NULL,
+    tier INTEGER NOT NULL CHECK(tier IN (0, 1, 2)),
+    rationale TEXT,
+    PRIMARY KEY (import_batch_id, source_family_code, target_family_code),
+    FOREIGN KEY (import_batch_id, source_family_code)
+        REFERENCES job_family_entries(import_batch_id, code),
+    FOREIGN KEY (import_batch_id, target_family_code)
+        REFERENCES job_family_entries(import_batch_id, code)
+);
+
 CREATE TABLE IF NOT EXISTS pd_assigned_job_family_mappings (
     id INTEGER PRIMARY KEY,
     position_description_id INTEGER NOT NULL REFERENCES position_descriptions(id) ON DELETE CASCADE,
@@ -429,6 +442,7 @@ def initialise_database(connection: sqlite3.Connection) -> None:
         DROP VIEW IF EXISTS pd_capabilities_readable;
         DROP VIEW IF EXISTS active_job_family_entries;
         DROP VIEW IF EXISTS active_pd_job_family_mappings;
+        DROP VIEW IF EXISTS active_job_family_adjacency;
         CREATE VIEW pd_capabilities_readable AS
         SELECT
             pc.id AS pd_capability_id,
@@ -452,6 +466,12 @@ def initialise_database(connection: sqlite3.Connection) -> None:
         SELECT entry.*
         FROM job_family_entries entry
         JOIN job_family_import_batches batch ON batch.id = entry.import_batch_id
+        WHERE batch.is_active = 1;
+        CREATE VIEW active_job_family_adjacency AS
+        SELECT adjacency.source_family_code, adjacency.target_family_code,
+               adjacency.tier, adjacency.rationale
+        FROM job_family_adjacency_entries adjacency
+        JOIN job_family_import_batches batch ON batch.id = adjacency.import_batch_id
         WHERE batch.is_active = 1;
         CREATE VIEW active_pd_job_family_mappings AS
         SELECT mapping.id, mapping.import_batch_id, mapping.position_description_id,

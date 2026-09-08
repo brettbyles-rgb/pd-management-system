@@ -57,7 +57,7 @@ The main application at `/` acts as both a home page and a container for several
 | Validation workspace | `/validation` | Find a PD; inspect extracted and draft data; correct sections; record review status; validate; export trusted JSON; prepare intelligence | Yes | Complete editor integrated into the joined application; read-only in the hosted PoC |
 | PD Library | `/#library` | Find a PD by number/title and inspect role details, related roles and current mapping context | No | Working locally |
 | Classification Admin | `/admin/classifications` | Maintain display label, abbreviation, cohort, seniority order, agreement/source, active status and notes; export CSV/JSON | Yes | Working locally; visibly read-only in the hosted PoC |
-| Mapping Workbook Import | `/#workbook` | Replace the active job-family framework and mapping reference batch from `.xlsx` | Yes, high impact | Working locally; visibly disabled in the hosted read-only PoC |
+| Reference Data Workbook | `/#workbook` | Download, validate and atomically replace the job-family framework, role mappings and family adjacency matrix as one `.xlsx` release | Yes, high impact | Download available in the protected hosted PoC; upload preview/apply working locally and blocked on Railway; controlled Supabase maintenance command available |
 
 ### B. Workforce intelligence and mapping
 

@@ -13,6 +13,7 @@ EXPLORER_TABLES = (
     "job_family_import_batches",
     "job_family_entries",
     "pd_job_family_mappings",
+    "job_family_adjacency_entries",
     "activity_definitions",
     "activity_statistics",
     "position_description_activities",

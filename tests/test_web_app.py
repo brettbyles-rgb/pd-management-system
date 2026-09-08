@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import base64
 from pathlib import Path
 
 from fastapi.testclient import TestClient
@@ -45,6 +46,14 @@ def test_existing_html_is_served_without_rewriting(tmp_path):
         admin = client.get("/admin/classifications")
         validation = client.get("/validation")
         validation_records = client.get("/api/validation/pds")
+        reference_workbook = client.get("/api/reference-data-workbook")
+        reference_preview = client.post(
+            "/api/reference-data-workbook/preview",
+            json={
+                "filename": "reference.xlsx",
+                "content_base64": base64.b64encode(reference_workbook.content).decode(),
+            },
+        )
 
     assert home.status_code == 200
     assert home.text == HTML_V2
@@ -55,6 +64,11 @@ def test_existing_html_is_served_without_rewriting(tmp_path):
     assert "/api/validation/pds" in validation.text
     assert validation_records.status_code == 200
     assert validation_records.json() == []
+    assert reference_workbook.status_code == 200
+    assert reference_workbook.content.startswith(b"PK")
+    assert "pd-reference-data-" in reference_workbook.headers["content-disposition"]
+    assert reference_preview.status_code == 200
+    assert reference_preview.json()["valid"] is False
 
 
 def test_joined_validation_routes_support_the_complete_local_workflow(tmp_path):
@@ -193,6 +207,9 @@ def test_admin_poc_readonly_challenges_admin_and_blocks_writes(tmp_path):
         validation_records = client.get(
             "/api/validation/pds", auth=("reviewer", "not-a-real-secret")
         )
+        reference_workbook = client.get(
+            "/api/reference-data-workbook", auth=("reviewer", "not-a-real-secret")
+        )
         semantic_search = client.get(
             "/api/search?query=payroll", auth=("reviewer", "not-a-real-secret")
         )
@@ -206,6 +223,19 @@ def test_admin_poc_readonly_challenges_admin_and_blocks_writes(tmp_path):
             auth=("reviewer", "not-a-real-secret"),
             json={"draft": {}},
         )
+        reference_upload = client.post(
+            "/api/reference-data-workbook/preview",
+            auth=("reviewer", "not-a-real-secret"),
+            json={
+                "filename": "reference.xlsx",
+                "content_base64": base64.b64encode(reference_workbook.content).decode(),
+            },
+        )
+        reference_apply = client.post(
+            "/api/reference-data-workbook/apply",
+            auth=("reviewer", "not-a-real-secret"),
+            json={"filename": "reference.xlsx", "content_base64": "UEs="},
+        )
         public_health = client.get("/health/live")
 
     assert unauthenticated.status_code == 401
@@ -214,12 +244,16 @@ def test_admin_poc_readonly_challenges_admin_and_blocks_writes(tmp_path):
     assert authenticated.status_code == 200
     assert "Hosted read-only proof of concept" in authenticated.text
     assert "Upload disabled" in authenticated.text
+    assert "Validate workbook" in authenticated.text
+    assert "Apply disabled on Railway" in authenticated.text
     assert admin.status_code == 200
     assert "Save disabled" in admin.text
     assert validation.status_code == 200
     assert "editing and validation are disabled" in validation.text
     assert validation_records.status_code == 200
     assert validation_records.json() == []
+    assert reference_workbook.status_code == 200
+    assert reference_workbook.content.startswith(b"PK")
     assert authenticated.headers["cache-control"] == "no-store"
     assert authenticated.headers["vary"] == "Authorization"
     assert semantic_search.status_code == 503
@@ -230,6 +264,10 @@ def test_admin_poc_readonly_challenges_admin_and_blocks_writes(tmp_path):
     assert write.json() == {"error": "Hosted administration is read-only"}
     assert validation_write.status_code == 405
     assert validation_write.json() == {"error": "Hosted administration is read-only"}
+    assert reference_upload.status_code == 200
+    assert reference_upload.json()["valid"] is False
+    assert reference_apply.status_code == 405
+    assert reference_apply.json() == {"error": "Hosted administration is read-only"}
     assert public_health.status_code == 200
 
 

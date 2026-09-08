@@ -11,6 +11,10 @@ administration, workforce intelligence and the Career Pathways Explorer.
 See [the cloud migration plan](docs/cloud-migration-plan.md) for the staged
 GitHub, Railway and Supabase transition and its deployment safeguards.
 
+See [the governed reference-data workbook](docs/reference-data-workbook.md) for
+the download, validation and controlled Supabase refresh process covering the
+job-family framework, role mappings and adjacency matrix.
+
 ## Run
 
 ```powershell

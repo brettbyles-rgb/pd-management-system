@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import argparse
 import base64
+import binascii
 import json
 import logging
 import os
 import re
 import secrets
 import sys
+import tempfile
 import time
 import uuid
 from contextlib import asynccontextmanager
@@ -30,7 +32,6 @@ from .database import (
     initialise_database,
     job_family_mappings_for_pd,
 )
-from .embeddings import framework_embedding_sources, upsert_embeddings
 from .extractor import extract_document
 from .intelligence_app import (
     ADMIN_HTML,
@@ -55,7 +56,6 @@ from .intelligence_app import (
     render_classification_admin,
 )
 from .intelligence_prepare import prepare_pd_intelligence
-from .job_family_import import import_job_family_workbook
 from .mapping_assistant_ui import build_mapping_assistant_payload, render_mapping_assistant
 from .mapping_suggestions import (
     framework_similarity_scores_for_pd,
@@ -64,6 +64,11 @@ from .mapping_suggestions import (
     suggest_mappings_for_query,
 )
 from .similarity import find_similar_roles, search_roles
+from .reference_workbook import (
+    apply_reference_workbook,
+    export_reference_workbook,
+    validate_reference_workbook,
+)
 from .validation_app import (
     confirm_validation,
     get_validated_export,
@@ -75,6 +80,7 @@ from .validation_app import (
 
 
 LOGGER = logging.getLogger("pd_management.web")
+REFERENCE_WORKBOOK_MAX_BYTES = 20 * 1024 * 1024
 SECURITY_HEADERS = {
     "Content-Security-Policy": (
         "default-src 'self'; script-src 'self' 'unsafe-inline'; "
@@ -107,6 +113,7 @@ POC_DISABLED_PATHS = {
     # data remains readable, but free-text searches requiring a live model do not.
     "/api/search",
 }
+POC_READ_ONLY_POST_PATHS = {"/api/reference-data-workbook/preview"}
 
 
 class JsonFormatter(logging.Formatter):
@@ -154,6 +161,22 @@ def _safe_exception_summary(error: Exception) -> str:
 
 def _json(value: object, status: int = 200) -> JSONResponse:
     return JSONResponse(value, status_code=status)
+
+
+def _decode_reference_workbook_payload(payload: object) -> tuple[str, bytes]:
+    if not isinstance(payload, dict):
+        raise ValueError("Invalid upload payload")
+    filename = _safe_workbook_filename(str(payload.get("filename") or ""))
+    encoded = str(payload.get("content_base64") or "")
+    if not encoded or len(encoded) > (REFERENCE_WORKBOOK_MAX_BYTES * 4 // 3) + 8:
+        raise ValueError("The workbook is empty or exceeds the 20 MB upload limit")
+    try:
+        content = base64.b64decode(encoded, validate=True)
+    except (binascii.Error, ValueError) as error:
+        raise ValueError("Workbook content is not valid base64") from error
+    if not content or len(content) > REFERENCE_WORKBOOK_MAX_BYTES:
+        raise ValueError("The workbook is empty or exceeds the 20 MB upload limit")
+    return filename, content
 
 
 def _valid_basic_credentials(request: Request, settings: WebSettings) -> bool:
@@ -271,7 +294,10 @@ def create_app(settings: WebSettings | None = None) -> FastAPI:
         ):
             if not _valid_basic_credentials(request, settings):
                 response = _basic_challenge()
-            elif request.method != "GET":
+            elif (
+                request.method != "GET"
+                and request.url.path not in POC_READ_ONLY_POST_PATHS
+            ):
                 response = _json({"error": "Hosted administration is read-only"}, 405)
             elif request.url.path in POC_DISABLED_PATHS:
                 response = _json(
@@ -533,6 +559,58 @@ def create_app(settings: WebSettings | None = None) -> FastAPI:
         with _connect(settings) as connection:
             return job_family_import_status(connection)
 
+    @app.get("/api/reference-data-workbook")
+    def download_reference_data_workbook():
+        with _connect(settings) as connection:
+            content = export_reference_workbook(connection)
+        stamp = datetime.now().strftime("%Y%m%d")
+        return Response(
+            content,
+            media_type=(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            ),
+            headers={
+                "Content-Disposition": (
+                    f'attachment; filename="pd-reference-data-{stamp}.xlsx"'
+                )
+            },
+        )
+
+    @app.post("/api/reference-data-workbook/preview")
+    async def preview_reference_data_workbook(request: Request):
+        try:
+            payload = await request.json()
+            filename, content = _decode_reference_workbook_payload(payload)
+        except (json.JSONDecodeError, TypeError, ValueError) as error:
+            return _json({"error": str(error)}, 400)
+        temporary_path: Path | None = None
+        try:
+            with tempfile.NamedTemporaryFile(
+                prefix="pd-reference-preview-", suffix=Path(filename).suffix, delete=False
+            ) as temporary:
+                temporary.write(content)
+                temporary_path = Path(temporary.name)
+            with _connect(settings) as connection:
+                return validate_reference_workbook(connection, temporary_path)
+        finally:
+            if temporary_path is not None:
+                temporary_path.unlink(missing_ok=True)
+
+    @app.post("/api/reference-data-workbook/apply")
+    async def apply_reference_data_workbook(request: Request):
+        try:
+            payload = await request.json()
+            filename, content = _decode_reference_workbook_payload(payload)
+        except (json.JSONDecodeError, TypeError, ValueError) as error:
+            return _json({"error": str(error)}, 400)
+        workbook_path = _uploaded_job_family_path(settings.database_path, filename)
+        workbook_path.write_bytes(content)
+        try:
+            with _connect(settings) as connection:
+                return apply_reference_workbook(connection, workbook_path)
+        except ValueError as error:
+            return _json({"error": str(error)}, 400)
+
     @app.get("/api/pds")
     def get_pds(request: Request):
         with _connect(settings) as connection:
@@ -584,22 +662,16 @@ def create_app(settings: WebSettings | None = None) -> FastAPI:
         return {"ok": True, "position_description_id": pd_id, "role_title": record.get("role_title", ""), "source_filename": record.get("source_filename", document_path.name), "extraction_status": record.get("extraction_status", ""), "validation_url": f"/validation?pd={pd_id}"}
 
     @app.post("/api/import-job-family-workbook")
-    async def import_job_family(request: Request):
-        payload = await request.json()
-        if not isinstance(payload, dict):
-            return _json({"error": "Invalid upload payload"}, 400)
-        filename = _safe_workbook_filename(str(payload.get("filename") or ""))
-        encoded = str(payload.get("content_base64") or "")
-        if not encoded:
-            return _json({"error": "No file content supplied"}, 400)
-        workbook_path = _uploaded_job_family_path(settings.database_path, filename)
-        workbook_path.write_bytes(base64.b64decode(encoded))
-        with _connect(settings) as connection:
-            initialise_database(connection)
-            summary = import_job_family_workbook(connection, workbook_path)
-            count = upsert_embeddings(connection, framework_embedding_sources(connection), _embedder(settings.model_name), model_name=settings.model_name)
-            status = job_family_import_status(connection)
-        return {"ok": True, "summary": {"import_batch_id": summary.import_batch_id, "framework_rows": summary.framework_rows, "mapping_rows": summary.mapping_rows, "mapping_rows_linked_to_pds": summary.mapping_rows_linked_to_pds, "invalid_mapping_codes": summary.invalid_mapping_codes, "framework_embeddings": count}, "status": status}
+    def legacy_import_job_family_workbook():
+        return _json(
+            {
+                "error": (
+                    "This importer has been replaced by the governed reference-data "
+                    "download, preview and apply workflow"
+                )
+            },
+            410,
+        )
 
     @app.post("/api/pds/{pd_id}/prepare-intelligence")
     def prepare_intelligence(pd_id: int):

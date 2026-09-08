@@ -20,6 +20,7 @@
 - `PD_MANAGEMENT_DEPLOYMENT_PROFILE=admin-poc-readonly` exposes the public Explorer plus a Basic-auth-protected, read-only administration workspace.
 - Non-GET requests are rejected and write controls are visibly disabled in the hosted profile.
 - Railway connects to PostgreSQL as the dedicated `pd_management_reader` role rather than the database owner.
+- Governed reference-data downloads are available through Railway; approved workbook writes use a separate, explicit maintenance command and never the Railway reader credential.
 - `PD_MANAGEMENT_REQUIRE_DATA=true` prevents readiness from passing when the database is empty or lacks pathway data.
 - The container runs as a non-root user.
 - The Docker build excludes databases, documents, generated output, backups, logs, local environments and `.env` files.
@@ -110,7 +111,7 @@ non-empty target tables and reconciles every copied table count before committin
 
 ## Current hard blockers to a full cloud deployment
 
-1. Write workflows still require their PostgreSQL persistence, audit and conflict-handling paths to be designed and tested.
+1. General write workflows still require their PostgreSQL persistence, audit and conflict-handling paths to be designed and tested; the reference-data workbook is the first controlled maintenance exception.
 2. Source documents, workbook imports and classification backups are written to local paths.
 3. Enterprise identity and role-based authorisation are not implemented; the hosted PoC currently uses one shared Basic credential.
 4. Supabase backup/recovery remains limited by the selected plan and has not been restore-tested.

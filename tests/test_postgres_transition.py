@@ -84,6 +84,7 @@ def test_postgres_copy_uses_cursor_for_bulk_inserts():
     assert "with target.cursor() as writer:" in script
     assert "writer.executemany(" in script
     assert "target.executemany(" not in script
+    assert '"job_family_adjacency_entries"' in script
 
 
 def test_explorer_queries_do_not_mix_text_and_numeric_coalesce_types():
@@ -131,3 +132,15 @@ def test_hosted_access_migration_creates_non_owner_select_role():
     assert "security_invoker = true" in migration
     assert "ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY" in migration
     assert "REVOKE ALL PRIVILEGES ON ALL TABLES" in migration
+
+
+def test_reference_workbook_migration_adds_protected_adjacency_dataset():
+    migration = (
+        ROOT / "migrations" / "postgresql" / "0004_reference_data_workbook.sql"
+    ).read_text(encoding="utf-8")
+
+    assert "CREATE TABLE job_family_adjacency_entries" in migration
+    assert "CREATE VIEW active_job_family_adjacency" in migration
+    assert "ENABLE ROW LEVEL SECURITY" in migration
+    assert "FOR SELECT TO pd_management_reader" in migration
+    assert "GRANT INSERT" not in migration

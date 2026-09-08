@@ -21,6 +21,7 @@ from .config import default_database_path
 from .database import (
     assign_job_family_mappings,
     connect_database,
+    database_object_exists,
     import_document,
     initialise_database,
     job_family_mappings_for_pd,
@@ -137,6 +138,7 @@ def job_family_import_status(connection: sqlite3.Connection) -> dict:
             "distinct_linked_db_pds": 0,
             "distinct_validated_workbook_pd_ids": 0,
             "distinct_validated_linked_db_pds": 0,
+            "adjacency_cells": 0,
         }
     batch_id = int(batch["id"])
     counts = connection.execute(
@@ -175,6 +177,11 @@ def job_family_import_status(connection: sqlite3.Connection) -> dict:
     output["distinct_linked_db_pds"] = int(counts["distinct_linked_db_pds"] or 0)
     output["distinct_validated_workbook_pd_ids"] = int(counts["distinct_validated_workbook_pd_ids"] or 0)
     output["distinct_validated_linked_db_pds"] = int(counts["distinct_validated_linked_db_pds"] or 0)
+    output["adjacency_cells"] = (
+        int(connection.execute("SELECT COUNT(*) AS count FROM active_job_family_adjacency").fetchone()["count"])
+        if database_object_exists(connection, "active_job_family_adjacency")
+        else 0
+    )
     return output
 
 
@@ -678,8 +685,8 @@ table{border-collapse:collapse;width:100%;font-size:14px}th,td{border:1px solid 
 </section>
 
 <section id=workbook class=view>
-<div class=hero><h1>Mapping Workbook Import</h1><p class=muted>Maintain the job-family framework and mapping reference data independently from classification administration.</p></div>
-<section class=card><h2>Job family framework and mappings</h2><p class=muted>Upload the master mapping workbook when the framework or PD mappings are updated. This replaces the active import batch used by search and Mapping Assistant.</p><input id=jobFamilyFile type=file accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"><div class=toolbar><button class=primary onclick="uploadJobFamilyWorkbook()">Import workbook</button><button onclick="loadJobFamilyStatus()">Refresh status</button></div><div id=jobFamilyStatus class=muted>Loading current import status...</div></section>
+<div class=hero><h1>Reference Data Workbook</h1><p class=muted>Govern the job-family framework, role mappings and family adjacency matrix as one versioned release.</p></div>
+<section class=card><h2>Download, validate, then apply</h2><p class=muted>Always begin with a fresh download. Edit the three governed sheets without renaming them, upload the workbook for a validation preview, then explicitly apply it. The prior import batch remains available for rollback.</p><div class=toolbar><a class=button href="/api/reference-data-workbook">Download current workbook</a><button onclick="loadJobFamilyStatus()">Refresh status</button></div><input id=jobFamilyFile type=file accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"><div class=toolbar><button onclick="previewReferenceWorkbook()">Validate workbook</button><button id=applyReferenceButton class=primary onclick="applyReferenceWorkbook()" disabled>Apply validated workbook</button></div><div id=jobFamilyStatus class=muted>Loading current import status...</div><div id=referencePreview></div></section>
 </section>
 <footer class=app-footer><div>Official Internal Workforce Tool</div><div class=footer-links><span>Privacy</span><span>Accessibility</span></div></footer>
 </main></div><script>
@@ -752,10 +759,15 @@ async function preparePD(id,target){document.querySelector('#'+target).innerHTML
 async function runQuery(){const q=document.querySelector('#query').value.trim();if(!q)return;document.querySelector('#semanticContent').innerHTML='<section class=card><h2>Searching...</h2><p class=muted>The first search may take a moment while the model loads.</p></section>';try{const data=await api('/api/search?query='+encodeURIComponent(q));document.querySelector('#semanticContent').innerHTML=`<section class=card><h2>Search results</h2><p class=muted>${esc(q)}</p></section><section class=card>${resultBlock('query-results','Evidence roles',data.roles||[],data.mapping_suggestions||[],data.framework_scores||{})}</section>`}catch(err){document.querySelector('#semanticContent').innerHTML=`<section class=card><h2>Search failed</h2><p class=muted>${esc(err.message||err)}</p></section>`}}
 function arrayBufferToBase64(buffer){let binary='';const bytes=new Uint8Array(buffer);const chunk=0x8000;for(let i=0;i<bytes.length;i+=chunk){binary+=String.fromCharCode.apply(null,bytes.subarray(i,i+chunk))}return btoa(binary)}
 async function uploadPD(){const file=document.querySelector('#uploadFile').files[0];const status=document.querySelector('#uploadStatus');if(!file){status.textContent='Choose a .docx file first.';return}if(!file.name.toLowerCase().endsWith('.docx')){status.textContent='Only .docx Word files are supported in this prototype.';return}status.textContent='Uploading and extracting...';try{const content_base64=arrayBufferToBase64(await file.arrayBuffer());const result=await api('/api/import-pd',{method:'POST',body:JSON.stringify({filename:file.name,content_base64})});status.innerHTML=`Imported <b>${esc(result.role_title)}</b>. <a href="/validation?pd=${result.position_description_id}">Open for validation</a>`;await loadValidationQueue();await searchPDs()}catch(err){status.textContent=err.message||err}}
-function jobFamilySummaryHtml(s){if(!s||!s.has_active_import)return '<p class=muted>No job family workbook has been imported yet.</p>';return `<p><b>Active workbook:</b> ${esc(s.source_filename)}<br><span class=small>Imported ${esc(s.imported_at||'')}</span></p><table><tbody><tr><th>Framework rows</th><td>${esc(s.framework_rows)}</td></tr><tr><th>Mapping rows</th><td>${esc(s.mapping_rows)}</td></tr><tr><th>Distinct workbook PD IDs mapped</th><td>${esc(s.distinct_workbook_pd_ids)}</td></tr><tr><th>Distinct workbook PD IDs validated</th><td>${esc(s.distinct_validated_workbook_pd_ids)}</td></tr><tr><th>Linked database PD records</th><td>${esc(s.distinct_linked_db_pds)}</td></tr><tr><th>Linked validated database PD records</th><td>${esc(s.distinct_validated_linked_db_pds)}</td></tr><tr><th>Linked mapping rows</th><td>${esc(s.mapping_rows_linked_to_pds)}</td></tr><tr><th>Unlinked mapping rows</th><td>${esc(s.unlinked_mapping_rows)}</td></tr><tr><th>Invalid mapping codes</th><td>${esc(s.invalid_mapping_codes)}</td></tr></tbody></table><p class=small>Mappings link by the five-digit PD base number, so a workbook PD ID like 11417 can match database versions like 11417-01.</p>`}
+function jobFamilySummaryHtml(s){if(!s||!s.has_active_import)return '<p class=muted>No job family workbook has been imported yet.</p>';return `<p><b>Active workbook:</b> ${esc(s.source_filename)}<br><span class=small>Imported ${esc(s.imported_at||'')}</span></p><table><tbody><tr><th>Framework rows</th><td>${esc(s.framework_rows)}</td></tr><tr><th>Mapping rows</th><td>${esc(s.mapping_rows)}</td></tr><tr><th>Adjacency cells</th><td>${esc(s.adjacency_cells||0)}</td></tr><tr><th>Distinct workbook PD IDs mapped</th><td>${esc(s.distinct_workbook_pd_ids)}</td></tr><tr><th>Distinct workbook PD IDs validated</th><td>${esc(s.distinct_validated_workbook_pd_ids)}</td></tr><tr><th>Linked database PD records</th><td>${esc(s.distinct_linked_db_pds)}</td></tr><tr><th>Linked validated database PD records</th><td>${esc(s.distinct_validated_linked_db_pds)}</td></tr><tr><th>Linked mapping rows</th><td>${esc(s.mapping_rows_linked_to_pds)}</td></tr><tr><th>Unlinked mapping rows</th><td>${esc(s.unlinked_mapping_rows)}</td></tr><tr><th>Invalid mapping codes</th><td>${esc(s.invalid_mapping_codes)}</td></tr></tbody></table><p class=small>Mappings link by the five-digit PD base number, so a workbook PD ID like 11417 can match database versions like 11417-01.</p>`}
 async function loadJobFamilyStatus(){const target=document.querySelector('#jobFamilyStatus');if(!target)return;target.innerHTML='<p class=muted>Loading current import status...</p>';try{const data=await api('/api/job-family-import-status');target.innerHTML=jobFamilySummaryHtml(data)}catch(err){target.innerHTML=`<p class=muted>Could not load import status: ${esc(err.message||err)}</p>`}}
-async function uploadJobFamilyWorkbook(){const file=document.querySelector('#jobFamilyFile').files[0];const status=document.querySelector('#jobFamilyStatus');if(!file){status.textContent='Choose an .xlsx workbook first.';return}if(!file.name.toLowerCase().endsWith('.xlsx')){status.textContent='Only .xlsx Excel workbooks are supported.';return}status.textContent='Uploading and importing workbook...';try{const content_base64=arrayBufferToBase64(await file.arrayBuffer());const result=await api('/api/import-job-family-workbook',{method:'POST',body:JSON.stringify({filename:file.name,content_base64})});status.innerHTML=`<p><b>Import complete.</b></p>${jobFamilySummaryHtml(result.status)}`;await searchPDs()}catch(err){status.textContent=err.message||err}}
+let validatedReferenceWorkbook=null;
+function referencePreviewHtml(result){const c=result.counts||{},current=result.current||{},d=result.changes||{};const errors=(result.errors||[]).map(x=>`<li>${esc(x)}</li>`).join('');const warnings=(result.warnings||[]).map(x=>`<li>${esc(x)}</li>`).join('');return `<section class=panel><h3>${result.valid?'Workbook passed validation':'Workbook cannot be applied'}</h3><table><thead><tr><th>Dataset</th><th>Workbook</th><th>Current</th><th>Proposed change</th></tr></thead><tbody><tr><td>Framework rows</td><td>${esc(c.framework_rows??0)}</td><td>${esc(current.framework_rows??0)}</td><td>+${esc(d.framework_added||0)} / −${esc(d.framework_removed||0)} / ${esc(d.framework_changed||0)} changed</td></tr><tr><td>Mapping assignments</td><td>${esc(c.mapping_assignments??0)}</td><td>${esc(current.mapping_assignments??0)}</td><td>+${esc(d.mapping_assignments_added||0)} / −${esc(d.mapping_assignments_removed||0)}</td></tr><tr><td>Adjacency cells</td><td>${esc(c.adjacency_cells??0)}</td><td>${esc(current.adjacency_cells??0)}</td><td>+${esc(d.adjacency_cells_added||0)} / −${esc(d.adjacency_cells_removed||0)} / ${esc(d.adjacency_cells_changed||0)} changed</td></tr></tbody></table>${errors?`<h4>Errors</h4><ul class=issues>${errors}</ul>`:''}${warnings?`<h4>Warnings</h4><ul>${warnings}</ul>`:''}</section>`}
+async function selectedReferencePayload(){const file=document.querySelector('#jobFamilyFile').files[0];if(!file)throw new Error('Choose an .xlsx workbook first.');if(!file.name.toLowerCase().endsWith('.xlsx'))throw new Error('Only .xlsx Excel workbooks are supported.');return {filename:file.name,content_base64:arrayBufferToBase64(await file.arrayBuffer())}}
+async function previewReferenceWorkbook(){const target=document.querySelector('#referencePreview'),button=document.querySelector('#applyReferenceButton');button.disabled=true;validatedReferenceWorkbook=null;target.innerHTML='<p class=muted>Validating the complete workbook...</p>';try{const payload=await selectedReferencePayload();const result=await api('/api/reference-data-workbook/preview',{method:'POST',body:JSON.stringify(payload)});target.innerHTML=referencePreviewHtml(result);if(result.valid){validatedReferenceWorkbook=payload;if(!button.dataset.hostedReadonly)button.disabled=false}}catch(err){target.innerHTML=`<p class=issues>${esc(err.message||err)}</p>`}}
+async function applyReferenceWorkbook(){const target=document.querySelector('#referencePreview'),button=document.querySelector('#applyReferenceButton');if(!validatedReferenceWorkbook)return;button.disabled=true;target.insertAdjacentHTML('afterbegin','<p class=muted>Applying the validated release atomically...</p>');try{const result=await api('/api/reference-data-workbook/apply',{method:'POST',body:JSON.stringify(validatedReferenceWorkbook)});target.innerHTML=`<section class=panel><h3>Reference release applied</h3><p>Import batch ${esc(result.import_batch_id)} is now active. ${esc(result.framework_rows)} framework rows, ${esc(result.mapping_assignments)} mapping assignments and ${esc(result.adjacency_cells)} adjacency cells were stored.</p></section>`;validatedReferenceWorkbook=null;await loadJobFamilyStatus();await searchPDs()}catch(err){target.innerHTML=`<p class=issues>${esc(err.message||err)}</p>`}}
 showView(location.hash.slice(1)||'home',false);
+document.querySelector('#jobFamilyFile')?.addEventListener('change',()=>{validatedReferenceWorkbook=null;document.querySelector('#applyReferenceButton').disabled=true;document.querySelector('#referencePreview').innerHTML=''})
 loadJobFamilyStatus();
 searchPDs();
 </script></body></html>"""
@@ -807,10 +819,9 @@ def render_application_shell(*, read_only: bool = False) -> str:
         '<button class=primary onclick="uploadPD()">Upload and extract</button>',
         '<button class=primary disabled title="Disabled in the hosted read-only proof of concept">Upload disabled</button>',
     )
-    html = html.replace('id=jobFamilyFile type=file', 'id=jobFamilyFile type=file disabled')
     html = html.replace(
-        '<button class=primary onclick="uploadJobFamilyWorkbook()">Import workbook</button>',
-        '<button class=primary disabled title="Disabled in the hosted read-only proof of concept">Import disabled</button>',
+        '<button id=applyReferenceButton class=primary onclick="applyReferenceWorkbook()" disabled>Apply validated workbook</button>',
+        '<button id=applyReferenceButton data-hosted-readonly=1 class=primary disabled title="Disabled in the hosted read-only proof of concept">Apply disabled on Railway</button>',
     )
     return html
 

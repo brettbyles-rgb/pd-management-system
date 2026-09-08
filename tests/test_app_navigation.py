@@ -26,6 +26,9 @@ def test_main_shell_keeps_workflows_separate_and_routes_mapping_to_new_ui():
     assert "<section id=upload class=view>" in INTELLIGENCE_APP_SOURCE
     assert "<section id=mapping class=view>" in INTELLIGENCE_APP_SOURCE
     assert "<section id=workbook class=view>" in INTELLIGENCE_APP_SOURCE
+    assert "Download current workbook" in INTELLIGENCE_APP_SOURCE
+    assert "Validate workbook" in INTELLIGENCE_APP_SOURCE
+    assert "Apply validated workbook" in INTELLIGENCE_APP_SOURCE
     assert "window.location.href='/mapping-assistant?pd=${r.id}'" in INTELLIGENCE_APP_SOURCE
     assert "showView('import')" not in INTELLIGENCE_APP_SOURCE
     assert "showView('admin')" not in INTELLIGENCE_APP_SOURCE
