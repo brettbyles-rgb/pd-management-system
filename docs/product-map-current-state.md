@@ -1,7 +1,7 @@
 # PD Management System — current-state product map
 
-**Status:** As built locally  
-**Date:** 24 August 2026  
+**Status:** Connected local and hosted proof of concept
+**Date:** 8 September 2026
 **Purpose:** Establish what the product currently contains, who each part appears to serve, how users move through it, and which apparent features are not yet complete.
 
 This is a product map, not a technical architecture or future-state design. It describes the experience currently available from the joined application and identifies decisions that should be made before the next substantial development phase.
@@ -52,9 +52,9 @@ The main application at `/` acts as both a home page and a container for several
 
 | Screen or view | Entry point | What the user can do | Persists changes? | Current status |
 | --- | --- | --- | --- | --- |
-| Product home | `/` | Choose Upload, Validation, Search, Mapping, Classification Admin or Workbook Import | No | Working locally |
+| Product home | `/` | Choose Explorer, Upload, Validation, Role Library, Semantic Search, Mapping, Classification Admin or Workbook Import | No | Joined shell; protected in the hosted PoC |
 | Upload Position Description | `/#upload` | Upload a Word `.docx`, extract its content and add the PD to the validation queue | Yes | Working locally |
-| Validation Queue | Separate app on port `8765` | Select a PD, compare with the source, edit extracted fields, review sections, manage issues and validate the record | Yes | Working, but still a separate legacy application shell |
+| Validation Queue | `/#validation` plus the legacy local editor on port `8765` | View the shared queue in the joined shell; use the legacy local editor for detailed correction and validation | Detailed editor only | Queue integrated; detailed editing remains local and separate |
 | PD Library | `/#library` | Find a PD by number/title and inspect role details, related roles and current mapping context | No | Working locally |
 | Classification Admin | `/admin/classifications` | Maintain display label, abbreviation, cohort, seniority order, agreement/source, active status and notes; export CSV/JSON | Yes | Working locally; unrestricted |
 | Mapping Workbook Import | `/#workbook` | Replace the active job-family framework and mapping reference batch from `.xlsx` | Yes, high impact | Working locally; unrestricted |
@@ -63,7 +63,7 @@ The main application at `/` acts as both a home page and a container for several
 
 | Screen or view | Entry point | What the user can do | Persists changes? | Current status |
 | --- | --- | --- | --- | --- |
-| Semantic Search | `/#semantic`, reached through Search | Describe work in natural language; receive semantically related roles and suggested job families | No | Working locally; first request may load the model slowly |
+| Semantic Search | `/#semantic` | Describe work in natural language; receive semantically related roles and suggested job families | No | Connected in the shell and working locally; intentionally disabled in the hosted PoC until a safe cloud embedding runtime is selected |
 | Mapping Assistant selector | `/#mapping` | Find an unmapped or uncertain PD and open the detailed mapping workflow | No | Working locally |
 | Detailed Mapping Assistant | `/mapping-assistant?pd=...` | Review ranked families, sub-families and specialisations; inspect similar-role evidence; shortlist; select primary/additional mappings; record rationale; assign | Yes | Working locally with live data |
 | Prepare intelligence | Validation Queue or mapping error recovery | Generate the mapping text/embedding needed for similarity and mapping assistance | Yes | Working, but still a user-triggered technical preparation step |
@@ -76,14 +76,14 @@ The Mapper is decision support. It recommends and supplies evidence, but the use
 | --- | --- | --- | --- | --- |
 | Starting-role search | `/career-explorer` | Find and select the employee's current role | No | Working locally |
 | Guided walk | After selecting a role | See an initial plausible direction; inspect shared work and new work; choose to reveal the broader landscape | No | Working locally |
-| Career landscape | Within Explorer | Explore an expanding constellation, inspect roles, and branch to same-grade or more-senior roles | No | Working locally |
+| Career landscape | Within Explorer | Explore an expanding constellation, inspect roles, and branch to same-grade or more-senior roles | No | Working locally and hosted |
 | Role detail | Select an Explorer node | Review purpose, grade, shared activities, new activities and capability gaps | No | Working locally |
 | Shortlist and comparison | Within Explorer | Shortlist up to three roles and compare them with the starting role | Browser-session state only | Working locally |
 | Route to a role | Within Explorer | Display a calculated pathway from the starting role to a selected target | No | Working locally, subject to pathway coverage |
 | Development plan | From comparison/detail | View suggested ways to build toward a role | No durable save | Demonstration experience; “Save my plan” is not yet a saved organisational workflow |
 | Manager/learning/PD actions | Role detail | “Talk to my manager”, “Find learning” and “Read role description” | No | Visible concepts/placeholders; destination workflows are not connected |
 
-The Explorer is currently a functional standalone experience. It is not linked from the main home page or shared primary navigation.
+The Explorer remains a deliberately self-contained employee experience so its refined interaction design is not altered. It is now linked from the joined product home and shared administration navigation.
 
 ## 4. Current navigation map
 
@@ -103,22 +103,23 @@ flowchart TD
     Home --> Upload
     Home --> Validation
     Home --> Library
+    Home --> Semantic
     Home --> MapSelect
     Home --> ClassAdmin
     Home --> Workbook
+    Home --> Explorer
     Library --> Semantic
     MapSelect --> Mapper
 
-    Explorer -. "direct URL only" .- Home
 ```
 
 ### Navigation observations
 
 - Upload, Validation, Search, Mapping, Classification Admin and Workbook Import are presented as one administration-oriented product.
-- Semantic Search is a secondary route from the PD Library rather than a primary navigation item.
+- Semantic Search is a primary route in the joined shell; the hosted model runtime is still pending.
 - The detailed Mapper has its own screen and returns to the main application through shared links.
 - The Validation Queue looks related but is hosted separately and uses absolute local links.
-- The Explorer currently has its own interaction model and no clear entry from, or return to, the main product.
+- The Explorer keeps its own interaction model and exact visual treatment, while the joined shell provides a clear entry to it.
 - Administrative and employee-facing experiences are not yet separated by audience or permissions.
 
 ## 5. Current end-to-end journeys
@@ -203,7 +204,7 @@ All three product areas draw from the same unified role data. Their use of it di
 - Validation remains a separate legacy server/application shell.
 - Some generated intelligence requires manual preparation or rebuild commands.
 - High-impact administration functions are available without workflow approval or access controls.
-- Screen design and navigation are not yet a unified design system.
+- The administration, search and mapping screens now share a shell; the Explorer intentionally retains its distinct refined experience.
 - Local SQLite and file storage are appropriate to the proof of concept, not the target 10,000-user operating model.
 
 ## 8. Product decisions exposed by this map

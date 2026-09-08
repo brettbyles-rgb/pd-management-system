@@ -55,6 +55,15 @@ write operation was found.
 - Set Railway usage alerts or a hard spending limit and retain serverless sleep.
 - Review Supabase backups and recovery settings appropriate to the PoC's value.
 
+## Recovery check
+
+- Checked in the Supabase dashboard on 8 September 2026.
+- The project is currently in a Free organisation. Supabase reports that the
+  Free plan does not include scheduled project backups.
+- This is an accepted proof-of-concept recovery gap only. Before the database
+  becomes the authoritative copy, move it to a plan with scheduled backups and
+  verify a restore, or implement and test an independent encrypted backup job.
+
 ## Required before real sensitive data or broader use
 
 - Replace shared Basic authentication with organisational identity (for example,

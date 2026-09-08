@@ -563,7 +563,7 @@ def career_explorer_neighbours(
 
 HTML = r"""<!doctype html><html lang=en><head><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
-<title>PD Role Intelligence</title>
+<title>PD Management System</title>
 <style>
 :root{--purple:#481579;--ink:#172033;--muted:#667085;--line:#d7dce6;--bg:#f4f6fa;--green:#067647;--amber:#9a5a00}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 system-ui,Segoe UI,sans-serif}
@@ -613,7 +613,7 @@ searchPDs();
 
 HTML_V2 = r"""<!doctype html><html lang=en><head><meta charset=utf-8>
 <meta name=viewport content="width=device-width,initial-scale=1">
-<title>PD Role Intelligence</title>
+<title>PD Management System</title>
 <style>
 :root{--purple:#481579;--purple2:#082646;--ink:#172033;--muted:#667085;--line:#d7dce6;--bg:#f6f8fb;--green:#067647;--soft:#f7f2fb;--panel:#ffffff}
 *{box-sizing:border-box}body{margin:0;color:var(--ink);font:15px/1.45 system-ui,Segoe UI,sans-serif;background:radial-gradient(#d7dce6 1px,transparent 1px) 0 0/18px 18px,var(--bg)}
@@ -633,24 +633,33 @@ table{border-collapse:collapse;width:100%;font-size:14px}th,td{border:1px solid 
 </style></head><body><div class=app><aside class=side>
 <a class=brand href="/">PD Manager</a><p class=tag>Search, compare and map position descriptions.</p>
 <nav class=nav aria-label="Primary navigation">
+<a href="/career-explorer">Career Explorer</a>
 <button data-view=upload onclick="showView('upload')">Upload</button>
-<a href="http://127.0.0.1:8765/">Validation Queue</a>
-<button data-view=library onclick="showView('library')">Search</button>
+<button data-view=validation onclick="showView('validation')">Validation Queue</button>
+<button data-view=library onclick="showView('library')">Role Library</button>
+<button data-view=semantic onclick="showView('semantic')">Semantic Search</button>
 <button data-view=mapping onclick="showView('mapping')">Mapping Assistant</button>
 <a href="/admin/classifications">Classification Admin</a>
 <button data-view=workbook onclick="showView('workbook')">Mapping Workbook Import</button>
 </nav>
 </aside><main>
 <section id=home class="view active">
-<div class=hero><h1>PD Management System</h1><p class=muted>Select a workflow to manage, validate, search and map position descriptions.</p></div>
+<div class=hero><h1>PD Management System</h1><p class=muted>Explore career pathways and use the connected workspace to find, validate, map and administer position descriptions.</p></div>
 <div class=cards>
+<button class=cardbutton onclick="window.location.href='/career-explorer'"><span class=workflow-icon>↗</span><span class=workflow-arrow>→</span><h3>Career Pathways Explorer</h3><p class=muted>Explore plausible career directions, compare roles and understand development gaps.</p></button>
 <button class=cardbutton onclick="showView('upload')"><span class=workflow-icon>⇧</span><span class=workflow-arrow>→</span><h3>Upload Position Description</h3><p class=muted>Ingest and process a new Word document for structured review.</p></button>
-<button class=cardbutton onclick="window.location.href='http://127.0.0.1:8765/'"><span class=workflow-icon>☑</span><span class=workflow-arrow>→</span><h3>Validation Queue</h3><p class=muted>Review and validate extracted data from uploaded PDs.</p></button>
+<button class=cardbutton onclick="showView('validation')"><span class=workflow-icon>☑</span><span class=workflow-arrow>→</span><h3>Validation Queue</h3><p class=muted>See PDs awaiting review and open their role information.</p></button>
 <button class=cardbutton onclick="showView('library')"><span class=workflow-icon>⌕</span><span class=workflow-arrow>→</span><h3>Search Roles</h3><p class=muted>Find existing position descriptions by ID, title, or role content.</p></button>
+<button class=cardbutton onclick="showView('semantic')"><span class=workflow-icon>≈</span><span class=workflow-arrow>→</span><h3>Semantic Search</h3><p class=muted>Describe work in plain language and find roles with similar meaning.</p></button>
 <button class=cardbutton onclick="showView('mapping')"><span class=workflow-icon>◇</span><span class=workflow-arrow>→</span><h3>Mapping Assistant</h3><p class=muted>Select and assign job family mappings using similar-role evidence.</p></button>
 <button class=cardbutton onclick="window.location.href='/admin/classifications'"><span class=workflow-icon>⚙</span><span class=workflow-arrow>→</span><h3>Classification Admin</h3><p class=muted>Maintain grade labels, abbreviations, cohorts and display order.</p></button>
 <button class=cardbutton onclick="showView('workbook')"><span class=workflow-icon>⇧</span><span class=workflow-arrow>→</span><h3>Mapping Workbook Import</h3><p class=muted>Replace the active job-family framework and mapping reference data.</p></button>
-</div><div class=home-version><span>Prototype Version: Local MVP</span></div></section>
+</div><div class=home-version><span>Connected proof of concept</span></div></section>
+
+<section id=validation class=view>
+<div class=hero><h1>Validation Queue</h1><p class=muted>One connected view of the position descriptions that still require review.</p></div>
+<section class=card><div class=toolbar><button class=primary onclick="loadValidationQueue()">Refresh queue</button></div><div id=validationQueue><p class=muted>Loading queue...</p></div></section>
+</section>
 
 <section id=library class=view>
 <div class=hero><h1>PD Library</h1><p class=muted>Use this when you know the role title, PD ID, or part of the source filename.</p></div>
@@ -751,7 +760,8 @@ async function uploadPD(){const file=document.querySelector('#uploadFile').files
 function jobFamilySummaryHtml(s){if(!s||!s.has_active_import)return '<p class=muted>No job family workbook has been imported yet.</p>';return `<p><b>Active workbook:</b> ${esc(s.source_filename)}<br><span class=small>Imported ${esc(s.imported_at||'')}</span></p><table><tbody><tr><th>Framework rows</th><td>${esc(s.framework_rows)}</td></tr><tr><th>Mapping rows</th><td>${esc(s.mapping_rows)}</td></tr><tr><th>Distinct workbook PD IDs mapped</th><td>${esc(s.distinct_workbook_pd_ids)}</td></tr><tr><th>Distinct workbook PD IDs validated</th><td>${esc(s.distinct_validated_workbook_pd_ids)}</td></tr><tr><th>Linked database PD records</th><td>${esc(s.distinct_linked_db_pds)}</td></tr><tr><th>Linked validated database PD records</th><td>${esc(s.distinct_validated_linked_db_pds)}</td></tr><tr><th>Linked mapping rows</th><td>${esc(s.mapping_rows_linked_to_pds)}</td></tr><tr><th>Unlinked mapping rows</th><td>${esc(s.unlinked_mapping_rows)}</td></tr><tr><th>Invalid mapping codes</th><td>${esc(s.invalid_mapping_codes)}</td></tr></tbody></table><p class=small>Mappings link by the five-digit PD base number, so a workbook PD ID like 11417 can match database versions like 11417-01.</p>`}
 async function loadJobFamilyStatus(){const target=document.querySelector('#jobFamilyStatus');if(!target)return;target.innerHTML='<p class=muted>Loading current import status...</p>';try{const data=await api('/api/job-family-import-status');target.innerHTML=jobFamilySummaryHtml(data)}catch(err){target.innerHTML=`<p class=muted>Could not load import status: ${esc(err.message||err)}</p>`}}
 async function uploadJobFamilyWorkbook(){const file=document.querySelector('#jobFamilyFile').files[0];const status=document.querySelector('#jobFamilyStatus');if(!file){status.textContent='Choose an .xlsx workbook first.';return}if(!file.name.toLowerCase().endsWith('.xlsx')){status.textContent='Only .xlsx Excel workbooks are supported.';return}status.textContent='Uploading and importing workbook...';try{const content_base64=arrayBufferToBase64(await file.arrayBuffer());const result=await api('/api/import-job-family-workbook',{method:'POST',body:JSON.stringify({filename:file.name,content_base64})});status.innerHTML=`<p><b>Import complete.</b></p>${jobFamilySummaryHtml(result.status)}`;await searchPDs()}catch(err){status.textContent=err.message||err}}
-async function loadValidationQueue(){const target=document.querySelector('#validationQueue');if(!target)return;target.innerHTML='<p class=muted>Loading queue...</p>';try{const data=await api('/api/validation-queue');const rows=data.rows||[];if(!rows.length){target.innerHTML='<p class=muted>No unvalidated PDs in the queue.</p>';return}const shown=rows.slice(0,100);target.innerHTML=`<p class=muted>${rows.length} unvalidated PDs. Showing the most recently updated ${shown.length}.</p><table><thead><tr><th>PD</th><th>Role</th><th>Validation</th><th>Intelligence</th><th>Issues</th><th>Action</th></tr></thead><tbody>${shown.map(r=>`<tr><td>${esc(r.position_description_no||'')}</td><td>${esc(r.role_title)}<br><span class=small>${esc(r.source_filename)}</span></td><td>${esc(r.validation_status)}<br><span class=small>${esc(r.extraction_status)}</span></td><td>${esc(r.intelligence_status||'Not prepared')}</td><td>${esc(r.issue_count)}</td><td><a class=button href="http://127.0.0.1:8765/?pd=${r.id}">Review</a></td></tr>`).join('')}</tbody></table>`}catch(err){target.innerHTML=`<p class=muted>Could not load queue: ${esc(err.message||err)}</p>`}}
+function openQueueRole(id){showView('library');loadPD(id,'detailContent')}
+async function loadValidationQueue(){const target=document.querySelector('#validationQueue');if(!target)return;target.innerHTML='<p class=muted>Loading queue...</p>';try{const data=await api('/api/validation-queue');const rows=data.rows||[];if(!rows.length){target.innerHTML='<p class=muted>No unvalidated PDs in the queue.</p>';return}const shown=rows.slice(0,100);target.innerHTML=`<p class=muted>${rows.length} unvalidated PDs. Showing the most recently updated ${shown.length}.</p><table><thead><tr><th>PD</th><th>Role</th><th>Validation</th><th>Intelligence</th><th>Issues</th><th>Action</th></tr></thead><tbody>${shown.map(r=>`<tr><td>${esc(r.position_description_no||'')}</td><td>${esc(r.role_title)}<br><span class=small>${esc(r.source_filename)}</span></td><td>${esc(r.validation_status)}<br><span class=small>${esc(r.extraction_status)}</span></td><td>${esc(r.intelligence_status||'Not prepared')}</td><td>${esc(r.issue_count)}</td><td><button onclick="openQueueRole(${r.id})">Open role</button></td></tr>`).join('')}</tbody></table>`}catch(err){target.innerHTML=`<p class=muted>Could not load queue: ${esc(err.message||err)}</p>`}}
 showView(location.hash.slice(1)||'home',false);
 loadValidationQueue();
 loadJobFamilyStatus();
@@ -765,7 +775,7 @@ ADMIN_HTML = r"""<!doctype html><html lang=en><head><meta charset=utf-8>
 <style>
 :root{--purple:#481579;--ink:#172033;--muted:#667085;--line:#d7dce6;--bg:#f4f6fa;--green:#067647}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.4 system-ui,Segoe UI,sans-serif}.system-nav{background:white;border-bottom:1px solid var(--line);padding:0 28px;display:flex;align-items:center;justify-content:space-between}.system-brand{font-size:17px;font-weight:800;color:#082646;text-decoration:none;white-space:nowrap}.system-links{display:flex;gap:20px;align-items:center}.system-links a{border:0;border-bottom:3px solid transparent;border-radius:0;padding:18px 0 14px;color:var(--muted);white-space:nowrap}.system-links a:hover,.system-links a.active{color:var(--purple);border-bottom-color:var(--purple)}main{padding:24px;max-width:1500px;margin:auto}.card{background:white;border:1px solid var(--line);border-radius:14px;padding:18px;margin-bottom:18px}h1{color:#351052;margin:0 0 6px}a,button{border:1px solid var(--purple);background:white;color:var(--purple);padding:8px 12px;border-radius:9px;text-decoration:none;cursor:pointer;font-weight:650}button.primary{background:var(--purple);color:white}.toolbar{display:flex;gap:10px;align-items:center;margin:14px 0}.muted{color:var(--muted)}table{border-collapse:collapse;width:100%;background:white}th,td{border:1px solid #dde1e9;padding:7px;text-align:left;vertical-align:top}th{background:#f2ecf7;color:#481579;position:sticky;top:0}input,textarea{width:100%;border:1px solid #c8cfda;border-radius:7px;padding:7px;font:inherit}textarea{min-height:38px}.num{width:82px}.raw{min-width:220px}.count{text-align:right}.status{font-weight:700;color:var(--green)}@media(max-width:1000px){.system-nav{align-items:flex-start;flex-direction:column;padding-top:14px}.system-links{flex-wrap:wrap;gap:8px 16px}.system-links a{padding:8px 0}}
-</style></head><body><nav class=system-nav><a class=system-brand href="/">PD Manager</a><div class=system-links><a href="/#upload">Upload</a><a href="http://127.0.0.1:8765/">Validation Queue</a><a href="/#library">Search</a><a href="/mapping-assistant">Mapping Assistant</a><a class=active href="/admin/classifications">Classification Admin</a><a href="/#workbook">Mapping Workbook Import</a></div></nav><main>
+</style></head><body><nav class=system-nav><a class=system-brand href="/">PD Manager</a><div class=system-links><a href="/career-explorer">Career Explorer</a><a href="/#upload">Upload</a><a href="/#validation">Validation Queue</a><a href="/#library">Role Library</a><a href="/#semantic">Semantic Search</a><a href="/mapping-assistant">Mapping Assistant</a><a class=active href="/admin/classifications">Classification Admin</a><a href="/#workbook">Mapping Workbook Import</a></div></nav><main>
 <section class=card>
 <h1>Classification admin</h1>
 <p class=muted>Edit the grade labels used by search and filtering. The raw label is what came from the PD; the display label, abbreviation, cohort and order are the governed reference values.</p>
