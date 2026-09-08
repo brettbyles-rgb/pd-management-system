@@ -114,3 +114,20 @@ def test_cloud_image_uses_reduced_runtime_dependencies():
     assert "requirements-cloud.txt" in dockerfile
     assert "sentence-transformers" not in cloud_requirements
     assert "pytest" not in cloud_requirements
+
+
+def test_hosted_access_migration_creates_non_owner_select_role():
+    migration = (
+        ROOT / "migrations" / "postgresql" / "0003_hosted_access_hardening.sql"
+    ).read_text(encoding="utf-8")
+
+    assert "CREATE ROLE pd_management_reader" in migration
+    assert "NOBYPASSRLS" in migration
+    assert "GRANT SELECT ON ALL TABLES" in migration
+    assert "GRANT INSERT" not in migration
+    assert "GRANT UPDATE" not in migration
+    assert "GRANT DELETE" not in migration
+    assert "PASSWORD" not in migration
+    assert "security_invoker = true" in migration
+    assert "ALTER TABLE public.%I ENABLE ROW LEVEL SECURITY" in migration
+    assert "REVOKE ALL PRIVILEGES ON ALL TABLES" in migration

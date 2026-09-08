@@ -35,9 +35,9 @@ write operation was found.
 
 - HTTP Basic authentication is a shared, single-factor gate. It is acceptable only
   for temporary, tightly controlled review—not for enterprise rollout.
-- Railway currently connects with the Supabase project database owner credential.
-  Read-only transactions are enforced by the application, but a dedicated
-  least-privilege database role would provide stronger isolation.
+- The hosted migration defines a dedicated `pd_management_reader` role with
+  SELECT-only access and explicit RLS policies. Its password is provisioned
+  separately through the secret-management workflow and is never stored in Git.
 - The Career Pathways Explorer is public by design. Automated traffic could create
   Railway or Supabase usage even though it cannot reach protected administration
   routes.
@@ -45,9 +45,9 @@ write operation was found.
 
 ## Operator checks
 
-- Rotate the Supabase database password once after setup. It was displayed in a
-  terminal screenshot during this build; update both the Railway database URL and
-  `PGPASSWORD` together after rotation. The password itself is not in Git.
+- The Supabase project-owner password exposed during initial setup was rotated on
+  8 September 2026. Railway now connects as `pd_management_reader`; the owner
+  password and the reader password are not in Git.
 - Enable MFA on GitHub, Railway, and Supabase accounts.
 - Keep Railway secrets only in its Variables store; never place credentials in the
   repository, screenshots, tickets, or logs. Rotate any credential that is exposed.
